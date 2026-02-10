@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Footer } from "@/components/footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,6 +29,41 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <Footer
+          brand={{
+            name: "MetroSewa",
+            description:
+              "Connecting you with the best home service experts in your area. Reliable, fast, and secure.",
+          }}
+          columns={[
+            {
+              title: "Services",
+              links: [
+                { name: "Plumbing" },
+                { name: "Electrical" },
+                { name: "Home Cleaning" },
+                { name: "AC Repair" },
+              ],
+            },
+            {
+              title: "Company",
+              links: [
+                { name: "About Us" },
+                { name: "Careers" },
+                { name: "Privacy Policy" },
+                { name: "Terms of Service" },
+              ],
+            },
+            {
+              title: "Contact",
+              links: [
+                { name: "support@metrosewa.com" },
+                { name: "+1 (555) 123-4567" },
+              ],
+            },
+          ]}
+          copyright={`© ${new Date().getFullYear()} MetroSewa Inc. All rights reserved.`}
+        />
       </body>
     </html>
   );
