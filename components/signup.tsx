@@ -38,7 +38,7 @@ const formSchema = z.object({
   email: z.string().email("Invalid email address"),
   phone: z.string().min(10, "Phone number must be at least 10 digits"),
   // address: z.string().optional(), // Address field was commented out in original
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
   confirmPassword: z.string(),
   role: z.enum(["user", "technician"]),
   terms: z.boolean().refine((val) => val === true, {

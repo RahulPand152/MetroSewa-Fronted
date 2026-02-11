@@ -1,14 +1,44 @@
 
-import Image from "next/image";
+import type { Metadata } from "next";
+import React from "react";
+import HomeSection from "./component/HomeSection";
 
-export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <h1 className="text-4xl font-bold  text-center ">Welcom to Metro Sewa</h1>
-      </main>
+export const metadata: Metadata = {
+  title: "Kaamhubs - Find the right job for your next step",
+  description:
+    "Kaamhubs helps you find the perfect job opportunities tailored to your skills and career goals. Explore thousands of listings and take the next step in your professional journey with Kaamhubs.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Kaamhubs - Find the right job for your next step",
+    description:
+      "Kaamhubs helps you find the perfect job opportunities tailored to your skills and career goals. Explore thousands of listings and take the next step in your professional journey with Kaamhubs.",
+    type: "website",
+    url: "/",
+    images: [
+      {
+        url: "/home.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Kaamhubs",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Kaamhubs - Find the right job for your next step",
+    description:
+      "Kaamhubs helps you find the perfect job opportunities tailored to your skills and career goals. Explore thousands of listings and take the next step in your professional journey with Kaamhubs.",
+    images: ["/twitter-og.png"],
+  },
+};
 
+const Home = () => {
+  return <>
+    <HomeSection />
 
-    </div>
-  );
-}
+  </>;
+};
+
+export default Home;
