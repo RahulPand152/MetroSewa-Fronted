@@ -21,7 +21,7 @@ const HomeSection = () => {
     };
 
     return (
-        <section className="relative flex min-h-[60vh] items-center overflow-hidden text-white sm:min-h-[70vh]">
+        <section className="relative flex min-h-[60vh] items-center overflow-hidden text-white sm:min-h-[70vh] ">
             {/* Background Image */}
             <div
                 className="absolute inset-0 z-0 bg-cover bg-center"

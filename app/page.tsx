@@ -1,42 +1,14 @@
 
-import type { Metadata } from "next";
-import React from "react";
 import HomeSection from "./component/HomeSection";
+import { NavbarPage } from "./component/Navbar";
+import { Categories } from "./component/Categories";
 
-export const metadata: Metadata = {
-  title: "Kaamhubs - Find the right job for your next step",
-  description:
-    "Kaamhubs helps you find the perfect job opportunities tailored to your skills and career goals. Explore thousands of listings and take the next step in your professional journey with Kaamhubs.",
-  alternates: {
-    canonical: "/",
-  },
-  openGraph: {
-    title: "Kaamhubs - Find the right job for your next step",
-    description:
-      "Kaamhubs helps you find the perfect job opportunities tailored to your skills and career goals. Explore thousands of listings and take the next step in your professional journey with Kaamhubs.",
-    type: "website",
-    url: "/",
-    images: [
-      {
-        url: "/home.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Kaamhubs",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Kaamhubs - Find the right job for your next step",
-    description:
-      "Kaamhubs helps you find the perfect job opportunities tailored to your skills and career goals. Explore thousands of listings and take the next step in your professional journey with Kaamhubs.",
-    images: ["/twitter-og.png"],
-  },
-};
 
 const Home = () => {
   return <>
+    <NavbarPage />
     <HomeSection />
+    <Categories />
 
   </>;
 };
