@@ -3,11 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { ForgetPassword } from "@/components/forget-password";
 import { useId, useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import {
     Form,
     FormControl,
@@ -19,12 +19,11 @@ import {
 
 const formSchema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
-    password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+    password: z.string().min(8, { message: "Password must be at least 8 characters" }),
 });
 
 export default function Signin() {
-    const id = useId();
-    const [isForgotOpen, setIsForgotOpen] = useState(false);
+    const id = useId()
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -33,6 +32,7 @@ export default function Signin() {
             password: "",
         },
     });
+    const router = useRouter()
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         console.log(values);
@@ -103,7 +103,7 @@ export default function Signin() {
                         <div className="flex justify-end">
                             <button
                                 type="button"
-                                onClick={() => setIsForgotOpen(true)}
+                                onClick={() => router.push("/forget-password")}
                                 className="text-sm underline hover:no-underline text-muted-foreground"
                             >
                                 Forgot password?
@@ -116,13 +116,6 @@ export default function Signin() {
                         </Button>
                     </form>
                 </Form>
-
-                <Dialog open={isForgotOpen} onOpenChange={setIsForgotOpen}>
-                    <DialogContent className="p-0 border-none bg-transparent shadow-none max-w-fit">
-                        <ForgetPassword onBack={() => setIsForgotOpen(false)} />
-                    </DialogContent>
-                </Dialog>
-
 
                 {/* Divider */}
                 <div className="flex items-center gap-3 before:h-px before:flex-1 before:bg-border after:h-px after:flex-1 after:bg-border">
