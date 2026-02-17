@@ -212,7 +212,7 @@ export default function SignupForm() {
                 />
 
                 {/* Role */}
-                <FormField
+                {/* <FormField
                   control={form.control}
                   name="role"
                   render={({ field }) => (
@@ -246,7 +246,7 @@ export default function SignupForm() {
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                /> */}
 
                 {/* Terms */}
                 <FormField

@@ -91,7 +91,7 @@ const Footer = () => {
                         <div className="space-y-4 text-sm text-slate-400">
                             <div className="flex items-start gap-3">
                                 <div className="bg-slate-800 p-2 rounded-lg">
-                                    <MapPin size={16} className="text-blue-500" />
+                                    <MapPin size={16} className="text-gray-200" />
                                 </div>
                                 <span>
                                     123 Service Lane, Tech City, <br /> Kathmandu, Nepal
@@ -100,14 +100,14 @@ const Footer = () => {
 
                             <div className="flex items-center gap-3">
                                 <div className="bg-slate-800 p-2 rounded-lg">
-                                    <Phone size={16} className="text-blue-500" />
+                                    <Phone size={16} className="text-gray-200" />
                                 </div>
                                 <span>+977 9800000000</span>
                             </div>
 
                             <div className="flex items-center gap-3">
                                 <div className="bg-slate-800 p-2 rounded-lg">
-                                    <Mail size={16} className="text-blue-500" />
+                                    <Mail size={16} className="text-gray-200" />
                                 </div>
                                 <span>hello@metrosewa.com</span>
                             </div>

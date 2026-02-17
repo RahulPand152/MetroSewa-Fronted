@@ -8,6 +8,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import TechnicianRegistrationModal from "./TechnicanRegister"
 
 export const NavbarPage = () => {
   return (
@@ -50,9 +51,12 @@ export const NavbarPage = () => {
           >
             Sign Up
           </Link>
-          <Button className="rounded-full px-5 shadow-sm bg-gray-700 font-semibold hover:bg-gray-600">
-            Become an Technician
-          </Button>
+
+          <TechnicianRegistrationModal>
+            <Button className="rounded-full px-5 shadow-sm bg-gray-600 font-semibold hover:bg-gray-700">
+              Become an Technician
+            </Button>
+          </TechnicianRegistrationModal>
         </div>
 
         {/* Mobile Menu */}
@@ -79,9 +83,11 @@ export const NavbarPage = () => {
                   Sign Up
                 </Link>
 
-                <Button className="mt-4 w-full rounded-full">
-                  Become a Technician
-                </Button>
+                <TechnicianRegistrationModal>
+                  <Button className="mt-4 w-full rounded-full">
+                    Become a Technician
+                  </Button>
+                </TechnicianRegistrationModal>
               </div>
             </SheetContent>
           </Sheet>
