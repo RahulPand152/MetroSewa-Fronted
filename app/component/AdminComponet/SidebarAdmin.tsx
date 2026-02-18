@@ -16,7 +16,6 @@ import {
     LayoutDashboard,
     Users,
     Calendar,
-    PenTool,
     UserCog,
     BarChart3,
     Settings,
@@ -24,10 +23,21 @@ import {
     Hammer,
     Wrench
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+const navItems = [
+    { label: "Dashboard", href: "/admin", icon: LayoutDashboard, tooltip: "Dashboard" },
+    { label: "Users", href: "/admin/users", icon: Users, tooltip: "Users" },
+    { label: "Bookings", href: "/admin/bookings", icon: Calendar, tooltip: "Bookings" },
+    { label: "Services", href: "/admin/services", icon: Wrench, tooltip: "Services" },
+    { label: "Technicians", href: "/admin/technicians", icon: UserCog, tooltip: "Technicians" },
+    { label: "Analytics", href: "/admin/analytics", icon: BarChart3, tooltip: "Analytics" },
+];
 
 export default function AdminSidebar() {
+    const pathname = usePathname();
+
     return (
         <Sidebar collapsible="icon">
             <SidebarHeader className="p-4">
@@ -46,47 +56,22 @@ export default function AdminSidebar() {
                     <SidebarGroupLabel>Main Menu</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            <SidebarMenuItem>
-                                <SidebarMenuButton isActive tooltip="Dashboard">
-                                    <LayoutDashboard />
-                                    <span>Dashboard</span>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-
-                            <SidebarMenuItem>
-                                <SidebarMenuButton tooltip="Users">
-                                    <Users />
-                                    <span>User</span>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-
-                            <SidebarMenuItem>
-                                <SidebarMenuButton tooltip="Bookings">
-                                    <Calendar />
-                                    <span>Bookings</span>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-
-                            <SidebarMenuItem>
-                                <SidebarMenuButton tooltip="Services">
-                                    <Wrench />
-                                    <span>Services</span>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-
-                            <SidebarMenuItem>
-                                <SidebarMenuButton tooltip="Technicians">
-                                    <UserCog />
-                                    <span>Technicians</span>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-
-                            <SidebarMenuItem>
-                                <SidebarMenuButton tooltip="Analytics">
-                                    <BarChart3 />
-                                    <span>Analytics</span>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
+                            {navItems.map((item) => {
+                                const isActive =
+                                    item.href === "/admin"
+                                        ? pathname === "/admin"
+                                        : pathname.startsWith(item.href);
+                                return (
+                                    <SidebarMenuItem key={item.href}>
+                                        <SidebarMenuButton isActive={isActive} tooltip={item.tooltip} asChild>
+                                            <Link href={item.href} className="flex items-center gap-2">
+                                                <item.icon />
+                                                <span>{item.label}</span>
+                                            </Link>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                );
+                            })}
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
@@ -96,9 +81,11 @@ export default function AdminSidebar() {
                     <SidebarGroupContent>
                         <SidebarMenu>
                             <SidebarMenuItem>
-                                <SidebarMenuButton tooltip="Settings">
-                                    <Settings />
-                                    <span>Settings</span>
+                                <SidebarMenuButton tooltip="Settings" asChild>
+                                    <Link href="/admin/settings">
+                                        <Settings />
+                                        <span>Settings</span>
+                                    </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
 
