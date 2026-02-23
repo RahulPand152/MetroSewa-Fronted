@@ -51,6 +51,8 @@ type BookingStatus = "Pending" | "Confirmed" | "In Progress" | "Completed" | "Ca
 type SortField = "customerName" | "serviceName" | "date" | "amount" | null;
 type SortDir = "asc" | "desc";
 
+const PAGE_SIZE = 10;
+
 interface Booking {
     id: string;
     customerName: string;
@@ -176,6 +178,7 @@ export default function BookingManagement() {
     const [statusFilter, setStatusFilter] = useState("All");
     const [sortField, setSortField] = useState<SortField>(null);
     const [sortDir, setSortDir] = useState<SortDir>("asc");
+    const [page, setPage] = useState(1);
 
     // Detail dialog
     const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
@@ -203,6 +206,9 @@ export default function BookingManagement() {
         }
         return list;
     }, [bookings, search, statusFilter, sortField, sortDir]);
+
+    const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
     const handleSort = (field: SortField) => {
         if (sortField === field) {
@@ -258,9 +264,9 @@ export default function BookingManagement() {
             <div className="flex items-center gap-3">
                 <div className="relative flex-1 max-w-sm">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                    <Input placeholder="Search bookings..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+                    <Input placeholder="Search bookings..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} className="pl-9" />
                 </div>
-                <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }} className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
                     <option value="All">All Status</option>
                     <option value="Pending">Pending</option>
                     <option value="Confirmed">Confirmed</option>
@@ -294,7 +300,7 @@ export default function BookingManagement() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {filtered.map((booking) => (
+                                {paginated.map((booking) => (
                                     <tr key={booking.id} className="border-b hover:bg-muted/50 transition-colors">
                                         <td className="px-6 py-4 font-medium">{booking.id}</td>
                                         <td className="px-6 py-4">
@@ -329,7 +335,7 @@ export default function BookingManagement() {
                                                         <MoreHorizontal className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
+                                                <DropdownMenuContent side="top" align="center">
                                                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                                     <DropdownMenuItem onClick={() => { setSelectedBooking(booking); setDetailOpen(true); }}>
                                                         <Eye className="mr-2 h-4 w-4" /> View Details
@@ -348,6 +354,33 @@ export default function BookingManagement() {
                                 ))}
                             </tbody>
                         </table>
+                    </div>
+                    {/* Pagination */}
+                    <div className="flex items-center justify-between px-6 py-3 border-t">
+                        <span className="text-sm text-slate-500">
+                            Showing {filtered.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length} bookings
+                        </span>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                disabled={page === 1}
+                            >
+                                Previous
+                            </Button>
+                            <span className="text-sm font-medium text-slate-600">
+                                Page {page} of {totalPages}
+                            </span>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                                disabled={page === totalPages}
+                            >
+                                Next
+                            </Button>
+                        </div>
                     </div>
                 </CardContent>
             </Card>

@@ -191,19 +191,6 @@ function UserProfilePopup({
                         value={String(user.bookings)}
                     />
                 </div>
-
-                <Separator className="mt-4" />
-
-                {/* Map placeholder */}
-                <div className="mt-4">
-                    <p className="mb-2 text-xs font-medium text-slate-500 uppercase tracking-wide">Location</p>
-                    <div className="flex h-28 items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-900/40">
-                        <div className="flex flex-col items-center gap-1 text-slate-400">
-                            <MapPin className="h-5 w-5" />
-                            <span className="text-xs">{user.address}</span>
-                        </div>
-                    </div>
-                </div>
             </DialogContent>
         </Dialog>
     );

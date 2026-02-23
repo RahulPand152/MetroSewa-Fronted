@@ -55,6 +55,8 @@ type TechnicianStatus = "Active" | "Inactive" | "Suspended";
 type SortField = "name" | "joinedDate" | "rating" | "jobsCompleted" | null;
 type SortDir = "asc" | "desc";
 
+const PAGE_SIZE = 10;
+
 interface Technician {
     id: number;
     name: string;
@@ -166,6 +168,7 @@ export default function TechnicianManagement() {
     const [sortField, setSortField] = useState<SortField>(null);
     const [sortDir, setSortDir] = useState<SortDir>("asc");
     const [isAddOpen, setIsAddOpen] = useState(false);
+    const [page, setPage] = useState(1);
 
     const filtered = useMemo(() => {
         let list = technicians.filter((t) => {
@@ -186,6 +189,9 @@ export default function TechnicianManagement() {
         }
         return list;
     }, [technicians, search, statusFilter, sortField, sortDir]);
+
+    const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
     const handleSort = (field: SortField) => {
         if (sortField === field) {
@@ -208,9 +214,6 @@ export default function TechnicianManagement() {
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Technician Management</h1>
                     <p className="text-sm text-slate-500 mt-1">Manage service providers, their status, and performance.</p>
                 </div>
-                <Button onClick={() => setIsAddOpen(true)} className="flex items-center gap-2">
-                    <Plus className="h-4 w-4" /> Add Technician
-                </Button>
             </div>
 
             {/* Stats */}
@@ -245,9 +248,9 @@ export default function TechnicianManagement() {
             <div className="flex items-center gap-3">
                 <div className="relative flex-1 max-w-sm">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                    <Input placeholder="Search technicians..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+                    <Input placeholder="Search technicians..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} className="pl-9" />
                 </div>
-                <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }} className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
                     <option value="All">All Status</option>
                     <option value="Active">Active</option>
                     <option value="Inactive">Inactive</option>
@@ -273,7 +276,7 @@ export default function TechnicianManagement() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {filtered.map((tech) => (
+                                {paginated.map((tech) => (
                                     <tr key={tech.id} className="border-b hover:bg-muted/50 transition-colors">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
@@ -307,6 +310,33 @@ export default function TechnicianManagement() {
                                 ))}
                             </tbody>
                         </table>
+                    </div>
+                    {/* Pagination */}
+                    <div className="flex items-center justify-between px-6 py-3 border-t">
+                        <span className="text-sm text-slate-500">
+                            Showing {filtered.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length} technicians
+                        </span>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                disabled={page === 1}
+                            >
+                                Previous
+                            </Button>
+                            <span className="text-sm font-medium text-slate-600">
+                                Page {page} of {totalPages}
+                            </span>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                                disabled={page === totalPages}
+                            >
+                                Next
+                            </Button>
+                        </div>
                     </div>
                 </CardContent>
             </Card>
