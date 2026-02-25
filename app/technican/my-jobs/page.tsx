@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const stats = [
     { icon: Briefcase, label: "Total Jobs", value: 4, iconClass: "bg-sky-50 dark:bg-sky-900/20 text-sky-500" },
@@ -75,9 +76,61 @@ export default function MyJobsPage() {
                             </div>
                             <div className="flex items-center gap-3 flex-shrink-0">
                                 <span className="text-sm font-bold text-slate-700 dark:text-slate-300">{job.pay}</span>
-                                <Button size="sm" variant="outline" className="rounded-xl text-xs border-sky-200 text-sky-600 hover:bg-sky-50 dark:border-sky-800 dark:text-sky-400 dark:hover:bg-sky-900/20">
-                                    Details
-                                </Button>
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button size="sm" variant="outline" className="rounded-xl text-xs border-sky-200 text-sky-600 hover:bg-sky-50 dark:border-sky-800 dark:text-sky-400 dark:hover:bg-sky-900/20">
+                                            Details
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="sm:max-w-[425px]">
+                                        <DialogHeader>
+                                            <DialogTitle>Job Details</DialogTitle>
+                                            <DialogDescription>
+                                                Full details for {job.title}
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <div className="grid gap-4 py-4">
+                                            <div className="flex flex-col gap-2">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-sm font-medium text-slate-500">Status</span>
+                                                    <Badge variant="secondary" className={`${job.statusClass} border-0`}>{job.status}</Badge>
+                                                </div>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-sm font-medium text-slate-500">Category</span>
+                                                    <span className="text-sm font-semibold">{job.category}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-sm font-medium text-slate-500">Pay</span>
+                                                    <span className="text-sm font-semibold text-sky-600 dark:text-sky-400">{job.pay}</span>
+                                                </div>
+                                            </div>
+                                            <Separator />
+                                            <div className="flex flex-col gap-4">
+                                                <div className="flex items-start gap-3">
+                                                    <MapPin className="h-4 w-4 mt-0.5 text-sky-500 flex-shrink-0" />
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm font-medium text-slate-900 dark:text-slate-100">Customer Address</span>
+                                                        <span className="text-xs text-slate-500 dark:text-slate-400">123 Main St, Lalitpur, Nepal</span>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-start gap-3">
+                                                    <Calendar className="h-4 w-4 mt-0.5 text-sky-500 flex-shrink-0" />
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm font-medium text-slate-900 dark:text-slate-100">Date & Time</span>
+                                                        <span className="text-xs text-slate-500 dark:text-slate-400">{job.date}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-start gap-3">
+                                                    <Briefcase className="h-4 w-4 mt-0.5 text-sky-500 flex-shrink-0" />
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm font-medium text-slate-900 dark:text-slate-100">Task Description</span>
+                                                        <span className="text-xs text-slate-500 dark:text-slate-400 mt-1">Please arrive on time. Fix the issue quickly and test. Report if additional material is required.</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </DialogContent>
+                                </Dialog>
                             </div>
                         </div>
                     ))}

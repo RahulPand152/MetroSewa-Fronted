@@ -6,6 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const specializations = ["Plumbing", "Electrical", "IT/CCTV", "Pipe Installation", "Leak Repair", "Wiring"];
 
@@ -29,13 +32,62 @@ export default function ProfilePage() {
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">My Profile</h1>
                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage your technician profile</p>
                 </div>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-2 rounded-xl border-sky-200 dark:border-sky-800 text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/20"
-                >
-                    <Edit className="h-4 w-4" /> Edit Profile
-                </Button>
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-2 rounded-xl border-sky-200 dark:border-sky-800 text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/20"
+                        >
+                            <Edit className="h-4 w-4" /> Edit Profile
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                            <DialogTitle>Edit Profile</DialogTitle>
+                            <DialogDescription>
+                                Make changes to your technician profile here. Click save when you're done.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-4 items-start sm:items-center gap-2 sm:gap-4">
+                                <Label htmlFor="name" className="sm:text-right font-medium">
+                                    Name
+                                </Label>
+                                <Input id="name" defaultValue="Rajesh Kumar" className="col-span-1 sm:col-span-3 rounded-xl" />
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-4 items-start sm:items-center gap-2 sm:gap-4">
+                                <Label htmlFor="phone" className="sm:text-right font-medium">
+                                    Phone
+                                </Label>
+                                <Input id="phone" defaultValue="+977-98XXXXXXXX" className="col-span-1 sm:col-span-3 rounded-xl" />
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-4 items-start sm:items-center gap-2 sm:gap-4">
+                                <Label htmlFor="email" className="sm:text-right font-medium">
+                                    Email
+                                </Label>
+                                <Input id="email" type="email" defaultValue="rajesh@metrosewa.com" className="col-span-1 sm:col-span-3 rounded-xl" />
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-4 items-start sm:items-center gap-2 sm:gap-4">
+                                <Label htmlFor="location" className="sm:text-right font-medium">
+                                    Location
+                                </Label>
+                                <Input id="location" defaultValue="Lalitpur, Nepal" className="col-span-1 sm:col-span-3 rounded-xl" />
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-4 items-start sm:items-center gap-2 sm:gap-4">
+                                <Label htmlFor="specializations" className="sm:text-right font-medium">
+                                    Specializations
+                                </Label>
+                                <Input id="specializations" defaultValue={specializations.join(", ")} className="col-span-1 sm:col-span-3 rounded-xl" />
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button type="button" className="bg-sky-500 hover:bg-sky-600 text-white rounded-xl w-full sm:w-auto">
+                                Save changes
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
 
             {/* Profile Card */}
