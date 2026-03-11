@@ -12,12 +12,17 @@ export const Categories = () => {
     return (
         <div className="w-full bg-background py-12">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <h1 className="text-2xl sm:text-5xl font-bold tracking-tight mb-4">
-                    <span className="text-gray-900">Service</span>{" "}
-                    <span className="bg-gradient-to-r from-gray-600 to-gray-600 bg-clip-text text-transparent">
-                        Categories
-                    </span>
-                </h1>
+                <div className="flex items-center justify-between mb-4">
+                    <h1 className="text-xl sm:text-3xl lg:text-5xl font-bold tracking-tight">
+                        <span className="text-gray-900">Service</span>{" "}
+                        <span className="bg-gradient-to-r from-gray-600 to-gray-600 bg-clip-text text-transparent">
+                            Categories
+                        </span>
+                    </h1>
+                    <Link href="/services" className="text-sm font-medium text-sky-500 hover:text-sky-600 whitespace-nowrap ml-4">
+                        View All →
+                    </Link>
+                </div>
 
 
                 <div className="w-full py-12">
