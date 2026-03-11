@@ -12,9 +12,14 @@ export const ServicePage = () => {
     return (
         <div className="w-full">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <h1 className="text-2xl sm:text-5xl font-bold tracking-tight mb-4 text-gray-900">
-                    Service
-                </h1>
+                <div className="flex items-center justify-between mb-4">
+                    <h1 className="text-xl sm:text-3xl lg:text-5xl font-bold tracking-tight text-gray-900">
+                        Services
+                    </h1>
+                    <Link href="/services" className="text-sm font-medium text-sky-500 hover:text-sky-600 whitespace-nowrap ml-4">
+                        View All →
+                    </Link>
+                </div>
 
 
                 <Carousel
