@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Footer from "./component/Footer";
+import Providers from "./providers";
+import ConditionalFooter from "./component/ConditionalFooter";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -84,7 +85,6 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-        <link rel="/favicon.ico" href="/favicon.ico" />
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
           rel="stylesheet"
@@ -98,8 +98,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
-        {children}
-        <Footer />
+        <Providers>
+          {children}
+          <ConditionalFooter />
+        </Providers>
       </body>
 
     </html>

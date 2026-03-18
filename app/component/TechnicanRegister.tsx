@@ -1,10 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { Loader2 } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 import {
     Card,
@@ -25,7 +27,10 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { toast } from "sonner"
+import { Spinner } from "@/components/ui/spinner"
+import { useTechnicianRegister, useVerifyRegistrationOtp } from "@/src/hooks/useAuth"
+
+const OTP_LENGTH = 6
 
 // --- Zod Schema ---
 const technicianSchema = z.object({
@@ -60,7 +65,16 @@ const EXPERTISE_OPTIONS = [
 ]
 
 export default function TechnicianRegistrationForm() {
-    const [isLoading, setIsLoading] = useState(false)
+    const router = useRouter()
+    const [step, setStep] = useState<"form" | "otp">("form")
+    const [registeredEmail, setRegisteredEmail] = useState("")
+    const [errorMsg, setErrorMsg] = useState("")
+    const [otpError, setOtpError] = useState("")
+    const [otp, setOtp] = useState(Array(OTP_LENGTH).fill(""))
+    const inputsRef = useRef<(HTMLInputElement | null)[]>([])
+
+    const { mutate: registerTechnician, isPending: isRegistering } = useTechnicianRegister()
+    const { mutate: verifyOtp, isPending: isVerifying } = useVerifyRegistrationOtp()
 
     const form = useForm<TechnicianFormValues>({
         resolver: zodResolver(technicianSchema),
@@ -78,15 +92,156 @@ export default function TechnicianRegistrationForm() {
     })
 
     async function onSubmit(data: TechnicianFormValues) {
-        setIsLoading(true)
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 2000))
-        console.log("Technician Registration Data:", data)
-        toast.success("Registration submitted! We will contact you soon.")
-        setIsLoading(false)
-        form.reset()
+        setErrorMsg("")
+        registerTechnician(
+            {
+                firstName: data.firstName,
+                lastName: data.lastName,
+                email: data.email,
+                phoneNumber: data.phone,
+                address: data.address,
+                password: data.password,
+                bio: "",
+                experience: 0,
+                skills: data.expertise.join(", "), // Convert array to comma-separated string for backend
+                certification: "",
+            },
+            {
+                onSuccess: () => {
+                    setRegisteredEmail(data.email)
+                    setStep("otp")
+                },
+                onError: (err: any) => {
+                    const msg =
+                        err?.response?.data?.error?.message ||
+                        err?.response?.data?.message ||
+                        err.message ||
+                        "Registration failed. Please try again."
+                    setErrorMsg(msg)
+                    toast.error(msg)
+                },
+            }
+        )
     }
 
+    // ── OTP helpers ─────────────────────────────────────────────────────
+    const handleOtpChange = (value: string, index: number) => {
+        if (!/^[0-9]?$/.test(value)) return
+        const next = [...otp]
+        next[index] = value
+        setOtp(next)
+        if (value && index < OTP_LENGTH - 1) {
+            inputsRef.current[index + 1]?.focus()
+        }
+    }
+
+    const handleOtpKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+        if (e.key === "Backspace" && !otp[index] && index > 0) {
+            inputsRef.current[index - 1]?.focus()
+        }
+    }
+
+    const handleOtpPaste = (e: React.ClipboardEvent) => {
+        e.preventDefault()
+        const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, OTP_LENGTH)
+        const next = [...otp]
+        pasted.split("").forEach((char, i) => { next[i] = char })
+        setOtp(next)
+        inputsRef.current[Math.min(pasted.length, OTP_LENGTH - 1)]?.focus()
+    }
+
+    const handleVerifyOtp = () => {
+        const code = otp.join("")
+        if (code.length < OTP_LENGTH) {
+            setOtpError("Please enter all 6 digits.")
+            return
+        }
+        setOtpError("")
+        verifyOtp(
+            { email: registeredEmail, otp: code },
+            {
+                onSuccess: () => {
+                    toast.success("Email verified! Please sign in.")
+                    router.push("/signin")
+                },
+                onError: (err: any) => {
+                    const msg =
+                        err?.response?.data?.error?.message ||
+                        err?.response?.data?.message ||
+                        err.message ||
+                        "Invalid OTP. Please try again."
+                    setOtpError(msg)
+                },
+            }
+        )
+    }
+
+    // ── OTP Screen ───────────────────────────────────────────────────────
+    if (step === "otp") {
+        return (
+            <div className="w-full max-w-md mx-auto bg-white dark:bg-slate-950 rounded-2xl shadow-xl p-8 border">
+                <h1 className="text-center text-2xl font-bold tracking-wide mb-2">
+                    Metro <span className="text-blue-600">Sewa</span>
+                </h1>
+                <h2 className="text-xl font-semibold text-center mb-2">OTP Verification</h2>
+                <p className="text-center text-gray-500 dark:text-gray-400 text-sm mb-6">
+                    Enter the 6-digit code sent to <strong>{registeredEmail}</strong>
+                </p>
+
+                <div className="flex justify-center items-center gap-2 mb-4">
+                    {Array.from({ length: OTP_LENGTH }).map((_, i) => (
+                        <div key={i} className="flex items-center">
+                            <input
+                                ref={(el) => { inputsRef.current[i] = el }}
+                                type="text"
+                                inputMode="numeric"
+                                maxLength={1}
+                                value={otp[i]}
+                                onChange={(e) => handleOtpChange(e.target.value, i)}
+                                onKeyDown={(e) => handleOtpKeyDown(e, i)}
+                                onPaste={handleOtpPaste}
+                                className={`w-11 h-13 text-center text-xl font-semibold rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 ${otpError ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+                                    } dark:bg-slate-900 dark:text-white`}
+                            />
+                            {i === 2 && <span className="mx-2 text-xl text-gray-400">-</span>}
+                        </div>
+                    ))}
+                </div>
+
+                {otpError && (
+                    <p className="text-center text-red-500 text-sm mb-3">{otpError}</p>
+                )}
+
+                <Button
+                    onClick={handleVerifyOtp}
+                    disabled={isVerifying}
+                    className="w-full h-12 rounded-xl text-base font-semibold"
+                >
+                    {isVerifying ? (
+                        <><Spinner className="mr-2 h-4 w-4 animate-spin" /> Verifying...</>
+                    ) : (
+                        "Verify & Continue"
+                    )}
+                </Button>
+
+                <p className="text-center text-sm text-muted-foreground mt-4">
+                    Wrong email?{" "}
+                    <button
+                        onClick={() => {
+                            setStep("form")
+                            setOtp(Array(OTP_LENGTH).fill(""))
+                            setOtpError("")
+                        }}
+                        className="text-primary hover:underline"
+                    >
+                        Go back
+                    </button>
+                </p>
+            </div>
+        )
+    }
+
+    // ── Registration Form ────────────────────────────────────────────────
     return (
         <Card className="w-full max-w-3xl mx-auto shadow-xl border-0 overflow-y-scroll rounded-2xl">
             <div className="flex flex-col h-full bg-white dark:bg-slate-950">
@@ -94,7 +249,7 @@ export default function TechnicianRegistrationForm() {
                 <div className="px-8 py-6 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-slate-900/50">
                     <CardHeader className="p-0 flex items-center justify-center">
                         <CardTitle className="md:text-xl text-lg font-bold tracking-tight text-gray-900 dark:text-white">
-                            Join MetroSewa <span className="text-primary"> as a Technican</span>
+                            Join MetroSewa <span className="text-primary">as a Technician</span>
                         </CardTitle>
                         <CardDescription className="text-gray-500 text-base mt-2">
                             Create your account to get started
@@ -102,8 +257,15 @@ export default function TechnicianRegistrationForm() {
                     </CardHeader>
                 </div>
 
+                {/* Error Banner */}
+                {errorMsg && (
+                    <div className="mx-8 mt-4 bg-rose-50 text-rose-500 p-3 rounded-md text-sm font-medium text-center">
+                        {errorMsg}
+                    </div>
+                )}
+
                 {/* Scrollable Form Content */}
-                <ScrollArea className="flex-1 px-8 py-6 max-h-[calc(90vh-100px)] ">
+                <ScrollArea className="flex-1 px-8 py-6 max-h-[calc(90vh-100px)]">
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 
@@ -182,7 +344,8 @@ export default function TechnicianRegistrationForm() {
                                     </div>
                                 </div>
                             </div>
-                            {/*  Expertise */}
+
+                            {/* 2. Expertise */}
                             <div className="space-y-4">
                                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
                                     Your Expertise
@@ -232,9 +395,10 @@ export default function TechnicianRegistrationForm() {
                                     )}
                                 />
                             </div>
-                            {/*  Security */}
+
+                            {/* 3. Security */}
                             <div className="space-y-4">
-                                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                                     Security
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -266,6 +430,7 @@ export default function TechnicianRegistrationForm() {
                                     />
                                 </div>
                             </div>
+
                             {/* 4. Terms */}
                             <div className="pt-4 border-t border-gray-100 dark:border-gray-800">
                                 <FormField
@@ -290,20 +455,20 @@ export default function TechnicianRegistrationForm() {
                                 />
                             </div>
 
-                            {/* Footer Action */}
+                            {/* Submit */}
                             <div className="sticky bottom-0 bg-white dark:bg-slate-950 pt-4 pb-2 z-10 border-t border-gray-100 dark:border-gray-800">
                                 <Button
                                     type="submit"
                                     className="w-full h-12 rounded-xl text-base font-semibold bg-slate-900 hover:bg-slate-800 text-white shadow-lg shadow-slate-900/20 transition-all hover:scale-[1.01]"
-                                    disabled={isLoading}
+                                    disabled={isRegistering}
                                 >
-                                    {isLoading ? (
+                                    {isRegistering ? (
                                         <>
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Submitting...
+                                            Registering...
                                         </>
                                     ) : (
-                                        "Register as MetroSewa Technican"
+                                        "Register as MetroSewa Technician"
                                     )}
                                 </Button>
                             </div>
