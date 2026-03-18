@@ -12,6 +12,16 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 import {
     LayoutDashboard,
     Users,
@@ -24,7 +34,8 @@ import {
     Wrench
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useLogout, useProfile } from "@/src/hooks/useAuth";
 
 const navItems = [
     { label: "Dashboard", href: "/admin", icon: LayoutDashboard, tooltip: "Dashboard" },
@@ -37,6 +48,27 @@ const navItems = [
 
 export default function AdminSidebar() {
     const pathname = usePathname();
+    const router = useRouter();
+    const { mutate: logout, isPending: isLoggingOut } = useLogout();
+    const { data: profile } = useProfile();
+
+    const handleLogout = () => {
+        logout(undefined, {
+            onSuccess: () => {
+                router.push("/signin");
+            },
+        });
+    };
+
+    const fullName = profile?.data
+        ? `${profile.data.firstName ?? ""} ${profile.data.lastName ?? ""}`.trim()
+        : "Admin";
+    const initials = fullName
+        .split(" ")
+        .map((n: string) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
 
     return (
         <Sidebar collapsible="icon">
@@ -89,12 +121,35 @@ export default function AdminSidebar() {
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
 
-                            <SidebarMenuItem>
-                                <SidebarMenuButton className="text-rose-500 hover:text-rose-600 hover:bg-rose-50" tooltip="Logout">
-                                    <LogOut />
-                                    <span>Logout</span>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
+                            <Dialog>
+                                <SidebarMenuItem>
+                                    <DialogTrigger asChild>
+                                        <SidebarMenuButton
+                                            className="text-rose-500 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
+                                            tooltip="Logout"
+                                        >
+                                            <LogOut />
+                                            <span>Logout</span>
+                                        </SidebarMenuButton>
+                                    </DialogTrigger>
+                                </SidebarMenuItem>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>Confirm Logout</DialogTitle>
+                                        <DialogDescription>
+                                            Are you sure you want to log out of your account?
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <DialogFooter>
+                                        <DialogTrigger asChild>
+                                            <Button variant="outline">Cancel</Button>
+                                        </DialogTrigger>
+                                        <Button variant="destructive" onClick={handleLogout} disabled={isLoggingOut}>
+                                            {isLoggingOut ? "Logging out..." : "Logout"}
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
@@ -103,14 +158,14 @@ export default function AdminSidebar() {
             <SidebarFooter className="p-4">
                 <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900/50 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:border-0 group-data-[collapsible=icon]:bg-transparent">
                     <img
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPVjfM8YBd0J8lta0_KGP-ZindhsJG3lnomjhw9gPjf0pSHYFYLj6_o8hrfyl4sIDrZzcH9NP2Mr603XAEJF95Iw_xg4uvhwU_ahgKsc-aMdJhwmof5zeA26yuRlf4IXogyrefKFwGXdPUuxVsHjbPO8dYlFpdqUBUjLbPbk5F_tUiVrWAkAaH2D2RH0ILsmQp0Sqj-G5XzIFMmK5zWYftY1pjf25mKkaa1O7cOFoeuTVl_9fbTucM3ZQ4GlB5VL_syqiRFatC4cM3"
-                        alt="Admin Profile"
+                        src={profile?.data?.avatar ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=6366f1&color=fff&size=80`}
+                        alt={fullName}
                         className="h-10 w-10 rounded-full border-2 border-white object-cover shadow-sm dark:border-slate-700"
                         width={40}
                         height={40}
                     />
                     <div className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
-                        <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">Rahul Sharma</p>
+                        <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">{fullName}</p>
                         <p className="truncate text-xs text-slate-500">System Admin</p>
                     </div>
                 </div>

@@ -14,13 +14,6 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Form,
   FormControl,
   FormField,
@@ -28,19 +21,21 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Eye, EyeOff, User, Wrench } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useRegister, useVerifyRegistrationOtp } from "@/src/hooks/useAuth";
+import { useRouter } from "next/navigation";
+
+const OTP_LENGTH = 6;
 
 const formSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
   lastName: z.string().min(2, "Last name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
   phone: z.string().min(10, "Phone number must be at least 10 digits"),
-  // address: z.string().optional(), // Address field was commented out in original
   password: z.string().min(8, "Password must be at least 8 characters"),
   confirmPassword: z.string(),
-  role: z.enum(["user", "technician"]),
   terms: z.boolean().refine((val) => val === true, {
     message: "You must agree to the terms and conditions",
   }),
@@ -50,8 +45,18 @@ const formSchema = z.object({
 });
 
 export default function SignupForm() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [step, setStep] = useState<"form" | "otp">("form");
+  const [registeredEmail, setRegisteredEmail] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [otpError, setOtpError] = useState("");
+  const [otp, setOtp] = useState(Array(OTP_LENGTH).fill(""));
+  const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
+
+  const { mutate: register, isPending: isRegistering } = useRegister();
+  const { mutate: verifyOtp, isPending: isVerifying } = useVerifyRegistrationOtp();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -62,15 +67,152 @@ export default function SignupForm() {
       phone: "",
       password: "",
       confirmPassword: "",
-      role: "user",
       terms: false,
     },
   });
 
   const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = (values) => {
-    console.log(values);
+    setErrorMsg("");
+    register(
+      {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        phoneNumber: values.phone,
+        password: values.password,
+      },
+      {
+        onSuccess: () => {
+          setRegisteredEmail(values.email);
+          setStep("otp");
+        },
+        onError: (err: any) => {
+          setErrorMsg(
+            err?.response?.data?.error?.message ||
+            err?.response?.data?.message ||
+            err.message ||
+            "Registration failed"
+          );
+        },
+      }
+    );
   };
 
+  // ── OTP helpers ──────────────────────────────────────────────────────
+  const handleOtpChange = (value: string, index: number) => {
+    if (!/^[0-9]?$/.test(value)) return;
+    const next = [...otp];
+    next[index] = value;
+    setOtp(next);
+    if (value && index < OTP_LENGTH - 1) {
+      inputsRef.current[index + 1]?.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      inputsRef.current[index - 1]?.focus();
+    }
+  };
+
+  const handleOtpPaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, OTP_LENGTH);
+    const next = [...otp];
+    pasted.split("").forEach((char, i) => { next[i] = char; });
+    setOtp(next);
+    inputsRef.current[Math.min(pasted.length, OTP_LENGTH - 1)]?.focus();
+  };
+
+  const handleVerifyOtp = () => {
+    const code = otp.join("");
+    if (code.length < OTP_LENGTH) {
+      setOtpError("Please enter all 6 digits.");
+      return;
+    }
+    setOtpError("");
+    verifyOtp(
+      { email: registeredEmail, otp: code },
+      {
+        onSuccess: () => {
+          router.push("/signin");
+        },
+        onError: (err: any) => {
+          setOtpError(
+            err?.response?.data?.error?.message ||
+            err?.response?.data?.message ||
+            err.message ||
+            "Invalid OTP. Please try again."
+          );
+        },
+      }
+    );
+  };
+
+  // ── OTP Screen ────────────────────────────────────────────────────────
+  if (step === "otp") {
+    return (
+      <div className="flex items-center justify-center min-h-screen px-4">
+        <div className="w-full max-w-md bg-white dark:bg-slate-950 rounded-2xl shadow-xl p-8 border">
+          <h1 className="text-center text-2xl font-bold tracking-wide mb-2">
+            Metro <span className="text-blue-600">Sewa</span>
+          </h1>
+          <h2 className="text-xl font-semibold text-center mb-2">OTP Verification</h2>
+          <p className="text-center text-gray-500 dark:text-gray-400 text-sm mb-6">
+            Enter the 6-digit code sent to <strong>{registeredEmail}</strong>
+          </p>
+
+          <div className="flex justify-center items-center gap-2 mb-4">
+            {Array.from({ length: OTP_LENGTH }).map((_, i) => (
+              <div key={i} className="flex items-center">
+                <input
+                  ref={(el) => { inputsRef.current[i] = el; }}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={1}
+                  value={otp[i]}
+                  onChange={(e) => handleOtpChange(e.target.value, i)}
+                  onKeyDown={(e) => handleOtpKeyDown(e, i)}
+                  onPaste={handleOtpPaste}
+                  className={`w-11 h-13 text-center text-xl font-semibold rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 ${otpError ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+                    } dark:bg-slate-900 dark:text-white`}
+                />
+                {i === 2 && <span className="mx-2 text-xl text-gray-400">-</span>}
+              </div>
+            ))}
+          </div>
+
+          {otpError && (
+            <p className="text-center text-red-500 text-sm mb-3">{otpError}</p>
+          )}
+
+          <Button
+            onClick={handleVerifyOtp}
+            disabled={isVerifying}
+            className="w-full"
+          >
+            {isVerifying ? (
+              <><Spinner className="mr-2 h-4 w-4 animate-spin" /> Verifying...</>
+            ) : (
+              "Verify & Continue"
+            )}
+          </Button>
+
+          <p className="text-center text-sm text-muted-foreground mt-4">
+            Wrong email?{" "}
+            <button
+              onClick={() => { setStep("form"); setOtp(Array(OTP_LENGTH).fill("")); setOtpError(""); }}
+              className="text-primary hover:underline"
+            >
+              Go back
+            </button>
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Registration Form ─────────────────────────────────────────────────
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-full max-w-md">
@@ -83,6 +225,11 @@ export default function SignupForm() {
           </CardHeader>
 
           <CardContent className="space-y-5 px-8">
+            {errorMsg && (
+              <div className="bg-rose-50 text-rose-500 p-3 rounded-md text-sm font-medium text-center">
+                {errorMsg}
+              </div>
+            )}
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 {/* Name */}
@@ -129,7 +276,6 @@ export default function SignupForm() {
                   )}
                 />
 
-                {/* Phone */}
                 <FormField
                   control={form.control}
                   name="phone"
@@ -211,43 +357,6 @@ export default function SignupForm() {
                   )}
                 />
 
-                {/* Role */}
-                {/* <FormField
-                  control={form.control}
-                  name="role"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Role</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select role" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="user">
-                            <div className="flex items-center gap-2">
-                              <User className="h-4 w-4" />
-                              <span>User</span>
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="technician">
-                            <div className="flex items-center gap-2">
-                              <Wrench className="h-4 w-4" />
-                              <span>Technician</span>
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                /> */}
-
                 {/* Terms */}
                 <FormField
                   control={form.control}
@@ -280,18 +389,17 @@ export default function SignupForm() {
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={form.formState.isSubmitting}
+                  disabled={isRegistering}
                 >
-                  {form.formState.isSubmitting ? (
+                  {isRegistering ? (
                     <>
                       <Spinner className="mr-2 h-4 w-4 animate-spin" />
-                      Sign Up ...
+                      Registering...
                     </>
                   ) : (
                     "Sign Up"
                   )}
                 </Button>
-
               </form>
             </Form>
           </CardContent>

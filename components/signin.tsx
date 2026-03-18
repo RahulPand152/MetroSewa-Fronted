@@ -16,6 +16,8 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
+import { useLogin } from "@/src/hooks/useAuth";
+import { setCookie } from "@/src/lib/cookies";
 
 const formSchema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
@@ -32,10 +34,35 @@ export default function Signin() {
             password: "",
         },
     });
-    const router = useRouter()
+    const router = useRouter();
+    const { mutate: login, isPending } = useLogin();
+    const [errorMsg, setErrorMsg] = useState("");
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values);
+        setErrorMsg("");
+        login(values, {
+            onSuccess: (res: any) => {
+                const data = res?.data ?? res;
+                if (data.token) {
+                    setCookie("token", data.token);
+                }
+                if (data.user?.role) {
+                    setCookie("role", data.user.role);
+                }
+
+                const role = data.user?.role;
+                if (role === "ADMIN") {
+                    router.push("/admin");
+                } else if (role === "TECHNICIAN") {
+                    router.push("/technican");
+                } else {
+                    router.push("/user");
+                }
+            },
+            onError: (err: any) => {
+                setErrorMsg(err?.response?.data?.message || err.message || "Login failed");
+            }
+        });
     }
 
     return (
@@ -56,6 +83,12 @@ export default function Signin() {
                         Login to manage your bookings and services
                     </p>
                 </div>
+
+                {errorMsg && (
+                    <div className="bg-rose-50 text-rose-500 p-3 rounded-md text-sm font-medium text-center">
+                        {errorMsg}
+                    </div>
+                )}
 
                 {/* Form */}
                 <Form {...form}>
@@ -111,8 +144,8 @@ export default function Signin() {
                         </div>
 
 
-                        <Button type="submit" className="w-full">
-                            Sign in
+                        <Button type="submit" className="w-full" disabled={isPending}>
+                            {isPending ? "Signing in..." : "Sign in"}
                         </Button>
                     </form>
                 </Form>

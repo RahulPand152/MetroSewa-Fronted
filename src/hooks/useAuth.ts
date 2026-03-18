@@ -124,6 +124,15 @@ export const useVerifyRegistrationOtp = () => {
     });
 };
 
+export const useVerifyOTP = () => {
+    return useMutation({
+        mutationFn: async (data: { email: string; otp: string }) => {
+            const response = await axiosInstance.post('/auth/verify-otp', data);
+            return response.data;
+        },
+    });
+};
+
 export const useResetPassword = () => {
     return useMutation({
         mutationFn: async (data: any) => {
