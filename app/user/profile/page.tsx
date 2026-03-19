@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { Phone, Mail, MapPin, Edit, Shield, Key } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,8 +10,74 @@ import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useProfile, useUploadProfileImage, useUpdateProfile } from "@/src/hooks/useAuth";
+import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function UserProfilePage() {
+    const { data: userProfile, isLoading } = useProfile();
+    const { mutate: uploadImage, isPending: isUploading } = useUploadProfileImage();
+    const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
+    const [isEditOpen, setIsEditOpen] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    if (isLoading) {
+        return <div className="flex h-96 items-center justify-center"><Spinner className="h-8 w-8 animate-spin" /></div>;
+    }
+
+    const user = userProfile?.data;
+    if (!user) return null;
+
+    const handleAvatarClick = () => {
+        if (isUploading) return;
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const formData = new FormData();
+            formData.append('avatar', file);
+            uploadImage(formData, {
+                onSuccess: () => {
+                    toast.success("Profile image updated");
+                },
+                onError: () => {
+                    toast.error("Failed to update profile image");
+                }
+            });
+        }
+    };
+
+    const handleUpdateProfile = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const data = {
+            firstName: formData.get('firstName') as string,
+            lastName: formData.get('lastName') as string,
+            phoneNumber: formData.get('phone') as string,
+            address: formData.get('location') as string,
+        };
+
+        updateProfile(data, {
+            onSuccess: () => {
+                toast.success("Profile updated successfully");
+                setIsEditOpen(false);
+            },
+            onError: (err: any) => {
+                toast.error(err.response?.data?.message || "Failed to update profile");
+            }
+        });
+    };
+
+    const name = `${user.firstName} ${user.lastName}`;
+    const initials = [user.firstName, user.lastName]
+        .filter(Boolean)
+        .map((n: string) => n[0].toUpperCase())
+        .join("")
+        .slice(0, 2) || "?";
+    const joinedDate = new Date(user.createdAt).toLocaleDateString("en-NP", { month: "short", year: "numeric" });
+
     return (
         <div className="flex flex-col gap-6 max-w-3xl">
             {/* Header */}
@@ -28,17 +95,28 @@ export default function UserProfilePage() {
                 <CardContent className="px-6 pb-6 -mt-12">
                     {/* Avatar & Action */}
                     <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-                        <div className="relative">
+                        <div className="relative cursor-pointer group" onClick={handleAvatarClick}>
                             <Avatar className="h-24 w-24 border-4 border-white dark:border-slate-900 shadow-lg">
-                                <AvatarImage
-                                    src="https://ui-avatars.com/api/?name=John+Doe&background=0ea5e9&color=fff&size=160"
-                                    alt="John Doe"
-                                />
-                                <AvatarFallback className="bg-sky-500 text-white text-2xl font-bold">JD</AvatarFallback>
+                                {user.avatar && (
+                                    <AvatarImage src={user.avatar} alt={name} className="object-cover" />
+                                )}
+                                <AvatarFallback className="bg-sky-500 text-white text-2xl font-bold">{initials}</AvatarFallback>
                             </Avatar>
                             <span className="absolute bottom-1 right-1 h-5 w-5 rounded-full bg-emerald-400 border-2 border-white dark:border-slate-900" />
+                            {isUploading && (
+                                <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center">
+                                    <Spinner className="h-8 w-8 text-white animate-spin" />
+                                </div>
+                            )}
+                            <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                ref={fileInputRef}
+                                onChange={handleFileChange}
+                            />
                         </div>
-                        <Dialog>
+                        <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                             <DialogTrigger asChild>
                                 <Button
                                     variant="outline"
@@ -48,44 +126,48 @@ export default function UserProfilePage() {
                                 </Button>
                             </DialogTrigger>
                             <DialogContent className="sm:max-w-[425px]">
-                                <DialogHeader>
-                                    <DialogTitle>Edit Profile</DialogTitle>
-                                    <DialogDescription>
-                                        Update your personal information below.
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <div className="grid gap-4 py-4">
-                                    <div className="grid grid-cols-1 sm:grid-cols-4 items-start sm:items-center gap-2 sm:gap-4">
-                                        <Label htmlFor="name" className="sm:text-right font-medium">Name</Label>
-                                        <Input id="name" defaultValue="John Doe" className="col-span-1 sm:col-span-3" />
+                                <form onSubmit={handleUpdateProfile}>
+                                    <DialogHeader>
+                                        <DialogTitle>Edit Profile</DialogTitle>
+                                        <DialogDescription>
+                                            Update your personal information below.
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="grid gap-4 py-4">
+                                        <div className="grid grid-cols-1 sm:grid-cols-4 items-start sm:items-center gap-2 sm:gap-4">
+                                            <Label htmlFor="firstName" className="sm:text-right font-medium">First Name</Label>
+                                            <Input name="firstName" id="firstName" defaultValue={user.firstName} required className="col-span-1 sm:col-span-3" />
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-4 items-start sm:items-center gap-2 sm:gap-4">
+                                            <Label htmlFor="lastName" className="sm:text-right font-medium">Last Name</Label>
+                                            <Input name="lastName" id="lastName" defaultValue={user.lastName} required className="col-span-1 sm:col-span-3" />
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-4 items-start sm:items-center gap-2 sm:gap-4">
+                                            <Label htmlFor="phone" className="sm:text-right font-medium">Phone</Label>
+                                            <Input name="phone" id="phone" defaultValue={user.phoneNumber || ""} className="col-span-1 sm:col-span-3" />
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-4 items-start sm:items-center gap-2 sm:gap-4">
+                                            <Label htmlFor="location" className="sm:text-right font-medium">Address</Label>
+                                            <Input name="location" id="location" defaultValue={user.address || ""} className="col-span-1 sm:col-span-3" />
+                                        </div>
                                     </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-4 items-start sm:items-center gap-2 sm:gap-4">
-                                        <Label htmlFor="phone" className="sm:text-right font-medium">Phone</Label>
-                                        <Input id="phone" defaultValue="+977-98XXXXXXXX" className="col-span-1 sm:col-span-3" />
-                                    </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-4 items-start sm:items-center gap-2 sm:gap-4">
-                                        <Label htmlFor="email" className="sm:text-right font-medium">Email</Label>
-                                        <Input id="email" type="email" defaultValue="johndoe@example.com" className="col-span-1 sm:col-span-3" />
-                                    </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-4 items-start sm:items-center gap-2 sm:gap-4">
-                                        <Label htmlFor="location" className="sm:text-right font-medium">Location</Label>
-                                        <Input id="location" defaultValue="Kathmandu, Nepal" className="col-span-1 sm:col-span-3" />
-                                    </div>
-                                </div>
-                                <DialogFooter>
-                                    <Button type="button" className="bg-sky-500 hover:bg-sky-600 text-white w-full sm:w-auto">
-                                        Save changes
-                                    </Button>
-                                </DialogFooter>
+                                    <DialogFooter>
+                                        <Button type="submit" disabled={isUpdating} className="bg-sky-500 hover:bg-sky-600 text-white w-full sm:w-auto">
+                                            {isUpdating ? "Saving..." : "Save changes"}
+                                        </Button>
+                                    </DialogFooter>
+                                </form>
                             </DialogContent>
                         </Dialog>
                     </div>
 
                     <div className="mt-4">
-                        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">John Doe</h2>
+                        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{name}</h2>
                         <div className="flex items-center gap-2 mt-1">
-                            <Badge className="bg-sky-100 text-sky-700 hover:bg-sky-200 dark:bg-sky-900/30 dark:text-sky-400 border-0">Premium Member</Badge>
-                            <Badge variant="outline" className="border-slate-200 dark:border-slate-700 text-slate-500">Joined Feb 2026</Badge>
+                            {user.isEmailVerified && (
+                                <Badge className="bg-sky-100 text-sky-700 hover:bg-sky-200 dark:bg-sky-900/30 dark:text-sky-400 border-0">Verified User</Badge>
+                            )}
+                            <Badge variant="outline" className="border-slate-200 dark:border-slate-700 text-slate-500">Joined {joinedDate}</Badge>
                         </div>
                     </div>
 
@@ -99,7 +181,7 @@ export default function UserProfilePage() {
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-xs text-slate-500">Phone Number</span>
-                                <span className="font-medium text-slate-900 dark:text-slate-200">+977-98XXXXXXXX</span>
+                                <span className="font-medium text-slate-900 dark:text-slate-200">{user.phoneNumber || "Not provided"}</span>
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
@@ -108,7 +190,7 @@ export default function UserProfilePage() {
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-xs text-slate-500">Email Address</span>
-                                <span className="font-medium text-slate-900 dark:text-slate-200">johndoe@example.com</span>
+                                <span className="font-medium text-slate-900 dark:text-slate-200">{user.email}</span>
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
@@ -117,7 +199,7 @@ export default function UserProfilePage() {
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-xs text-slate-500">Address</span>
-                                <span className="font-medium text-slate-900 dark:text-slate-200">Kathmandu, Nepal</span>
+                                <span className="font-medium text-slate-900 dark:text-slate-200">{user.address || "Not provided"}</span>
                             </div>
                         </div>
                     </div>

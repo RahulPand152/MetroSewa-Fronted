@@ -32,11 +32,7 @@ export const useUploadProfileImage = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async (formData: FormData) => {
-            const response = await axiosInstance.post('/auth/profile/image', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+            const response = await axiosInstance.post('/auth/profile/image', formData);
             return response.data;
         },
         onSuccess: () => {

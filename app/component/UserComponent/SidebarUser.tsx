@@ -177,10 +177,12 @@ export default function SidebarUser() {
                 >
                     <div className="relative flex-shrink-0">
                         <Avatar className="h-9 w-9 border-2 border-sky-200 dark:border-sky-800">
-                            <AvatarImage
-                                src={profile?.data?.avatar ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=0ea5e9&color=fff&size=80`}
-                                alt={fullName}
-                            />
+                            {profile?.data?.avatar && (
+                                <AvatarImage
+                                    src={profile.data.avatar}
+                                    alt={fullName}
+                                />
+                            )}
                             <AvatarFallback className="bg-sky-500 text-white text-sm font-bold">{initials}</AvatarFallback>
                         </Avatar>
                         <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white dark:border-slate-900 bg-emerald-400" />

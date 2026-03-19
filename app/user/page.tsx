@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { CalendarCheck, Clock, Settings, Wallet, ArrowRight, HelpCircle } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { useProfile } from "@/src/hooks/useAuth";
 
 const stats = [
     { label: "Active Bookings", value: 2, icon: CalendarCheck, color: "text-sky-500", bg: "bg-sky-100 dark:bg-sky-900/20" },
@@ -18,12 +19,15 @@ const recentBookings = [
 ];
 
 export default function UserDashboard() {
+    const { data: userProfile } = useProfile();
+    const firstName = userProfile?.data?.firstName || "User";
+
     return (
         <div className="flex flex-col gap-6 max-w-5xl">
             {/* Header section */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Welcome back, John! 👋</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Welcome back, {firstName}! 👋</h1>
                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Here is what&apos;s happening with your services today.</p>
                 </div>
                 <Link href="/user/book-service">

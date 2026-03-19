@@ -22,6 +22,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
     LayoutDashboard,
     Users,
@@ -157,13 +158,12 @@ export default function AdminSidebar() {
 
             <SidebarFooter className="p-4">
                 <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900/50 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:border-0 group-data-[collapsible=icon]:bg-transparent">
-                    <img
-                        src={profile?.data?.avatar ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=6366f1&color=fff&size=80`}
-                        alt={fullName}
-                        className="h-10 w-10 rounded-full border-2 border-white object-cover shadow-sm dark:border-slate-700"
-                        width={40}
-                        height={40}
-                    />
+                    <Avatar className="h-10 w-10 border-2 border-white dark:border-slate-700 shadow-sm">
+                        {profile?.data?.avatar && (
+                            <AvatarImage src={profile.data.avatar} alt={fullName} />
+                        )}
+                        <AvatarFallback className="bg-indigo-500 text-white text-sm font-bold">{initials}</AvatarFallback>
+                    </Avatar>
                     <div className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
                         <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">{fullName}</p>
                         <p className="truncate text-xs text-slate-500">System Admin</p>
