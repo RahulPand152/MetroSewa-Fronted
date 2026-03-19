@@ -11,11 +11,16 @@ export const axiosInstance = axios.create({
     },
 });
 
-// Optional: You can add interceptors here to inject tokens
+// Inject auth token + fix Content-Type for FormData (multipart) uploads
 axiosInstance.interceptors.request.use((config) => {
     const token = getCookie('token');
     if (token && config.headers) {
-        config.headers.Authorization = `Bearer ${token}`
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    // When sending FormData, let the browser set Content-Type automatically
+    // (it includes the correct multipart boundary). Manually setting it breaks uploads.
+    if (config.data instanceof FormData) {
+        delete config.headers['Content-Type'];
     }
     return config;
 });

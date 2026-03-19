@@ -1,24 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef } from "react";
 import {
-    User,
-    Bell,
-    Shield,
-    Palette,
-    Monitor,
-    Moon,
     Sun,
-    Globe,
-    Lock,
-    Mail,
-    Smartphone,
-    Save
+    Moon,
+    Monitor,
+    Edit
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
     Card,
     CardContent,
@@ -28,69 +21,119 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
+import { useProfile, useUploadProfileImage } from "@/src/hooks/useAuth";
+import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function SettingsPage() {
+    const { data: userProfile, isLoading } = useProfile();
+    const { mutate: uploadImage, isPending: isUploading } = useUploadProfileImage();
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    if (isLoading) {
+        return <div className="flex h-96 items-center justify-center"><Spinner className="h-8 w-8 animate-spin" /></div>;
+    }
+
+    const user = userProfile?.data;
+    if (!user) return null;
+
+    const handleAvatarClick = () => {
+        if (isUploading) return;
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const formData = new FormData();
+            formData.append('avatar', file);
+            uploadImage(formData, {
+                onSuccess: () => {
+                    toast.success("Profile image updated");
+                },
+                onError: () => {
+                    toast.error("Failed to update profile image");
+                }
+            });
+        }
+    };
+
+    const name = `${user.firstName || ""} ${user.lastName || ""}`.trim();
+    const initials = name ? name.split(" ").map((n: string) => n[0]).join("") : "?";
+
     return (
-        <div className="flex flex-1 flex-col gap-6 p-6">
+        <div className="flex flex-1 flex-col gap-6 p-6 max-w-5xl">
             <div>
                 <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Settings</h1>
-                <p className="text-sm text-slate-500 mt-1">Manage your account settings and preferences.</p>
+                <p className="text-sm text-slate-500 mt-1">Manage admin account settings and platform preferences.</p>
             </div>
 
-            <Tabs defaultValue="general" className="w-full">
+            <Tabs defaultValue="profile" className="w-full">
                 <TabsList className="grid w-full grid-cols-4 lg:w-[400px]">
-                    <TabsTrigger value="general">General</TabsTrigger>
                     <TabsTrigger value="profile">Profile</TabsTrigger>
+                    <TabsTrigger value="general">Platform</TabsTrigger>
                     <TabsTrigger value="notifications">Notifications</TabsTrigger>
                     <TabsTrigger value="appearance">Appearance</TabsTrigger>
                 </TabsList>
-
-                {/* General Settings */}
-                <TabsContent value="general" className="mt-6 space-y-6">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Platform Settings</CardTitle>
-                            <CardDescription>Configure general platform preferences.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <div className="space-y-0.5">
-                                    <Label className="text-base">Maintenance Mode</Label>
-                                    <p className="text-sm text-slate-500">Temporarily disable the platform for all users.</p>
-                                </div>
-                                <Switch />
-                            </div>
-                            <Separator />
-                            <div className="flex items-center justify-between">
-                                <div className="space-y-0.5">
-                                    <Label className="text-base">Public Registration</Label>
-                                    <p className="text-sm text-slate-500">Allow new users to sign up without invitation.</p>
-                                </div>
-                                <Switch defaultChecked />
-                            </div>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
 
                 {/* Profile Settings */}
                 <TabsContent value="profile" className="mt-6 space-y-6">
                     <Card>
                         <CardHeader>
                             <CardTitle>Profile Information</CardTitle>
-                            <CardDescription>Update your personal information and contact details.</CardDescription>
+                            <CardDescription>Update your personal information and profile picture.</CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="name">Full Name</Label>
-                                <Input id="name" defaultValue="Rahul Sharma" />
+                        <CardContent className="space-y-6">
+                            <div className="flex items-center gap-6">
+                                <div className="relative group cursor-pointer" onClick={handleAvatarClick}>
+                                    <Avatar className="h-24 w-24 border-4 border-white shadow-sm dark:border-slate-900">
+                                        <AvatarImage src={user.avatar || ""} className="object-cover" />
+                                        <AvatarFallback className="text-2xl font-bold bg-blue-600 text-white">{initials}</AvatarFallback>
+                                    </Avatar>
+                                    <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <Edit className="h-6 w-6 text-white" />
+                                    </div>
+                                    {isUploading && (
+                                        <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center">
+                                            <Spinner className="h-6 w-6 text-white animate-spin" />
+                                        </div>
+                                    )}
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        ref={fileInputRef}
+                                        onChange={handleFileChange}
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <h3 className="font-semibold text-lg">{name}</h3>
+                                    <p className="text-sm text-slate-500">{user.email}</p>
+                                    <Button variant="outline" size="sm" className="mt-2" onClick={handleAvatarClick} disabled={isUploading}>
+                                        Change Picture
+                                    </Button>
+                                </div>
                             </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email Address</Label>
-                                <Input id="email" defaultValue="admin@metrosewa.com" />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="role">Role</Label>
-                                <Input id="role" defaultValue="Super Admin" disabled className="bg-slate-50" />
+
+                            <Separator />
+
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="firstName">First Name</Label>
+                                    <Input id="firstName" defaultValue={user.firstName} />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="lastName">Last Name</Label>
+                                    <Input id="lastName" defaultValue={user.lastName} />
+                                </div>
+                                <div className="grid gap-2 sm:col-span-2">
+                                    <Label htmlFor="email">Email Address</Label>
+                                    <Input id="email" defaultValue={user.email} />
+                                </div>
+                                <div className="grid gap-2 sm:col-span-2">
+                                    <Label htmlFor="role">Role</Label>
+                                    <Input id="role" defaultValue={user.role} disabled className="bg-slate-50" />
+                                </div>
                             </div>
                             <Button className="w-fit mt-2">Save Changes</Button>
                         </CardContent>
@@ -115,6 +158,33 @@ export default function SettingsPage() {
                                 <Input id="confirm-password" type="password" />
                             </div>
                             <Button variant="outline" className="w-fit mt-2">Update Password</Button>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                {/* General Settings */}
+                <TabsContent value="general" className="mt-6 space-y-6">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Platform Settings</CardTitle>
+                            <CardDescription>Configure general platform preferences.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <div className="space-y-0.5">
+                                    <Label className="text-base">Maintenance Mode</Label>
+                                    <p className="text-sm text-slate-500">Temporarily disable the platform for all users.</p>
+                                </div>
+                                <Switch />
+                            </div>
+                            <Separator />
+                            <div className="flex items-center justify-between">
+                                <div className="space-y-0.5">
+                                    <Label className="text-base">Public Registration</Label>
+                                    <p className="text-sm text-slate-500">Allow new users to sign up without invitation.</p>
+                                </div>
+                                <Switch defaultChecked />
+                            </div>
                         </CardContent>
                     </Card>
                 </TabsContent>
