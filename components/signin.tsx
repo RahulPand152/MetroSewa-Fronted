@@ -84,12 +84,6 @@ export default function Signin() {
                     </p>
                 </div>
 
-                {errorMsg && (
-                    <div className="bg-rose-50 text-rose-500 p-3 rounded-md text-sm font-medium text-center">
-                        {errorMsg}
-                    </div>
-                )}
-
                 {/* Form */}
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
