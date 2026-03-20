@@ -2,7 +2,6 @@
 
 
 import Link from 'next/link'
-import { plumbingSubcategories } from '@/date'
 
 interface SubCategoryProps {
     id: number;

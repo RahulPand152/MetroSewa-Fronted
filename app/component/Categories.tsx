@@ -1,6 +1,8 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
-import { CategoriesData } from "@/date";
 import Link from "next/link";
+import { useGetPublicCategories } from "@/src/hooks/useServices";
 import {
     Carousel,
     CarouselContent,
@@ -8,7 +10,11 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/carousel"
+import { Loader2 } from "lucide-react";
+
 export const Categories = () => {
+    const { data: categories = [], isLoading } = useGetPublicCategories();
+
     return (
         <div className="w-full bg-background py-12">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -26,34 +32,47 @@ export const Categories = () => {
 
 
                 <div className="w-full py-12">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                        {CategoriesData.services.map((product) => (
-                            <Link key={product.id} href={product.link}>
-                                <div className="group relative rounded-2xl overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/60 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer">
+                    {isLoading ? (
+                        <div className="flex justify-center items-center h-40">
+                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        </div>
+                    ) : categories.length === 0 ? (
+                        <div className="flex justify-center items-center h-40 text-slate-500">
+                            No categories available
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                            {categories.map((cat: any) => (
+                                <Link key={cat.id} href={`/service/${cat.id}`}>
+                                    <div className="group relative rounded-2xl overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/60 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer">
 
-                                    {/* Image */}
-                                    <div className="relative h-40 w-full overflow-hidden">
-                                        <img
-                                            src={product.image}
-                                            alt={product.title}
-                                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                        />
-                                        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition duration-300" />
+                                        {/* Image */}
+                                        <div className="relative h-40 w-full overflow-hidden flex items-center justify-center bg-slate-100 dark:bg-slate-800">
+                                            {cat.iconPublicId || cat.imageUrl || cat.icon ? (
+                                                <img
+                                                    src={cat.iconPublicId || cat.imageUrl || cat.icon}
+                                                    alt={cat.name}
+                                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                />
+                                            ) : (
+                                                <div className="h-full w-full bg-slate-200 dark:bg-slate-700" />
+                                            )}
+                                            <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition duration-300" />
+                                        </div>
+
+                                        {/* Title */}
+                                        <div className="p-4 text-center">
+                                            <h3 className="text-sm sm:text-base font-semibold text-slate-800 dark:text-white group-hover:text-primary transition">
+                                                {cat.name}
+                                            </h3>
+                                        </div>
+
                                     </div>
-
-                                    {/* Title */}
-                                    <div className="p-4 text-center">
-                                        <h3 className="text-sm sm:text-base font-semibold text-slate-800 dark:text-white group-hover:text-primary transition">
-                                            {product.title}
-                                        </h3>
-                                    </div>
-
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    )}
                 </div>
-
 
             </div>
         </div>

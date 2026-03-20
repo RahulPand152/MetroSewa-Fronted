@@ -621,7 +621,7 @@ export default function ServiceManagement() {
 
     const filtered = useMemo(() => {
         const q = search.toLowerCase();
-        return services.filter(s =>
+        return services.filter((s: AdminService) =>
             s.name.toLowerCase().includes(q) ||
             (s.category?.name ?? "").toLowerCase().includes(q) ||
             (s.description ?? "").toLowerCase().includes(q)
@@ -630,13 +630,13 @@ export default function ServiceManagement() {
 
     const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
     const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-    const totalActive = services.filter(s => s.isActive).length;
+    const totalActive = services.filter((s: AdminService) => s.isActive).length;
 
     const isCatPending = createCategory.isPending || updateCategory.isPending || deleteCategory.isPending;
     const isSvcPending = createService.isPending || updateService.isPending;
     const isDeletePending = deleteService.isPending;
 
-    const catOptions = categories.map(c => ({ id: c.id, name: c.name, imageUrl: c.imageUrl, icon: c.icon }));
+    const catOptions = categories.map((c: any) => ({ id: c.id, name: c.name, imageUrl: c.imageUrl, icon: c.icon }));
 
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6">
@@ -685,7 +685,7 @@ export default function ServiceManagement() {
                     <select value={catFilter} onChange={e => { setCatFilter(e.target.value); setPage(1); }}
                         className="h-9 rounded-lg border border-slate-200 bg-white pl-9 pr-4 text-sm outline-none focus:border-primary dark:border-slate-700 dark:bg-slate-900 appearance-none cursor-pointer">
                         <option value="all">All Categories</option>
-                        {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                        {categories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                 </div>
                 <span className="text-sm text-slate-400">{filtered.length} service{filtered.length !== 1 ? "s" : ""}</span>
@@ -695,7 +695,7 @@ export default function ServiceManagement() {
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
                 {svcLoading
                     ? Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
-                    : paginated.map(s => (
+                    : paginated.map((s: AdminService) => (
                         <ServiceCard
                             key={s.id} service={s}
                             onEdit={() => { setEditService(s); setFormOpen(true); }}
