@@ -112,13 +112,7 @@ export default function TechnicianRegistrationForm() {
                     setStep("otp")
                 },
                 onError: (err: any) => {
-                    const msg =
-                        err?.response?.data?.error?.message ||
-                        err?.response?.data?.message ||
-                        err.message ||
-                        "Registration failed. Please try again."
-                    setErrorMsg(msg)
-                    toast.error(msg)
+                    // Error is handled entirely by global Axios interceptor which triggers a toast
                 },
             }
         )
@@ -208,9 +202,7 @@ export default function TechnicianRegistrationForm() {
                     ))}
                 </div>
 
-                {otpError && (
-                    <p className="text-center text-red-500 text-sm mb-3">{otpError}</p>
-                )}
+                {/* Error messages are handled by global toast */}
 
                 <Button
                     onClick={handleVerifyOtp}
@@ -257,12 +249,7 @@ export default function TechnicianRegistrationForm() {
                     </CardHeader>
                 </div>
 
-                {/* Error Banner */}
-                {errorMsg && (
-                    <div className="mx-8 mt-4 bg-rose-50 text-rose-500 p-3 rounded-md text-sm font-medium text-center">
-                        {errorMsg}
-                    </div>
-                )}
+                {/* Error messages are handled by global toast */}
 
                 {/* Scrollable Form Content */}
                 <ScrollArea className="flex-1 px-8 py-6 max-h-[calc(90vh-100px)]">

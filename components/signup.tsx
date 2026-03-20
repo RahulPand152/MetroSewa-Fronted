@@ -182,9 +182,7 @@ export default function SignupForm() {
             ))}
           </div>
 
-          {otpError && (
-            <p className="text-center text-red-500 text-sm mb-3">{otpError}</p>
-          )}
+          {/* Error messages are handled by global toast */}
 
           <Button
             onClick={handleVerifyOtp}
@@ -225,11 +223,7 @@ export default function SignupForm() {
           </CardHeader>
 
           <CardContent className="space-y-5 px-8">
-            {errorMsg && (
-              <div className="bg-rose-50 text-rose-500 p-3 rounded-md text-sm font-medium text-center">
-                {errorMsg}
-              </div>
-            )}
+            {/* Error messages are handled by global toast */}
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 {/* Name */}
