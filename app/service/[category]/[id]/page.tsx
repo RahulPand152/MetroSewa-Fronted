@@ -14,48 +14,31 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Star, ArrowLeft, ShoppingCart } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
-import { SubServicesData } from "@/date"
 import { NavbarPage } from "@/app/component/Navbar"
 import Link from "next/link"
 import { Reviews } from "@/app/component/Reviews"
+import { useGetPublicServices } from "@/src/hooks/useServices"
+import { Loader2 } from "lucide-react"
 
 export default function ServiceDetails() {
     const router = useRouter();
     const params = useParams();
 
-    // Finding the subcategory using the id from params
-    const id = Number(params.id)
-    const categorySlug = params.category as string;
-    const subCategories = SubServicesData[categorySlug as keyof typeof SubServicesData] || [];
+    const id = params.id as string;
+    const { data: services = [], isLoading } = useGetPublicServices();
 
-    interface Review {
-        id: number;
-        user: string;
-        rating: number;
-        comment: string;
-        date: string;
-        verified: boolean;
+    const service = services.find((item: any) => item.id === id);
+
+    if (isLoading) {
+        return (
+            <div>
+                <NavbarPage />
+                <div className='flex justify-center items-center h-[60vh]'>
+                    <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                </div>
+            </div>
+        )
     }
-
-    interface ServiceItem {
-        id: number;
-        name: string;
-        description: string;
-        image: string;
-        buttonText: string;
-        priority: boolean;
-        price?: string;
-        duration?: string;
-        rating?: number;
-        reviewsCount?: number;
-        longDescription?: string;
-        features?: string[];
-        images?: string[];
-        isPremium?: boolean;
-        reviews?: Review[];
-    }
-
-    const service = subCategories.find((item) => item.id === id) as ServiceItem | undefined;
 
     if (!service) {
         return (
@@ -72,12 +55,14 @@ export default function ServiceDetails() {
     }
 
     // Fallback values
-    const images = service.images || [service.image];
-    const price = service.price || "Contact for Price";
+    const images = service.images?.map((img: any) => img.url) || [];
+    if (images.length === 0) images.push("https://picsum.photos/800/600"); // placeholder if missing
+
+    const price = service.price != null ? `Rs. ${service.price}` : "Contact for Price";
     const duration = service.duration || "Variable";
     const rating = service.rating || 4.5;
     const reviewsCount = service.reviewsCount || 0;
-    const longDescription = service.longDescription || service.description;
+    const longDescription = service.description || "";
     const features = service.features || ["Professional Service", "Verified Expert", "Satisfaction Guaranteed"];
     const isPremium = service.isPremium || false;
     const reviews = service.reviews || [];
@@ -89,10 +74,10 @@ export default function ServiceDetails() {
             <div className="max-w-7xl mx-auto px-4 pt-8">
                 <button
                     onClick={() => router.back()}
-                    className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition mb-6"
+                    className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition mb-6 bg-gray-200 text-2xl px-2 py-1 rounded-lg"
                 >
                     <ArrowLeft className="w-5 h-5" />
-                    <span className="font-medium">Back to {categorySlug.replace('-', ' ')}</span>
+                    <span className="font-medium text-sm">Back</span>
                 </button>
 
                 <Carousel
@@ -104,7 +89,7 @@ export default function ServiceDetails() {
                     className="w-full"
                 >
                     <CarouselContent>
-                        {images.map((img, index) => (
+                        {images.map((img: string, index: number) => (
                             <CarouselItem key={index}>
                                 <div className="relative h-[200px] md:h-[400px] w-full overflow-hidden rounded-3xl shadow-lg">
                                     <img
@@ -157,7 +142,7 @@ export default function ServiceDetails() {
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {features.map((feature, index) => (
+                                {features.map((feature: string, index: number) => (
                                     <div key={index} className="flex items-center gap-3 p-4 rounded-xl bg-gray-50 border border-gray-100">
                                         <div className="relative flex items-center justify-center h-6 w-6 rounded-full bg-sky-500">
                                             <svg

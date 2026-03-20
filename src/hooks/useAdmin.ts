@@ -46,3 +46,119 @@ export const useDeleteUser = () => {
         },
     });
 };
+
+export type AdminService = any;
+export type ServiceImage = any;
+
+export const useGetCategories = () => {
+    return useQuery({
+        queryKey: ['admin', 'categories'],
+        queryFn: async () => {
+            const response = await axiosInstance.get('/admin/categories');
+            return response.data.data;
+        },
+    });
+};
+
+export const useCreateCategory = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (formData: FormData) => {
+            const response = await axiosInstance.post(`/admin/categories`, formData);
+            return response.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin', 'categories'] });
+        },
+    });
+};
+
+export const useUpdateCategory = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ id, formData }: { id: string; formData: FormData }) => {
+            const response = await axiosInstance.put(`/admin/categories/${id}`, formData);
+            return response.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin', 'categories'] });
+        },
+    });
+};
+
+export const useDeleteCategory = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (id: string) => {
+            const response = await axiosInstance.delete(`/admin/categories/${id}`);
+            return response.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin', 'categories'] });
+        },
+    });
+};
+
+export const useGetAdminServices = (categoryId?: string) => {
+    return useQuery({
+        queryKey: ['admin', 'services', categoryId],
+        queryFn: async () => {
+            const params = categoryId && categoryId !== 'all' ? { categoryId } : undefined;
+            const response = await axiosInstance.get('/admin/services', { params });
+            return response.data.data;
+        },
+    });
+};
+
+export const useCreateService = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (formData: FormData) => {
+            const response = await axiosInstance.post(`/admin/services`, formData);
+            return response.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin', 'services'] });
+        },
+    });
+};
+
+export const useUpdateService = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ id, formData }: { id: string; formData: FormData }) => {
+            const response = await axiosInstance.put(`/admin/services/${id}`, formData);
+            return response.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin', 'services'] });
+        },
+    });
+};
+
+export const useDeleteService = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (id: string) => {
+            const response = await axiosInstance.delete(`/admin/services/${id}`);
+            return response.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin', 'services'] });
+        },
+    });
+};
+
+export const useToggleService = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (id: string) => {
+            const response = await axiosInstance.patch(`/admin/services/${id}/toggle`);
+            return response.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin', 'services'] });
+        },
+    });
+};
+
