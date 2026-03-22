@@ -16,22 +16,22 @@ export const Categories = () => {
     const { data: categories = [], isLoading } = useGetPublicCategories();
 
     return (
-        <div className="w-full bg-background py-12">
+        <div className="w-full bg-background pt-10 pb-4">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between mb-4">
-                    <h1 className="text-xl sm:text-3xl lg:text-5xl font-bold tracking-tight">
+                <div className="flex items-center justify-between">
+                    <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-center">
                         <span className="text-gray-900">Service</span>{" "}
-                        <span className="bg-gradient-to-r from-gray-600 to-gray-600 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-black to-gray-500 bg-clip-text text-transparent">
                             Categories
                         </span>
-                    </h1>
+                    </div>
                     <Link href="/services" className="text-sm font-medium text-sky-500 hover:text-sky-600 whitespace-nowrap ml-4">
                         View All →
                     </Link>
                 </div>
 
 
-                <div className="w-full py-12">
+                <div className="w-full pt-8 pb-4">
                     {isLoading ? (
                         <div className="flex justify-center items-center h-40">
                             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -48,9 +48,9 @@ export const Categories = () => {
 
                                         {/* Image */}
                                         <div className="relative h-40 w-full overflow-hidden flex items-center justify-center bg-slate-100 dark:bg-slate-800">
-                                            {cat.iconPublicId || cat.imageUrl || cat.icon ? (
+                                            {cat.icon ? (
                                                 <img
-                                                    src={cat.iconPublicId || cat.imageUrl || cat.icon}
+                                                    src={cat.icon}
                                                     alt={cat.name}
                                                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                                                 />

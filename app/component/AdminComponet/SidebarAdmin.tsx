@@ -28,7 +28,7 @@ import {
     Users,
     Calendar,
     UserCog,
-    BarChart3,
+    MessageSquare,
     Settings,
     LogOut,
     Hammer,
@@ -44,7 +44,7 @@ const navItems = [
     { label: "Bookings", href: "/admin/bookings", icon: Calendar, tooltip: "Bookings" },
     { label: "Services", href: "/admin/services", icon: Wrench, tooltip: "Services" },
     { label: "Technicians", href: "/admin/technicians", icon: UserCog, tooltip: "Technicians" },
-    { label: "Analytics", href: "/admin/analytics", icon: BarChart3, tooltip: "Analytics" },
+    { label: "User Inquiries", href: "/admin/inquiries", icon: MessageSquare, tooltip: "User Inquiries" },
 ];
 
 export default function AdminSidebar() {

@@ -15,12 +15,12 @@ export const ServicePage = () => {
     const { data: services = [], isLoading } = useGetPublicServices();
 
     return (
-        <div className="w-full">
+        <div className="w-full pb-10">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between mb-4">
-                    <h1 className="text-xl sm:text-3xl lg:text-5xl font-bold tracking-tight text-gray-900">
+                <div className="flex items-center justify-between mb-8">
+                    <span className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-gray-900">
                         Services
-                    </h1>
+                    </span>
                     <Link href="/services" className="text-sm font-medium text-sky-500 hover:text-sky-600 whitespace-nowrap ml-4">
                         View All →
                     </Link>

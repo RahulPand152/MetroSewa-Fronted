@@ -149,34 +149,56 @@ export const NavbarPage = () => {
               </Button>
             </SheetTrigger>
 
-            <SheetContent side="right" className="w-72">
-              <div className="mt-8 flex flex-col gap-6">
-                <Link href="/" className="text-sm font-semibold text-slate-800">
+            <SheetContent side="right" className="w-72 bg-black text-white border-l border-gray-800">
+              <div className="mt-8 flex flex-col gap-4">
+
+                {/* Navigation Links */}
+                <Link
+                  href="/"
+                  className="px-4 py-2 rounded-md text-base sm:text-lg font-bold text-gray-300 hover:text-white hover:bg-gray-700 transition-all duration-200"
+                >
                   Home
                 </Link>
-                <Link href="/services" className="text-sm font-semibold text-slate-800">
+
+                <Link
+                  href="/services"
+                  className="px-4 py-2 rounded-md text-base sm:text-lg font-bold text-gray-300 hover:text-white hover:bg-gray-700 transition-all duration-200"
+                >
                   Services
                 </Link>
-                <Link href="/contact" className="text-sm font-semibold text-slate-800">
+
+                <Link
+                  href="/contact"
+                  className="px-4 py-2 rounded-md text-base sm:text-lg font-bold text-gray-300 hover:text-white hover:bg-gray-700 transition-all duration-200"
+                >
                   Contacts
                 </Link>
 
-                <div className="h-px bg-slate-100 w-full my-2" />
+                <div className="h-px bg-gray-800 w-full my-3" />
 
                 {!profile?.data ? (
                   <>
                     <Link href="/signin" className="w-full">
-                      <Button variant="outline" className="w-full justify-start font-semibold">
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800 transition font-semibold"
+                      >
                         Sign In
                       </Button>
                     </Link>
+
                     <Link href="/signup" className="w-full">
-                      <Button className="w-full justify-start bg-blue-600 hover:bg-blue-700 font-semibold text-white">
+                      <Button
+                        className="w-full justify-start bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 transition font-bold shadow-md"
+                      >
                         Sign Up
                       </Button>
                     </Link>
+
                     <Link href="/technician-register" className="w-full">
-                      <Button className="w-full justify-start bg-slate-800 hover:bg-slate-900 font-semibold text-white">
+                      <Button
+                        className="w-full justify-start bg-gray-900 text-white hover:bg-gray-700 transition font-semibold"
+                      >
                         Become a Technician
                       </Button>
                     </Link>
@@ -184,14 +206,17 @@ export const NavbarPage = () => {
                 ) : (
                   <>
                     <Link href={getDashboardLink()} className="w-full">
-                      <Button variant="outline" className="w-full justify-start font-semibold">
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800 transition font-semibold"
+                      >
                         <LayoutDashboard className="mr-2 h-4 w-4" />
                         Dashboard
                       </Button>
                     </Link>
+
                     <Button
-                      variant="destructive"
-                      className="w-full justify-start font-semibold"
+                      className="w-full justify-start bg-gray-900 text-white hover:bg-gray-700 transition font-semibold"
                       onClick={handleLogout}
                       disabled={isLoggingOut}
                     >
