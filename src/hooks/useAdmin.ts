@@ -158,6 +158,7 @@ export const useToggleService = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin', 'services'] });
+            queryClient.invalidateQueries({ queryKey: ['public', 'services'] });
         },
     });
 };

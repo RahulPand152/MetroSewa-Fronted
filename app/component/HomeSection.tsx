@@ -14,8 +14,8 @@ const HomeSection = () => {
 
         const trimmedTitle = title.trim();
         const searchUrl = trimmedTitle
-            ? `/find-job?q=${encodeURIComponent(trimmedTitle)}`
-            : "/find-job";
+            ? `/services?q=${encodeURIComponent(trimmedTitle)}`
+            : "/services";
 
         router.push(searchUrl);
     };

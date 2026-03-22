@@ -89,9 +89,12 @@ function ServiceCard({ service, onEdit, onDelete, onToggle, isPending }: {
     onEdit: () => void; onDelete: () => void; onToggle: () => void; isPending: boolean;
 }) {
     const mainImage = service.images?.[0];
-    const iconOpt = ICON_OPTIONS.find(o => o.label === service.category?.icon) ?? ICON_OPTIONS[0];
+    const catIconValue = service.category?.icon;
+    // icon field may be a Cloudinary URL (uploaded image) or an icon label name
+    const isUrl = catIconValue?.startsWith('http');
+    const iconOpt = (!isUrl && ICON_OPTIONS.find(o => o.label === catIconValue)) || ICON_OPTIONS[0];
     const Icon = iconOpt.icon;
-    const catImage = service.category?.imageUrl;
+    const catImage = isUrl ? catIconValue : null;
 
     return (
         <div className={`bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${!service.isActive ? "opacity-60" : ""}`}>
@@ -348,7 +351,7 @@ function ServiceFormDialog({ open, onClose, editService, categories, onCreate, o
 }
 
 // ─── Manage Categories Dialog ─────────────────────────────────────────────────
-type CatRow = { id: string; name: string; icon: string | null; imageUrl: string | null; isActive: boolean; _count: { services: number } };
+type CatRow = { id: string; name: string; icon: string | null; isActive: boolean; _count: { services: number } };
 function ManageCategoriesDialog({ open, onClose, categories, onCreate, onUpdate, onDelete, isPending }: {
     open: boolean; onClose: () => void;
     categories: CatRow[];
@@ -379,12 +382,16 @@ function ManageCategoriesDialog({ open, onClose, categories, onCreate, onUpdate,
         if (!name.trim()) return;
         const fd = new FormData();
         fd.append("name", name.trim());
-        fd.append("icon", ICON_OPTIONS[iconIdx].label);
+        // Always send the selected icon label as a separate field (no collision with file)
+        fd.append("iconLabel", ICON_OPTIONS[iconIdx].label);
         if (file) {
-            fd.append("image", file);
+            // New image uploaded — send as "icon" for multer
+            fd.append("icon", file);
         } else if (editingId && !preview) {
+            // No preview means user cleared the image — request removal
             const originalCat = categories.find(c => c.id === editingId);
-            if (originalCat?.imageUrl) {
+            const hadImage = originalCat?.icon?.startsWith("http");
+            if (hadImage) {
                 fd.append("removeImage", "true");
             }
         }
@@ -395,9 +402,17 @@ function ManageCategoriesDialog({ open, onClose, categories, onCreate, onUpdate,
 
     const startEdit = (cat: CatRow) => {
         setName(cat.name);
-        const idx = ICON_OPTIONS.findIndex(o => o.label === cat.icon);
-        setIconIdx(idx >= 0 ? idx : 0);
-        setPreview(cat.imageUrl ?? "");
+        const isUrl = cat.icon?.startsWith('http');
+        if (isUrl) {
+            // Has uploaded image — show as preview, keep current iconIdx
+            setPreview(cat.icon ?? "");
+            setIconIdx(0);
+        } else {
+            // Has icon label (or nothing)
+            const idx = ICON_OPTIONS.findIndex(o => o.label === cat.icon);
+            setIconIdx(idx >= 0 ? idx : 0);
+            setPreview("");
+        }
         setFile(null);
         setEditingId(cat.id);
         setDeleteConfirmId(null);
@@ -519,9 +534,9 @@ function ManageCategoriesDialog({ open, onClose, categories, onCreate, onUpdate,
                                         : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-primary/30"
                                         }`}>
                                         <div className="flex items-center gap-3 min-w-0 mb-3">
-                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0 ${cat.imageUrl ? 'bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700' : IconOpt.bg}`}>
-                                                {cat.imageUrl
-                                                    ? <img src={cat.imageUrl} alt="" className="w-full h-full object-cover" />
+                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0 ${cat.icon ? 'bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700' : IconOpt.bg}`}>
+                                                {cat.icon
+                                                    ? <img src={cat.icon} alt="" className="w-full h-full object-cover" />
                                                     : <CatIcon className={`h-5 w-5 ${IconOpt.color}`} />}
                                             </div>
                                             <div className="flex-1 min-w-0">
