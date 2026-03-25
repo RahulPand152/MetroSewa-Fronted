@@ -122,7 +122,13 @@ function ServiceCard({ service, onEdit, onDelete, onToggle, isPending }: {
                 <p className={`text-xs font-semibold uppercase tracking-wider mb-2 ${service.isActive ? "text-primary" : "text-slate-400"}`}>
                     {service.category?.name ?? "Uncategorized"}
                 </p>
-                <p className="text-slate-500 dark:text-slate-400 text-sm line-clamp-2 mb-3">{service.description ?? "—"}</p>
+                <p className="text-slate-500 dark:text-slate-400 text-sm line-clamp-2 mb-3"
+                    title={service.description ? service.description.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : undefined}
+                >
+                    {service.description 
+                        ? service.description.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() || "—" 
+                        : "—"}
+                </p>
                 <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
                     <div>
                         <p className="text-[10px] text-slate-400 font-medium">Starts from</p>
@@ -241,11 +247,51 @@ function ServiceFormDialog({ open, onClose, editService, categories, onCreate, o
                         </div>
                         <div className="space-y-1.5">
                             <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Category</label>
-                            <select value={categoryId} onChange={e => setCategoryId(e.target.value)}
-                                className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-                                <option value="">Select a category</option>
-                                {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                            </select>
+                            {categories.length === 0 ? (
+                                <p className="text-xs text-slate-400 italic">No categories found. Create one first.</p>
+                            ) : (
+                                <div className="grid grid-cols-3 gap-2 max-h-40 overflow-y-auto pr-1">
+                                    {/* No selection option */}
+                                    <button
+                                        type="button"
+                                        onClick={() => setCategoryId("")}
+                                        className={`flex flex-col items-center gap-1 p-2 rounded-lg border-2 text-xs font-medium transition-all ${categoryId === ""
+                                            ? "border-primary bg-primary/5 text-primary"
+                                            : "border-slate-200 dark:border-slate-700 text-slate-400 hover:border-primary/40"
+                                            }`}
+                                    >
+                                        <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                                            <X className="h-4 w-4" />
+                                        </div>
+                                        <span className="truncate w-full text-center">None</span>
+                                    </button>
+                                    {categories.map(c => {
+                                        const isUrl = c.icon?.startsWith('http');
+                                        const iconOpt = (!isUrl && ICON_OPTIONS.find(o => o.label === c.icon)) || ICON_OPTIONS[0];
+                                        const Icon = iconOpt.icon;
+                                        const isSelected = categoryId === c.id;
+                                        return (
+                                            <button
+                                                key={c.id}
+                                                type="button"
+                                                onClick={() => setCategoryId(c.id)}
+                                                className={`flex flex-col items-center gap-1 p-2 rounded-lg border-2 text-xs font-medium transition-all ${isSelected
+                                                    ? "border-primary bg-primary/5 text-primary"
+                                                    : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-primary/40"
+                                                    }`}
+                                            >
+                                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden ${isUrl ? 'bg-slate-100 dark:bg-slate-800' : iconOpt.bg}`}>
+                                                    {isUrl
+                                                        ? <img src={c.icon!} alt={c.name} className="w-full h-full object-cover" />
+                                                        : <Icon className={`h-4 w-4 ${iconOpt.color}`} />
+                                                    }
+                                                </div>
+                                                <span className="truncate w-full text-center">{c.name}</span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -275,9 +321,12 @@ function ServiceFormDialog({ open, onClose, editService, categories, onCreate, o
                     <div className="space-y-1.5">
                         <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Description</label>
                         <RichTextEditor
-                            placeholder="Describe the service details, benefits, and what customers can expect..."
                             value={description}
                             onChange={setDescription}
+                            placeholder="Leave a description..."
+                            showCharCount={true}
+                            characterLimit={2000}
+                            minHeight={200}
                         />
                     </div>
 
@@ -525,7 +574,8 @@ function ManageCategoriesDialog({ open, onClose, categories, onCreate, onUpdate,
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 content-start">
                             {categories.map(cat => {
-                                const IconOpt = ICON_OPTIONS.find(o => o.label === cat.icon) ?? ICON_OPTIONS[0];
+                                const isIconUrl = cat.icon?.startsWith('http');
+                                const IconOpt = (!isIconUrl && ICON_OPTIONS.find(o => o.label === cat.icon)) || ICON_OPTIONS[0];
                                 const CatIcon = IconOpt.icon;
                                 const isDelConfirm = deleteConfirmId === cat.id;
                                 return (
@@ -534,9 +584,9 @@ function ManageCategoriesDialog({ open, onClose, categories, onCreate, onUpdate,
                                         : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-primary/30"
                                         }`}>
                                         <div className="flex items-center gap-3 min-w-0 mb-3">
-                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0 ${cat.icon ? 'bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700' : IconOpt.bg}`}>
-                                                {cat.icon
-                                                    ? <img src={cat.icon} alt="" className="w-full h-full object-cover" />
+                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0 ${isIconUrl ? 'bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700' : IconOpt.bg}`}>
+                                                {isIconUrl
+                                                    ? <img src={cat.icon!} alt="" className="w-full h-full object-cover" />
                                                     : <CatIcon className={`h-5 w-5 ${IconOpt.color}`} />}
                                             </div>
                                             <div className="flex-1 min-w-0">
