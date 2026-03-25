@@ -138,7 +138,6 @@ export default function ServicesPage() {
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
                                 {categories.map((cat: any) => {
                                     const isActive = selectedCategory === cat.id;
-                                    const imageUrl = cat.iconPublicId || cat.imageUrl || cat.icon || "https://picsum.photos/200/300";
                                     return (
                                         <button
                                             key={cat.id}
@@ -148,12 +147,16 @@ export default function ServicesPage() {
                                                 : "border-slate-200 dark:border-slate-800 hover:border-sky-300 hover:shadow-sm"
                                                 }`}
                                         >
-                                            <div className="relative h-24 w-full overflow-hidden flex items-center justify-center bg-slate-100">
-                                                <img
-                                                    src={imageUrl}
-                                                    alt={cat.name}
-                                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                                />
+                                            <div className="relative h-24 w-full overflow-hidden flex items-center justify-center bg-slate-100 dark:bg-slate-800">
+                                                {cat.icon ? (
+                                                    <img
+                                                        src={cat.icon}
+                                                        alt={cat.name}
+                                                        className="h-full w-full object-contain p-2 transition-transform duration-500 group-hover:scale-110"
+                                                    />
+                                                ) : (
+                                                    <div className="h-full w-full bg-slate-200 dark:bg-slate-700" />
+                                                )}
                                                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition duration-300" />
                                             </div>
                                             <div className="p-2 bg-white dark:bg-slate-900">
@@ -209,20 +212,22 @@ export default function ServicesPage() {
                                             key={service.id}
                                             className="group relative rounded-xl overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col"
                                         >
-                                            <div className="relative h-36 w-full overflow-hidden shrink-0">
-                                                <img
-                                                    src={mainImg}
-                                                    alt={service.name}
-                                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                                />
-                                                <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition duration-300" />
+                                            <div className="relative h-36 w-full overflow-hidden shrink-0 cursor-pointer">
+                                                <Link href={`/service/${service.categoryId ?? 'all'}/${service.id}`}>
+                                                    <img
+                                                        src={mainImg}
+                                                        alt={service.name}
+                                                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110 block"
+                                                    />
+                                                    <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition duration-300" />
+                                                </Link>
                                                 {service.priority && (
-                                                    <Badge className="absolute top-2 left-2 bg-amber-500 text-white text-[10px] px-2 py-0.5">
+                                                    <Badge className="absolute top-2 left-2 bg-amber-500 text-white text-[10px] px-2 py-0.5 pointer-events-none">
                                                         {service.badge || "Priority"}
                                                     </Badge>
                                                 )}
                                                 {service.isPremium && !service.priority && (
-                                                    <Badge className="absolute top-2 left-2 bg-sky-500 text-white text-[10px] px-2 py-0.5">
+                                                    <Badge className="absolute top-2 left-2 bg-sky-500 text-white text-[10px] px-2 py-0.5 pointer-events-none">
                                                         Premium
                                                     </Badge>
                                                 )}

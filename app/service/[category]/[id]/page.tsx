@@ -12,13 +12,28 @@ import {
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Star, ArrowLeft, ShoppingCart } from "lucide-react"
+import { Star, ArrowLeft, ShoppingCart, Calendar, Clock, FileText, CreditCard, CheckCircle } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
 import { NavbarPage } from "@/app/component/Navbar"
 import Link from "next/link"
 import { Reviews } from "@/app/component/Reviews"
 import { useGetPublicServices } from "@/src/hooks/useServices"
 import { Loader2 } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Separator } from "@/components/ui/separator"
+import { Calendar as CalendarUI } from "@/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Input } from "@/components/ui/input"
+import { format } from "date-fns"
+import { cn } from "@/lib/utils"
+
+const timeSlots = [
+    "8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM",
+    "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM",
+    "4:00 PM", "5:00 PM", "6:00 PM",
+];
 
 export default function ServiceDetails() {
     const router = useRouter();
@@ -28,6 +43,50 @@ export default function ServiceDetails() {
     const { data: services = [], isLoading } = useGetPublicServices();
 
     const service = services.find((item: any) => item.id === id);
+
+    // Booking state
+    const [bookingService, setBookingService] = React.useState<any>(null);
+    const [bookingDate, setBookingDate] = React.useState<Date | undefined>(undefined);
+    const [bookingTime, setBookingTime] = React.useState("");
+    const [bookingNote, setBookingNote] = React.useState("");
+    const [isBooked, setIsBooked] = React.useState(false);
+
+    const handleBookNow = (serviceData: any) => {
+        setBookingService(serviceData);
+        setBookingDate(undefined);
+        setBookingTime("");
+        setBookingNote("");
+        setIsBooked(false);
+    };
+
+    const handleConfirm = () => {
+        if (!bookingService || !bookingDate || !bookingTime) return;
+
+        // Build new booking record
+        const newBooking = {
+            id: `B-${Date.now()}`,
+            service: bookingService.name,
+            category: (bookingService.slug || "")
+                .split("-")
+                .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+                .join(" "),
+            status: "Upcoming",
+            date: format(bookingDate, "MMM d, yyyy"),
+            time: bookingTime,
+            price: bookingService.price || "—",
+            description: bookingNote || bookingService.description || "",
+            statusColor: "bg-sky-100 text-sky-700",
+        };
+
+        try {
+            const existing = JSON.parse(localStorage.getItem("metro_bookings") || "[]");
+            localStorage.setItem("metro_bookings", JSON.stringify([newBooking, ...existing]));
+        } catch (_) { }
+
+        setIsBooked(true);
+    };
+
+    const canConfirm = bookingDate && bookingTime;
 
     if (isLoading) {
         return (
@@ -136,9 +195,24 @@ export default function ServiceDetails() {
                         <CardContent className="p-8 md:p-10 space-y-8">
                             <div>
                                 <h3 className="text-2xl font-bold text-gray-900 mb-4">About this Service</h3>
-                                <p className="text-lg text-gray-600 leading-relaxed">
-                                    {longDescription}
-                                </p>
+                                <div 
+                                    className="text-lg text-gray-600 leading-relaxed
+                                    [&_p]:mb-4 last:[&_p]:mb-0
+                                    [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-4 [&_ul_li]:mb-2 
+                                    [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-4 [&_ol_li]:mb-2
+                                    [&_li_p]:inline
+                                    [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:text-gray-900 [&_h1]:mb-4 [&_h1]:mt-8
+                                    [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-gray-900 [&_h2]:mb-4 [&_h2]:mt-8
+                                    [&_h3]:text-xl [&_h3]:font-bold [&_h3]:text-gray-900 [&_h3]:mb-3 [&_h3]:mt-6
+                                    [&_strong]:font-semibold [&_strong]:text-gray-900
+                                    [&_a]:text-sky-600 [&_a]:hover:underline [&_a]:transition-colors
+                                    [&_blockquote]:border-l-4 [&_blockquote]:border-sky-500 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:bg-gray-50 [&_blockquote]:py-2 [&_blockquote]:pr-4 [&_blockquote]:rounded-r-lg
+                                    [&_pre]:bg-gray-900 [&_pre]:text-gray-100 [&_pre]:p-4 [&_pre]:rounded-xl [&_pre]:overflow-x-auto [&_pre]:my-6
+                                    [&_code]:text-sm [&_code]:font-mono [&_code]:bg-sky-50 [&_code]:text-sky-700 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded-md
+                                    [&_table]:w-full [&_table]:mb-6 [&_table]:border-collapse [&_th]:border [&_th]:border-gray-200 [&_th]:p-3 [&_th]:bg-gray-50 [&_th]:text-left [&_th]:font-semibold
+                                    [&_td]:border [&_td]:border-gray-200 [&_td]:p-3"
+                                    dangerouslySetInnerHTML={{ __html: longDescription || "<p>No description provided.</p>" }}
+                                />
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -198,16 +272,13 @@ export default function ServiceDetails() {
                                     </div>
                                 </div>
 
-                                <Link href={`/contact?service=${encodeURIComponent(service.name)}`} className="block">
-                                    <Button size="lg" className="w-full rounded-full h-10 text-lg font-medium shadow-lg hover:shadow-xl transition-all bg-sky-500 hover:bg-sky-600">
-                                        Book Now
-                                    </Button>
-                                </Link>
-                                <Link href="/contact" className="block">
-                                    <Button variant="outline" size="lg" className="w-full rounded-full h-10  text-lg font-medium border-gray-200 bg-gray-50 hover:bg-gray-50">
-                                        Contact Support
-                                    </Button>
-                                </Link>
+                                <Button 
+                                    size="lg" 
+                                    className="w-full rounded-full h-10 text-lg font-medium shadow-lg hover:shadow-xl transition-all bg-sky-500 hover:bg-sky-600"
+                                    onClick={() => handleBookNow({ ...service, slug: service.categoryId || "all", price: price })}
+                                >
+                                    Book Now
+                                </Button>
                             </CardContent>
                         </Card>
 
@@ -222,6 +293,188 @@ export default function ServiceDetails() {
                 </div>
 
             </div>
+
+            {/* Booking Dialog */}
+            <Dialog open={!!bookingService} onOpenChange={(open) => { if (!open) setBookingService(null); }}>
+                <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+                    {isBooked ? (
+                        /* Success State */
+                        <div className="flex flex-col items-center justify-center py-8 gap-4 text-center">
+                            <div className="h-16 w-16 rounded-full bg-emerald-100 flex items-center justify-center">
+                                <CheckCircle className="h-8 w-8 text-emerald-500" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-gray-900">Booking Confirmed!</h3>
+                                <p className="text-sm text-gray-500 mt-1">
+                                    Your <span className="font-medium text-gray-700">{bookingService?.name}</span> is scheduled for{" "}
+                                    <span className="font-medium text-gray-700">
+                                        {bookingDate ? format(bookingDate, "MMM d, yyyy") : ""} at {bookingTime}
+                                    </span>.
+                                </p>
+                            </div>
+                            <div className="w-full p-4 rounded-xl bg-gray-50 border border-gray-100 text-left text-sm">
+                                <div className="flex justify-between mb-2">
+                                    <span className="text-gray-500">Service</span>
+                                    <span className="font-medium">{bookingService?.name}</span>
+                                </div>
+                                <div className="flex justify-between mb-2">
+                                    <span className="text-gray-500">Amount</span>
+                                    <span className="font-bold text-sky-600">{bookingService?.price || "—"}</span>
+                                </div>
+                                {bookingNote && (
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">Note</span>
+                                        <span className="text-gray-600 text-right max-w-[200px] truncate">{bookingNote}</span>
+                                    </div>
+                                )}
+                            </div>
+                            <Button
+                                className="bg-sky-500 hover:bg-sky-600 text-white w-full"
+                                onClick={() => setBookingService(null)}
+                            >
+                                Done
+                            </Button>
+                        </div>
+                    ) : (
+                        /* Booking Form */
+                        <>
+                            <DialogHeader>
+                                <div className="flex items-center gap-3">
+                                    <div className="h-10 w-10 rounded-xl bg-sky-50 flex items-center justify-center shrink-0">
+                                        <Calendar className="h-5 w-5 text-sky-500" />
+                                    </div>
+                                    <div>
+                                        <DialogTitle className="text-base leading-tight">{bookingService?.name}</DialogTitle>
+                                        <DialogDescription className="text-xs mt-0.5">
+                                            {bookingService?.price && <span className="font-semibold text-sky-600">{bookingService.price}</span>}
+                                            {bookingService?.duration && <span className="text-gray-400"> · {bookingService.duration}</span>}
+                                        </DialogDescription>
+                                    </div>
+                                </div>
+                            </DialogHeader>
+
+                            <div className="grid gap-5 py-2">
+                                {/* Date */}
+                                <div className="flex flex-col gap-2">
+                                    <Label className="flex items-center gap-1.5 text-sm font-medium">
+                                        <Calendar className="h-3.5 w-3.5 text-sky-500" /> Preferred Date
+                                    </Label>
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                className={cn(
+                                                    "w-full justify-start text-left font-normal border-gray-200",
+                                                    !bookingDate && "text-muted-foreground"
+                                                )}
+                                            >
+                                                <Calendar className="mr-2 h-4 w-4 text-gray-400" />
+                                                {bookingDate ? format(bookingDate, "PPP") : <span>Pick a date</span>}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0 z-[10000]" align="start">
+                                            <CalendarUI
+                                                mode="single"
+                                                selected={bookingDate}
+                                                onSelect={setBookingDate}
+                                                disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                                                className="bg-white rounded-md border"
+                                                initialFocus
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                </div>
+
+                                {/* Time */}
+                                <div className="flex flex-col gap-2">
+                                    <Label className="flex items-center gap-1.5 text-sm font-medium">
+                                        <Clock className="h-3.5 w-3.5 text-sky-500" /> Preferred Time
+                                    </Label>
+                                    <div className="relative">
+                                        <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                                        <Input
+                                            type="time"
+                                            className="pl-9 border-gray-200 text-sm"
+                                            value={timeSlots.includes(bookingTime) ? "" : bookingTime}
+                                            onChange={(e) => {
+                                                if (e.target.value) {
+                                                    const [h, m] = e.target.value.split(":").map(Number);
+                                                    const ampm = h >= 12 ? "PM" : "AM";
+                                                    const hour = h % 12 || 12;
+                                                    setBookingTime(`${hour}:${String(m).padStart(2, "0")} ${ampm}`);
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                    {bookingTime && (
+                                        <p className="text-xs text-sky-600 font-medium">
+                                            Selected: {bookingTime}
+                                        </p>
+                                    )}
+                                    <div className="grid grid-cols-4 gap-2">
+                                        {timeSlots.map((slot) => (
+                                            <button
+                                                key={slot}
+                                                onClick={() => setBookingTime(slot)}
+                                                className={cn(
+                                                    "text-xs py-2 px-1 rounded-lg border transition-all",
+                                                    bookingTime === slot
+                                                        ? "bg-sky-500 text-white border-sky-500 font-medium"
+                                                        : "border-gray-200 text-gray-600 hover:border-sky-300 hover:bg-sky-50"
+                                                )}
+                                            >
+                                                {slot}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <Separator className="bg-gray-100" />
+
+                                {/* Note */}
+                                <div className="flex flex-col gap-2">
+                                    <Label className="flex items-center gap-1.5 text-sm font-medium">
+                                        <FileText className="h-3.5 w-3.5 text-gray-400" /> Note{" "}
+                                        <span className="text-gray-400 font-normal text-xs">(optional)</span>
+                                    </Label>
+                                    <Textarea
+                                        placeholder="Describe the issue or any specific requirements..."
+                                        className="resize-none min-h-[80px] border-gray-200 text-sm"
+                                        value={bookingNote}
+                                        onChange={(e) => setBookingNote(e.target.value)}
+                                    />
+                                </div>
+
+                                {/* Summary */}
+                                {bookingService?.price && (
+                                    <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-between">
+                                        <span className="text-sm text-gray-500">Total Amount</span>
+                                        <span className="text-base font-bold text-gray-900">{bookingService.price}</span>
+                                    </div>
+                                )}
+                            </div>
+
+                            <DialogFooter className="flex flex-col sm:flex-row gap-2">
+                                <Button
+                                    variant="outline"
+                                    className="w-full sm:w-auto"
+                                    onClick={() => setBookingService(null)}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    className="bg-sky-500 hover:bg-sky-600 text-white w-full sm:w-auto gap-2"
+                                    onClick={handleConfirm}
+                                    disabled={!canConfirm}
+                                >
+                                    <CreditCard className="h-4 w-4" />
+                                    Confirm &amp; Pay
+                                </Button>
+                            </DialogFooter>
+                        </>
+                    )}
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }
