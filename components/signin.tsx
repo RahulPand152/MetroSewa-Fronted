@@ -2,7 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
 import { useId, useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -37,6 +38,7 @@ export default function Signin() {
     const router = useRouter();
     const { mutate: login, isPending } = useLogin();
     const [errorMsg, setErrorMsg] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         setErrorMsg("");
@@ -68,6 +70,12 @@ export default function Signin() {
     return (
         <div className="flex min-h-screen items-center justify-center px-4">
             <div className="w-full max-w-md space-y-6 rounded-lg border bg-background p-6 shadow-sm">
+                
+                {/* Back to Home */}
+                <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to home
+                </Link>
 
                 {/* Header */}
                 <div className="flex flex-col items-center gap-2">
@@ -114,12 +122,21 @@ export default function Signin() {
                                     <FormItem>
                                         <FormLabel htmlFor={`${id}-password`}>Password</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                id={`${id}-password`}
-                                                type="password"
-                                                placeholder="Enter your password"
-                                                {...field}
-                                            />
+                                            <div className="relative">
+                                                <Input
+                                                    id={`${id}-password`}
+                                                    type={showPassword ? "text" : "password"}
+                                                    placeholder="Enter your password"
+                                                    {...field}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowPassword(!showPassword)}
+                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                                >
+                                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                </button>
+                                            </div>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

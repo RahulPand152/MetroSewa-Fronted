@@ -5,7 +5,8 @@ import { z } from "zod";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 import {
   Card,
@@ -155,8 +156,12 @@ export const ForgetPassword = ({ onBack }: { onBack?: () => void }) => {
   };
 
   return (
-    <Card className="flex w-full max-w-[440px] shadow-none flex-col gap-6 p-5 md:p-8 border-none md:border-solid">
-      <CardHeader className="flex flex-col items-center gap-2">
+    <Card className="flex w-full max-w-[440px] shadow-none flex-col gap-6 p-5 md:p-8 border-none md:border-solid relative">
+      <Link href="/" className="absolute top-6 left-6 inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        Back to home
+      </Link>
+      <CardHeader className="flex flex-col items-center gap-2 mt-6">
         <div className="flex flex-col space-y-1.5 text-center">
           <CardTitle className="md:text-xl font-medium">
             {step === "email" && "Forgot password?"}

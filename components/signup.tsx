@@ -21,7 +21,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { useRegister, useVerifyRegistrationOtp } from "@/src/hooks/useAuth";
@@ -154,6 +154,12 @@ export default function SignupForm() {
     return (
       <div className="flex items-center justify-center min-h-screen px-4">
         <div className="w-full max-w-md bg-white dark:bg-slate-950 rounded-2xl shadow-xl p-8 border">
+          <div className="mb-4">
+            <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to home
+            </Link>
+          </div>
           <h1 className="text-center text-2xl font-bold tracking-wide mb-2">
             Metro <span className="text-blue-600">Sewa</span>
           </h1>
@@ -212,10 +218,16 @@ export default function SignupForm() {
 
   // ── Registration Form ─────────────────────────────────────────────────
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center min-h-screen px-4">
       <div className="w-full max-w-md">
-        <Card className="border-none shadow-lg">
-          <CardHeader className="flex flex-col items-center space-y-2 pt-6">
+        <Card className="border-none shadow-lg pt-4 md:pt-6">
+          <div className="px-6 flex">
+            <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to home
+            </Link>
+          </div>
+          <CardHeader className="flex flex-col items-center space-y-2 pt-2">
             <h2 className="text-2xl font-semibold">Create an account</h2>
             <p className="text-muted-foreground">
               Join MetroSewa to get started

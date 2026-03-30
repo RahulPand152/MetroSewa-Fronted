@@ -18,8 +18,10 @@ import { NavbarPage } from "@/app/component/Navbar"
 import Link from "next/link"
 import { Reviews } from "@/app/component/Reviews"
 import { useGetPublicServices } from "@/src/hooks/useServices"
+import { useProfile } from "@/src/hooks/useAuth"
 import { Loader2 } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
+import { AuthDialog } from "@/components/AuthDialog"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
@@ -44,49 +46,17 @@ export default function ServiceDetails() {
 
     const service = services.find((item: any) => item.id === id);
 
-    // Booking state
-    const [bookingService, setBookingService] = React.useState<any>(null);
-    const [bookingDate, setBookingDate] = React.useState<Date | undefined>(undefined);
-    const [bookingTime, setBookingTime] = React.useState("");
-    const [bookingNote, setBookingNote] = React.useState("");
-    const [isBooked, setIsBooked] = React.useState(false);
+    const { data: userProfile } = useProfile();
+    const isEligibleToBook = userProfile?.role !== 'ADMIN' && userProfile?.role !== 'TECHNICIAN';
+    const [showAuthDialog, setShowAuthDialog] = React.useState(false);
 
-    const handleBookNow = (serviceData: any) => {
-        setBookingService(serviceData);
-        setBookingDate(undefined);
-        setBookingTime("");
-        setBookingNote("");
-        setIsBooked(false);
+    const handleBookNow = () => {
+        if (!userProfile) {
+            setShowAuthDialog(true);
+            return;
+        }
+        router.push(`/booking/${service.id}`);
     };
-
-    const handleConfirm = () => {
-        if (!bookingService || !bookingDate || !bookingTime) return;
-
-        // Build new booking record
-        const newBooking = {
-            id: `B-${Date.now()}`,
-            service: bookingService.name,
-            category: (bookingService.slug || "")
-                .split("-")
-                .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
-                .join(" "),
-            status: "Upcoming",
-            date: format(bookingDate, "MMM d, yyyy"),
-            time: bookingTime,
-            price: bookingService.price || "—",
-            description: bookingNote || bookingService.description || "",
-            statusColor: "bg-sky-100 text-sky-700",
-        };
-
-        try {
-            const existing = JSON.parse(localStorage.getItem("metro_bookings") || "[]");
-            localStorage.setItem("metro_bookings", JSON.stringify([newBooking, ...existing]));
-        } catch (_) { }
-
-        setIsBooked(true);
-    };
-
-    const canConfirm = bookingDate && bookingTime;
 
     if (isLoading) {
         return (
@@ -129,6 +99,13 @@ export default function ServiceDetails() {
     return (
         <div className="min-h-screen bg-[#f8f9fa]">
             <NavbarPage />
+            
+            <AuthDialog 
+                open={showAuthDialog} 
+                onOpenChange={setShowAuthDialog}
+                onSuccess={() => router.push(`/booking/${service.id}`)}
+            />
+
             {/* Hero Carousel */}
             <div className="max-w-7xl mx-auto px-4 pt-8">
                 <button
@@ -272,13 +249,19 @@ export default function ServiceDetails() {
                                     </div>
                                 </div>
 
-                                <Button 
-                                    size="lg" 
-                                    className="w-full rounded-full h-10 text-lg font-medium shadow-lg hover:shadow-xl transition-all bg-sky-500 hover:bg-sky-600"
-                                    onClick={() => handleBookNow({ ...service, slug: service.categoryId || "all", price: price })}
-                                >
-                                    Book Now
-                                </Button>
+                                {isEligibleToBook ? (
+                                    <Button 
+                                        size="lg" 
+                                        className="w-full rounded-full h-10 text-lg font-medium shadow-lg hover:shadow-xl transition-all bg-sky-500 hover:bg-sky-600"
+                                        onClick={handleBookNow}
+                                    >
+                                        Book Now
+                                    </Button>
+                                ) : (
+                                    <div className="w-full p-3 bg-red-50 text-red-600 rounded-xl text-center font-medium text-sm border border-red-100">
+                                        For security reasons, {userProfile?.role === 'ADMIN' ? 'Admins' : 'Technicians'} cannot book services.
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
 
@@ -294,187 +277,7 @@ export default function ServiceDetails() {
 
             </div>
 
-            {/* Booking Dialog */}
-            <Dialog open={!!bookingService} onOpenChange={(open) => { if (!open) setBookingService(null); }}>
-                <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
-                    {isBooked ? (
-                        /* Success State */
-                        <div className="flex flex-col items-center justify-center py-8 gap-4 text-center">
-                            <div className="h-16 w-16 rounded-full bg-emerald-100 flex items-center justify-center">
-                                <CheckCircle className="h-8 w-8 text-emerald-500" />
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-bold text-gray-900">Booking Confirmed!</h3>
-                                <p className="text-sm text-gray-500 mt-1">
-                                    Your <span className="font-medium text-gray-700">{bookingService?.name}</span> is scheduled for{" "}
-                                    <span className="font-medium text-gray-700">
-                                        {bookingDate ? format(bookingDate, "MMM d, yyyy") : ""} at {bookingTime}
-                                    </span>.
-                                </p>
-                            </div>
-                            <div className="w-full p-4 rounded-xl bg-gray-50 border border-gray-100 text-left text-sm">
-                                <div className="flex justify-between mb-2">
-                                    <span className="text-gray-500">Service</span>
-                                    <span className="font-medium">{bookingService?.name}</span>
-                                </div>
-                                <div className="flex justify-between mb-2">
-                                    <span className="text-gray-500">Amount</span>
-                                    <span className="font-bold text-sky-600">{bookingService?.price || "—"}</span>
-                                </div>
-                                {bookingNote && (
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-500">Note</span>
-                                        <span className="text-gray-600 text-right max-w-[200px] truncate">{bookingNote}</span>
-                                    </div>
-                                )}
-                            </div>
-                            <Button
-                                className="bg-sky-500 hover:bg-sky-600 text-white w-full"
-                                onClick={() => setBookingService(null)}
-                            >
-                                Done
-                            </Button>
-                        </div>
-                    ) : (
-                        /* Booking Form */
-                        <>
-                            <DialogHeader>
-                                <div className="flex items-center gap-3">
-                                    <div className="h-10 w-10 rounded-xl bg-sky-50 flex items-center justify-center shrink-0">
-                                        <Calendar className="h-5 w-5 text-sky-500" />
-                                    </div>
-                                    <div>
-                                        <DialogTitle className="text-base leading-tight">{bookingService?.name}</DialogTitle>
-                                        <DialogDescription className="text-xs mt-0.5">
-                                            {bookingService?.price && <span className="font-semibold text-sky-600">{bookingService.price}</span>}
-                                            {bookingService?.duration && <span className="text-gray-400"> · {bookingService.duration}</span>}
-                                        </DialogDescription>
-                                    </div>
-                                </div>
-                            </DialogHeader>
 
-                            <div className="grid gap-5 py-2">
-                                {/* Date */}
-                                <div className="flex flex-col gap-2">
-                                    <Label className="flex items-center gap-1.5 text-sm font-medium">
-                                        <Calendar className="h-3.5 w-3.5 text-sky-500" /> Preferred Date
-                                    </Label>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                variant="outline"
-                                                className={cn(
-                                                    "w-full justify-start text-left font-normal border-gray-200",
-                                                    !bookingDate && "text-muted-foreground"
-                                                )}
-                                            >
-                                                <Calendar className="mr-2 h-4 w-4 text-gray-400" />
-                                                {bookingDate ? format(bookingDate, "PPP") : <span>Pick a date</span>}
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0 z-[10000]" align="start">
-                                            <CalendarUI
-                                                mode="single"
-                                                selected={bookingDate}
-                                                onSelect={setBookingDate}
-                                                disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                                                className="bg-white rounded-md border"
-                                                initialFocus
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
-                                </div>
-
-                                {/* Time */}
-                                <div className="flex flex-col gap-2">
-                                    <Label className="flex items-center gap-1.5 text-sm font-medium">
-                                        <Clock className="h-3.5 w-3.5 text-sky-500" /> Preferred Time
-                                    </Label>
-                                    <div className="relative">
-                                        <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
-                                        <Input
-                                            type="time"
-                                            className="pl-9 border-gray-200 text-sm"
-                                            value={timeSlots.includes(bookingTime) ? "" : bookingTime}
-                                            onChange={(e) => {
-                                                if (e.target.value) {
-                                                    const [h, m] = e.target.value.split(":").map(Number);
-                                                    const ampm = h >= 12 ? "PM" : "AM";
-                                                    const hour = h % 12 || 12;
-                                                    setBookingTime(`${hour}:${String(m).padStart(2, "0")} ${ampm}`);
-                                                }
-                                            }}
-                                        />
-                                    </div>
-                                    {bookingTime && (
-                                        <p className="text-xs text-sky-600 font-medium">
-                                            Selected: {bookingTime}
-                                        </p>
-                                    )}
-                                    <div className="grid grid-cols-4 gap-2">
-                                        {timeSlots.map((slot) => (
-                                            <button
-                                                key={slot}
-                                                onClick={() => setBookingTime(slot)}
-                                                className={cn(
-                                                    "text-xs py-2 px-1 rounded-lg border transition-all",
-                                                    bookingTime === slot
-                                                        ? "bg-sky-500 text-white border-sky-500 font-medium"
-                                                        : "border-gray-200 text-gray-600 hover:border-sky-300 hover:bg-sky-50"
-                                                )}
-                                            >
-                                                {slot}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <Separator className="bg-gray-100" />
-
-                                {/* Note */}
-                                <div className="flex flex-col gap-2">
-                                    <Label className="flex items-center gap-1.5 text-sm font-medium">
-                                        <FileText className="h-3.5 w-3.5 text-gray-400" /> Note{" "}
-                                        <span className="text-gray-400 font-normal text-xs">(optional)</span>
-                                    </Label>
-                                    <Textarea
-                                        placeholder="Describe the issue or any specific requirements..."
-                                        className="resize-none min-h-[80px] border-gray-200 text-sm"
-                                        value={bookingNote}
-                                        onChange={(e) => setBookingNote(e.target.value)}
-                                    />
-                                </div>
-
-                                {/* Summary */}
-                                {bookingService?.price && (
-                                    <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-between">
-                                        <span className="text-sm text-gray-500">Total Amount</span>
-                                        <span className="text-base font-bold text-gray-900">{bookingService.price}</span>
-                                    </div>
-                                )}
-                            </div>
-
-                            <DialogFooter className="flex flex-col sm:flex-row gap-2">
-                                <Button
-                                    variant="outline"
-                                    className="w-full sm:w-auto"
-                                    onClick={() => setBookingService(null)}
-                                >
-                                    Cancel
-                                </Button>
-                                <Button
-                                    className="bg-sky-500 hover:bg-sky-600 text-white w-full sm:w-auto gap-2"
-                                    onClick={handleConfirm}
-                                    disabled={!canConfirm}
-                                >
-                                    <CreditCard className="h-4 w-4" />
-                                    Confirm &amp; Pay
-                                </Button>
-                            </DialogFooter>
-                        </>
-                    )}
-                </DialogContent>
-            </Dialog>
         </div>
     )
 }

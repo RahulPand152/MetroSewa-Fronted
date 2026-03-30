@@ -2,6 +2,7 @@
 
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 interface SubCategoryProps {
     id: number;
@@ -14,15 +15,17 @@ interface SubCategoryProps {
 }
 
 export const SubCategories = ({ data, category }: { data: SubCategoryProps[], category: string }) => {
+    const router = useRouter();
+
     return (
         <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-auto">
             {data.map((service) => (
-                <Link href={`/service/${category}/${service.id}`}
+                <div 
                     key={service.id}
                     className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200/60 bg-white dark:bg-slate-900 shadow-sm transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 hover:border-primary/40"
                 >
-                    {/* Image Section */}
-                    <div className="relative h-52 w-full overflow-hidden">
+                    <Link href={`/service/${category}/${service.id}`} className="block relative h-52 w-full overflow-hidden">
+                        {/* Image Section */}
                         <img
                             src={service.image}
                             alt={service.name}
@@ -38,25 +41,31 @@ export const SubCategories = ({ data, category }: { data: SubCategoryProps[], ca
                                 24/7 Priority
                             </span>
                         )}
-                    </div>
+                    </Link>
 
                     {/* Content Section */}
                     <div className="p-5 flex flex-col justify-between h-[190px]">
-                        <div>
-                            <h3 className="text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition">
+                        <Link href={`/service/${category}/${service.id}`}>
+                            <h3 className="text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition tracking-tight">
                                 {service.name}
                             </h3>
                             <p className="text-sm text-gray-500 mt-2 line-clamp-3">
                                 {service.description}
                             </p>
-                        </div>
+                        </Link>
 
                         {/* Button */}
-                        <button className="w-full rounded-xl bg-[#020817] hover:bg-gray-400  hover:text-gray-200 px-4 py-2 text-sm font-semibold text-white transition-all duration-300 hover:bg-[#0b1224] hover:shadow-lg">
+                        <button 
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(`/booking/${service.id}`);
+                            }}
+                            className="w-full rounded-xl bg-[#020817] hover:bg-gray-400 hover:text-gray-200 px-4 py-2 text-sm font-semibold text-white transition-all duration-300 hover:bg-[#0b1224] hover:shadow-lg mt-3"
+                        >
                             {service.buttonText}
                         </button>
                     </div>
-                </Link>
+                </div>
             ))}
         </div>
 
