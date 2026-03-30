@@ -184,7 +184,7 @@ export default function BookServicePage() {
                                             <span className="text-sm font-bold text-slate-800 dark:text-slate-100">
                                                 {service.price != null ? `Rs. ${service.price}` : "--"}
                                             </span>
-                                            <Link href={`/service/${service.categoryId}/${service.id}`} className="ml-auto">
+                                            <Link href={`/booking/${service.id}`} className="ml-auto">
                                                 <Button size="sm" className="bg-sky-500 hover:bg-sky-600 text-white text-xs h-8 px-4">
                                                     Book Now
                                                 </Button>
