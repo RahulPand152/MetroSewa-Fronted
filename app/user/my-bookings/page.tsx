@@ -16,91 +16,91 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner"; // Assuming sonner is installed, otherwise standard alert/console
 
-const initialBookings = [
-    {
-        id: "B-1029", service: "Plumbing Repair", category: "Plumbing", status: "Upcoming",
-        date: "Today", time: "3:00 PM", price: "Rs. 1,200",
-        statusColor: "bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-400",
-        description: "Fixing a leaky pipe under the kitchen sink. Requires urgent attention before it damages the wooden cabinet."
-    },
-    {
-        id: "B-1028", service: "AC Servicing", category: "Appliance Repair", status: "Completed",
-        date: "Feb 23, 2026", time: "10:00 AM", price: "Rs. 2,500",
-        statusColor: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400",
-        description: "Standard AC servicing including filter cleaning, gas check, and overall performance tuning."
-    },
-    {
-        id: "B-1027", service: "House Cleaning", category: "Cleaning", status: "Cancelled",
-        date: "Feb 15, 2026", time: "9:00 AM", price: "Rs. 3,000",
-        statusColor: "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-400",
-        description: "Deep cleaning of a 3BHK apartment including bathrooms, kitchen, and living areas."
-    },
-];
+import { useGetMyBookings } from "@/src/hooks/useBookings";
 
 export default function MyBookingsPage() {
-    const [bookings, setBookings] = useState(initialBookings);
+    const { data: realBookings = [], isLoading } = useGetMyBookings();
 
-    // Load any bookings saved from Book Now flow
-    useEffect(() => {
-        try {
-            const stored = JSON.parse(localStorage.getItem("metro_bookings") || "[]");
-            if (stored.length > 0) {
-                // Merge: stored bookings first (newest), then initial seed (avoid duplicates by id)
-                setBookings([
-                    ...stored,
-                    ...initialBookings.filter(
-                        (ib) => !stored.some((sb: any) => sb.id === ib.id)
-                    ),
-                ]);
-            }
-        } catch (_) { }
-    }, []);
+    const mappedBookings = realBookings.map((b: any) => {
+        const d = new Date(b.scheduledDate || new Date());
+        let statusColor = "";
+        let displayStatus = b.status; 
+        
+        switch(displayStatus) {
+            case "PENDING":
+            case "ASSIGNED":
+                statusColor = "bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-400";
+                break;
+            case "COMPLETED":
+                statusColor = "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400";
+                break;
+            case "CANCELLED":
+                statusColor = "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-400";
+                break;
+            default:
+                statusColor = "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400"; 
+                displayStatus = "In Progress";
+        }
 
-    // State for Editing
+        let paymentStatus = "Pending";
+        let paymentColor = "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400";
+        if (b.payment?.status === "PAID") {
+             paymentStatus = "Paid";
+             paymentColor = "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400";
+        } else if (b.payment?.paymentMethod === "COD") {
+             paymentStatus = "Cash on Delivery";
+             paymentColor = "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400";
+        }
+
+        return {
+             id: b.id,
+             shortId: b.id.substring(0, 4).toUpperCase(),
+             service: b.service?.name || "Unknown Service",
+             category: b.service?.category?.name || "General",
+             status: displayStatus,
+             date: format(d, "MMM d, yyyy"),
+             time: format(d, "hh:mm a"),
+             price: `Rs. ${b.service?.price || 0}`,
+             statusColor,
+             description: b.description || "No specific details provided.",
+             paymentStatus,
+             paymentColor,
+             address: "No address provided"
+        };
+    });
+
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [editingBooking, setEditingBooking] = useState<any>(null);
     const [editingDate, setEditingDate] = useState<Date | undefined>(undefined);
 
-    const handleCancelBooking = (id: string) => {
-        setBookings(prev => prev.map(b =>
-            b.id === id ? { ...b, status: "Cancelled", statusColor: "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-400" } : b
-        ));
-        // You would typically also call an API here
-    };
-
-    const handleDeleteBooking = (id: string) => {
-        setBookings(prev => prev.filter(b => b.id !== id));
-        try {
-            const stored = JSON.parse(localStorage.getItem("metro_bookings") || "[]");
-            localStorage.setItem(
-                "metro_bookings",
-                JSON.stringify(stored.filter((b: any) => b.id !== id))
-            );
-        } catch (_) { }
-    };
-
     const handleEditClick = (booking: any) => {
         setEditingBooking({ ...booking });
-        // Try parsing the existing date, otherwise leave undefined
-        let parsedDate: Date | undefined = undefined;
-        try {
-            const d = new Date(booking.date);
-            if (!isNaN(d.getTime())) parsedDate = d;
-        } catch (e) { }
-        setEditingDate(parsedDate);
+        setEditingDate(new Date(booking.date));
         setIsEditDialogOpen(true);
     };
 
     const handleSaveEdit = () => {
-        if (!editingBooking) return;
-        const finalBooking = { ...editingBooking };
-        if (editingDate) {
-            finalBooking.date = format(editingDate, "MMM d, yyyy");
-        }
-        setBookings(prev => prev.map(b => b.id === finalBooking.id ? finalBooking : b));
+        toast.info("Edit feature requires backend API integration.");
         setIsEditDialogOpen(false);
         setEditingBooking(null);
     };
+
+    const handleCancelBooking = (id: string) => {
+        toast.info("Cancellation feature requires backend API integration.");
+    };
+
+    const handleDeleteBooking = (id: string) => {
+        toast.info("Delete feature requires backend API integration.");
+    };
+
+    if (isLoading) {
+        return (
+            <div className="flex flex-col gap-6 max-w-5xl items-center justify-center py-20">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-500"></div>
+                <p className="text-slate-500 dark:text-slate-400">Loading your bookings...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col gap-6 max-w-5xl">
@@ -115,11 +115,13 @@ export default function MyBookingsPage() {
                 <CardHeader className="border-b border-slate-100 dark:border-slate-800 py-4">
                     <div className="flex items-center justify-between">
                         <CardTitle className="text-base text-slate-800 dark:text-slate-200">All Bookings</CardTitle>
-                        <Badge className="bg-sky-500 hover:bg-sky-600 text-white text-xs">{bookings.length} total</Badge>
+                        <Badge className="bg-sky-500 hover:bg-sky-600 text-white text-xs">{mappedBookings.length} total</Badge>
                     </div>
                 </CardHeader>
                 <CardContent className="p-0 divide-y divide-slate-100 dark:divide-slate-800">
-                    {bookings.map((booking) => (
+                    {mappedBookings.length === 0 ? (
+                        <div className="p-8 text-center text-slate-500">No bookings found.</div>
+                    ) : mappedBookings.map((booking: any) => (
                         <div
                             key={booking.id}
                             className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-4 hover:bg-slate-50/50 dark:hover:bg-slate-900/5 transition-colors"
@@ -127,7 +129,7 @@ export default function MyBookingsPage() {
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-3 flex-wrap">
                                     <div className="h-9 w-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 font-semibold text-[10px] shrink-0">
-                                        {booking.id.split('-')[1]}
+                                        {booking.shortId}
                                     </div>
                                     <div className="flex flex-col">
                                         <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">{booking.service}</p>

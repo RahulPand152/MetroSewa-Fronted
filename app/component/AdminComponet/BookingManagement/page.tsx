@@ -1,7 +1,12 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import {
+import { format } from "date-fns";
+import { useGetBookings, useUpdateBookingStatus } from "@/src/hooks/useAdmin";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+    
+import{
     Search,
     Filter,
     Calendar,
@@ -47,55 +52,37 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-type BookingStatus = "Pending" | "Confirmed" | "In Progress" | "Completed" | "Cancelled";
 type SortField = "customerName" | "serviceName" | "date" | "amount" | null;
 type SortDir = "asc" | "desc";
 
 const PAGE_SIZE = 10;
 
-interface Booking {
-    id: string;
-    customerName: string;
-    serviceName: string;
-    technicianName: string | null;
-    date: string;
-    time: string;
-    status: BookingStatus;
-    amount: number;
-    address: string;
-    paymentStatus: "Paid" | "Unpaid" | "Pending";
-}
-
-// ─── Mock Data ────────────────────────────────────────────────────────────────
-const initialBookings: Booking[] = [
-    { id: "BK-001", customerName: "Aarav Sharma", serviceName: "Leak Repair", technicianName: "Ramesh Gupta", date: "2024-06-15", time: "10:00 AM", status: "Completed", amount: 1500, address: "Baneshwor, Kathmandu", paymentStatus: "Paid" },
-    { id: "BK-002", customerName: "Priya Thapa", serviceName: "Deep Cleaning", technicianName: "Gita Rai", date: "2024-06-16", time: "02:00 PM", status: "In Progress", amount: 3500, address: "Pulchowk, Lalitpur", paymentStatus: "Pending" },
-    { id: "BK-003", customerName: "Sita Rai", serviceName: "Electric Wiring", technicianName: null, date: "2024-06-18", time: "11:30 AM", status: "Pending", amount: 2000, address: "Thamel, Kathmandu", paymentStatus: "Unpaid" },
-    { id: "BK-004", customerName: "Rohan Gurung", serviceName: "AC Service", technicianName: "Suresh Thapa", date: "2024-06-14", time: "04:00 PM", status: "Confirmed", amount: 2500, address: "Lakeside, Pokhara", paymentStatus: "Unpaid" },
-    { id: "BK-005", customerName: "Bikash Karki", serviceName: "Pipe Installation", technicianName: "Ramesh Gupta", date: "2024-06-10", time: "09:00 AM", status: "Cancelled", amount: 1200, address: "Suryabinayak, Bhaktapur", paymentStatus: "Unpaid" },
-];
-
 // ─── Components ───────────────────────────────────────────────────────────────
 
-function StatusBadge({ status }: { status: BookingStatus }) {
-    const map: Record<BookingStatus, string> = {
-        Pending: "bg-amber-100 text-amber-700 border-amber-200",
-        Confirmed: "bg-blue-100 text-blue-700 border-blue-200",
-        "In Progress": "bg-indigo-100 text-indigo-700 border-indigo-200",
-        Completed: "bg-green-100 text-green-700 border-green-200",
-        Cancelled: "bg-red-100 text-red-700 border-red-200",
+function StatusBadge({ status }: { status: string }) {
+    const s = (status || "UNKNOWN").toUpperCase().replace(' ', '_');
+    
+    const map: Record<string, string> = {
+        PENDING: "bg-amber-100 text-amber-700 border-amber-200",
+        ASSIGNED: "bg-blue-100 text-blue-700 border-blue-200",
+        IN_PROGRESS: "bg-indigo-100 text-indigo-700 border-indigo-200",
+        COMPLETED: "bg-green-100 text-green-700 border-green-200",
+        CANCELLED: "bg-red-100 text-red-700 border-red-200",
     };
-    const iconMap: Record<BookingStatus, React.ElementType> = {
-        Pending: Clock3,
-        Confirmed: CheckCircle2,
-        "In Progress": Clock,
-        Completed: CheckCircle2,
-        Cancelled: XCircle,
+    
+    const iconMap: Record<string, React.ElementType> = {
+        PENDING: Clock3,
+        ASSIGNED: CheckCircle2,
+        IN_PROGRESS: Clock,
+        COMPLETED: CheckCircle2,
+        CANCELLED: XCircle,
     };
-    const Icon = iconMap[status];
+    
+    const Icon = iconMap[s] || Clock;
+    const styleStr = map[s] || "bg-slate-100 text-slate-700 border-slate-200";
 
     return (
-        <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium ${map[status]}`}>
+        <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium ${styleStr}`}>
             <Icon className="h-3 w-3" />
             {status}
         </span>
@@ -116,7 +103,7 @@ function SortHeader({ label, field, sortField, sortDir, onSort }: { label: strin
 }
 
 // ─── Booking Detail Dialog ────────────────────────────────────────────────────
-function BookingDetailDialog({ booking, open, onClose }: { booking: Booking | null; open: boolean; onClose: () => void }) {
+function BookingDetailDialog({ booking, open, onClose }: { booking: any; open: boolean; onClose: () => void }) {
     if (!booking) return null;
 
     return (
@@ -173,7 +160,35 @@ function BookingDetailDialog({ booking, open, onClose }: { booking: Booking | nu
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function BookingManagement() {
-    const [bookings, setBookings] = useState<Booking[]>(initialBookings);
+    const { data: rawBookings = [], isLoading } = useGetBookings();
+    const { mutate: updateStatus } = useUpdateBookingStatus();
+    
+    // Process backend bookings into our display format
+    const bookings = useMemo(() => {
+        if (!Array.isArray(rawBookings)) return [];
+        return rawBookings.map((b: any) => {
+            const dateObj = b.scheduledDate ? new Date(b.scheduledDate) : new Date();
+            return {
+                id: b.id,
+                customerName: `${b.user?.firstName || ''} ${b.user?.lastName || ''}`.trim() || 'Unknown',
+                serviceName: b.service?.name || 'Unknown Service',
+                technicianName: b.technicians && b.technicians.length > 0 
+                    ? `${b.technicians[0].user?.firstName || ''} ${b.technicians[0].user?.lastName || ''}`.trim()
+                    : null,
+                date: b.scheduledDate ? format(dateObj, "yyyy-MM-dd") : 'N/A',
+                time: b.scheduledDate ? format(dateObj, "hh:mm a") : 'N/A',
+                status: b.status ? b.status.charAt(0).toUpperCase() + b.status.slice(1).toLowerCase().replace('_', ' ') : 'Unknown', // e.g. IN_PROGRESS -> In progress -> In Progress
+                amount: b.service?.price || 0,
+                address: b.user?.address || 'No Address',
+                paymentStatus: b.payment?.status === "PAID" 
+                    ? "Paid (Khalti)" 
+                    : b.payment?.paymentMethod === "COD" 
+                        ? "Cash on Delivery" 
+                        : "Pending",
+            };
+        });
+    }, [rawBookings]);
+
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("All");
     const [sortField, setSortField] = useState<SortField>(null);
@@ -181,22 +196,22 @@ export default function BookingManagement() {
     const [page, setPage] = useState(1);
 
     // Detail dialog
-    const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+    const [selectedBooking, setSelectedBooking] = useState<any>(null);
     const [detailOpen, setDetailOpen] = useState(false);
 
     const filtered = useMemo(() => {
-        let list = bookings.filter((b) => {
+        let list = bookings.filter((b: any) => {
             const q = search.toLowerCase();
             const matchSearch =
-                b.customerName.toLowerCase().includes(q) ||
-                b.serviceName.toLowerCase().includes(q) ||
-                b.id.toLowerCase().includes(q);
-            const matchStatus = statusFilter === "All" || b.status === statusFilter;
+                (b.customerName || "").toLowerCase().includes(q) ||
+                (b.serviceName || "").toLowerCase().includes(q) ||
+                String(b.id || "").toLowerCase().includes(q);
+            const matchStatus = statusFilter === "All" || (b.status || "").toUpperCase() === statusFilter.toUpperCase();
             return matchSearch && matchStatus;
         });
 
         if (sortField) {
-            list = [...list].sort((a, b) => {
+            list = [...list].sort((a: any, b: any) => {
                 let av: any = a[sortField];
                 let bv: any = b[sortField];
                 if (av < bv) return sortDir === "asc" ? -1 : 1;
@@ -219,9 +234,21 @@ export default function BookingManagement() {
         }
     };
 
-    const handleStatusChange = (id: string, status: BookingStatus) => {
-        setBookings(prev => prev.map(b => b.id === id ? { ...b, status } : b));
+    const handleStatusChange = async (id: string, status: string) => {
+        let backendStatus = status.toUpperCase().replace(' ', '_');
+        if (backendStatus === "CONFIRMED") backendStatus = "ASSIGNED"; // Map confirmed to assigned or similar if matching schema
+        
+        updateStatus({ id, status: backendStatus });
     };
+
+    if (isLoading) {
+        return (
+            <div className="flex flex-1 flex-col items-center justify-center h-full p-6">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-900"></div>
+                <p className="mt-4 text-slate-500">Loading bookings...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-1 flex-col gap-6 p-6">
@@ -243,19 +270,19 @@ export default function BookingManagement() {
                 <Card>
                     <CardContent className="p-4 flex items-center gap-4">
                         <div className="bg-amber-100 p-2 rounded-lg text-amber-600"><Clock className="h-6 w-6" /></div>
-                        <div><p className="text-sm text-slate-500">Pending</p><p className="text-xl font-bold">{bookings.filter(b => b.status === "Pending").length}</p></div>
+                        <div><p className="text-sm text-slate-500">Pending</p><p className="text-xl font-bold">{bookings.filter((b:any) => (b.status || "").toUpperCase() === "PENDING").length}</p></div>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardContent className="p-4 flex items-center gap-4">
                         <div className="bg-green-100 p-2 rounded-lg text-green-600"><CheckCircle2 className="h-6 w-6" /></div>
-                        <div><p className="text-sm text-slate-500">Completed</p><p className="text-xl font-bold">{bookings.filter(b => b.status === "Completed").length}</p></div>
+                        <div><p className="text-sm text-slate-500">Completed</p><p className="text-xl font-bold">{bookings.filter((b:any) => (b.status || "").toUpperCase() === "COMPLETED").length}</p></div>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardContent className="p-4 flex items-center gap-4">
                         <div className="bg-orange-100 p-2 rounded-lg text-orange-600"><AlertCircle className="h-6 w-6" /></div>
-                        <div><p className="text-sm text-slate-500">Cancelled</p><p className="text-xl font-bold">{bookings.filter(b => b.status === "Cancelled").length}</p></div>
+                        <div><p className="text-sm text-slate-500">Cancelled</p><p className="text-xl font-bold">{bookings.filter((b:any) => (b.status || "").toUpperCase() === "CANCELLED").length}</p></div>
                     </CardContent>
                 </Card>
             </div>
@@ -293,6 +320,7 @@ export default function BookingManagement() {
                                     </th>
                                     <th className="px-6 py-3 text-left font-medium text-muted-foreground">Technician</th>
                                     <th className="px-6 py-3 text-left font-medium text-muted-foreground">Status</th>
+                                    <th className="px-6 py-3 text-left font-medium text-muted-foreground">Payment</th>
                                     <th className="px-6 py-3 text-left font-medium text-muted-foreground">
                                         <SortHeader label="Amount" field="amount" sortField={sortField} sortDir={sortDir} onSort={handleSort} />
                                     </th>
@@ -300,9 +328,9 @@ export default function BookingManagement() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {paginated.map((booking) => (
+                                {paginated.map((booking: any) => (
                                     <tr key={booking.id} className="border-b hover:bg-muted/50 transition-colors">
-                                        <td className="px-6 py-4 font-medium">{booking.id}</td>
+                                        <td className="px-6 py-4 font-medium">{String(booking.id || "").substring(0, 8).toUpperCase()}</td>
                                         <td className="px-6 py-4">
                                             <div>
                                                 <p className="font-medium text-slate-900 dark:text-slate-100">{booking.customerName}</p>
@@ -327,6 +355,16 @@ export default function BookingManagement() {
                                             )}
                                         </td>
                                         <td className="px-6 py-4"><StatusBadge status={booking.status} /></td>
+                                        <td className="px-6 py-4">
+                                            <span className={cn(
+                                                "px-2 py-1 rounded-full text-xs font-medium",
+                                                booking.paymentStatus.includes("Paid") ? "bg-green-100 text-green-700" :
+                                                booking.paymentStatus.includes("Cash") ? "bg-blue-100 text-blue-700" :
+                                                "bg-amber-100 text-amber-700"
+                                            )}>
+                                                {booking.paymentStatus}
+                                            </span>
+                                        </td>
                                         <td className="px-6 py-4 font-medium">Rs. {booking.amount}</td>
                                         <td className="px-6 py-4 text-right">
                                             <DropdownMenu>
