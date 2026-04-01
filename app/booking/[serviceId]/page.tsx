@@ -1,9 +1,9 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
-import { useParams, useRouter } from "next/navigation"
+import React, { useState, useEffect, useCallback } from "react"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { format } from "date-fns"
-import { Calendar as CalendarIcon, Clock, ArrowLeft, ArrowRight, ShieldCheck, CreditCard, User, Mail, Phone, FileText, CheckCircle, Wallet, Check } from "lucide-react"
+import { Calendar as CalendarIcon, Clock, ArrowLeft, ArrowRight, ShieldCheck, CreditCard, User, Mail, Phone, FileText, CheckCircle, Wallet, Check, Loader2, XCircle, AlertTriangle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 
@@ -34,6 +34,7 @@ const STEPS = [
 export default function BookingWizardPage() {
     const params = useParams()
     const router = useRouter()
+    const searchParams = useSearchParams()
     const serviceId = params.serviceId as string
 
     const { data: userProfile, isLoading: isAuthLoading } = useProfile()
@@ -52,6 +53,7 @@ export default function BookingWizardPage() {
     const [contactName, setContactName] = useState("")
     const [contactEmail, setContactEmail] = useState("")
     const [contactPhone, setContactPhone] = useState("")
+    const [contactAddress, setContactAddress] = useState("")
     const [initialized, setInitialized] = useState(false)
 
     // Step 3 State
@@ -64,6 +66,10 @@ export default function BookingWizardPage() {
     // Auth Dialog State
     const [showAuthDialog, setShowAuthDialog] = useState(false)
 
+    // Khalti callback verification state
+    const [isVerifyingPayment, setIsVerifyingPayment] = useState(false)
+    const [paymentError, setPaymentError] = useState<string | null>(null)
+
     useEffect(() => {
         const user = userProfile?.data;
         if (user && !initialized) {
@@ -73,6 +79,75 @@ export default function BookingWizardPage() {
             setInitialized(true)
         }
     }, [userProfile, initialized])
+
+    const userRole = userProfile?.data?.role || userProfile?.role;
+    useEffect(() => {
+        if (userRole === "ADMIN" || userRole === "TECHNICIAN") {
+            toast.error("Admins and Technicians are not eligible to book services. Only standard users can make a booking.");
+            router.push("/");
+        }
+    }, [userRole, router])
+
+    // ── Handle Khalti Callback ─────────────────────────────────────────
+    // When Khalti redirects back, URL has: ?pidx=xxx&status=Completed&transaction_id=xxx&purchase_order_id=xxx
+    const handleKhaltiCallback = useCallback(async () => {
+        const pidx = searchParams.get("pidx")
+        const status = searchParams.get("status")
+        const purchase_order_id = searchParams.get("purchase_order_id")
+        const transaction_id = searchParams.get("transaction_id")
+
+        if (!pidx || !purchase_order_id) return
+
+        // Prevent re-processing
+        if (isVerifyingPayment || bookingResult) return
+
+        setIsVerifyingPayment(true)
+        setStep(4) // Jump to success/result step
+
+        if (status === "Completed") {
+            try {
+                // Verify payment via our backend
+                const res = await axiosInstance.post("/payment/verify", {
+                    pidx,
+                    bookingId: purchase_order_id,
+                })
+
+                const data = res.data?.data || res.data;
+
+                if (res.status === 200 && data) {
+                    setBookingResult({
+                        id: purchase_order_id,
+                        paymentStatus: "PAID",
+                        transactionId: transaction_id || data.transaction_id,
+                        amount: data.total_amount,
+                        khaltiStatus: data.khaltiStatus || "Completed",
+                    })
+                    toast.success("Payment verified successfully! Your booking is confirmed.")
+                } else {
+                    setPaymentError("Payment verification returned unexpected status.")
+                    toast.error("Payment verification failed")
+                }
+            } catch (error: any) {
+                console.error("Verification error:", error)
+                const errorMsg = error.response?.data?.message || error.response?.data?.error || "An error occurred while verifying your payment. Please contact support.";
+                setPaymentError(errorMsg)
+                toast.error(errorMsg)
+            }
+        } else if (status === "User canceled") {
+            setPaymentError("Payment was cancelled. You can try again.")
+            setStep(3) // Go back to payment step
+            toast.error("Payment was cancelled")
+        } else {
+            setPaymentError(`Payment status: ${status}. Please try again or contact support.`)
+            toast.error(`Payment ${status}`)
+        }
+
+        setIsVerifyingPayment(false)
+    }, [searchParams, isVerifyingPayment, bookingResult])
+
+    useEffect(() => {
+        handleKhaltiCallback()
+    }, [handleKhaltiCallback])
 
     if (isAuthLoading || isServicesLoading) {
         return (
@@ -97,13 +172,9 @@ export default function BookingWizardPage() {
         )
     }
 
-    const userRole = userProfile?.data?.role || userProfile?.role;
-    useEffect(() => {
-        if (userRole === "ADMIN" || userRole === "TECHNICIAN") {
-            toast.error("Admins and Technicians are not eligible to book services. Only standard users can make a booking.");
-            router.push("/");
-        }
-    }, [userRole, router])
+    // Calculate display price
+    const servicePriceNPR = service.price ? Number(service.price) : 0
+    const displayPrice = servicePriceNPR > 0 ? `NPR ${servicePriceNPR.toLocaleString()}` : "Free"
 
     const handleNextStep = () => {
         if (step === 1 && !userProfile) {
@@ -115,14 +186,11 @@ export default function BookingWizardPage() {
     const prevStep = () => setStep((s) => Math.max(s - 1, 1))
 
     // Validation for Step 1
-    const isStep1Valid = bookingDate && bookingTime;
+    const isStep1Valid = bookingDate && bookingTime && contactAddress.trim() !== "";
 
-    const handleConfirmBooking = async () => {
-        if (!userProfile) return;
-        setIsSubmitting(true);
+    const processBackendBooking = async () => {
         try {
             const finalDescription = notes.trim()
-
             const dateObj = new Date(bookingDate!)
 
             // Parse time from input type="time" (e.g., "14:30")
@@ -132,19 +200,93 @@ export default function BookingWizardPage() {
             }
 
             // 1. Initiate backend booking
-            const response = await axiosInstance.post("/booking", {
+            const payload: any = {
                 serviceId: service.id,
                 scheduledDate: dateObj.toISOString(),
                 description: finalDescription,
-            })
+                address: contactAddress,
+            }
 
-            setBookingResult(response.data?.data)
-            setStep(4) // Move to success step
-        } catch (error) {
+            const response = await axiosInstance.post("/bookings", payload)
+            return response.data?.data;
+
+        } catch (error: any) {
             console.error("Booking error:", error)
-            alert("Failed to create booking. Please try again.")
-        } finally {
+            const errMsg = error.response?.data?.error?.message || error.response?.data?.message || "Failed to create booking. Please try again.";
+            toast.error(errMsg);
             setIsSubmitting(false)
+            return null;
+        }
+    }
+
+    const handleConfirmBooking = async () => {
+        if (!userProfile) return;
+        setIsSubmitting(true);
+
+        if (paymentMethod === "KHALTI") {
+            try {
+                // Step 1: Create the pending booking
+                const booking = await processBackendBooking();
+                if (!booking) return;
+
+                // Step 2: Initiate Khalti payment directly via our backend Express API
+                const initiatePayload = {
+                    bookingId: booking.id,
+                    return_url: `${window.location.origin}/booking/${service.id}`,
+                    website_url: window.location.origin,
+                    customer_info: {
+                        name: contactName || "Customer",
+                        email: contactEmail || "customer@metrosewa.com",
+                        phone: contactPhone || "9800000000"
+                    }
+                };
+
+                const res = await axiosInstance.post("/payment/initiate", initiatePayload);
+                const data = res.data?.data;
+
+                if (!data || !data.payment_url) {
+                    throw new Error(res.data?.message || "Failed to generate payment URL.");
+                }
+
+                // Step 4: Redirect user to Khalti payment page
+                window.location.href = data.payment_url;
+            } catch (error: any) {
+                console.error("Khalti API Exception:", error);
+                const errMsg = error.response?.data?.error?.message || error.response?.data?.message || error.message || "An error occurred while initializing payment.";
+                toast.error(errMsg);
+                setIsSubmitting(false);
+            }
+        } else if (paymentMethod === "CASH") {
+            try {
+                // Step 1: Create the pending booking
+                const booking = await processBackendBooking();
+                if (!booking) return;
+
+                // Step 2: Call the COD endpoint
+                await axiosInstance.post("/payment/cod", { bookingId: booking.id });
+
+                // Step 3: Go to Success View
+                setBookingResult({
+                    id: booking.id,
+                    paymentStatus: "Pending",
+                    transactionId: null,
+                    amount: servicePriceNPR
+                });
+                setStep(4);
+                setIsSubmitting(false);
+            } catch (error: any) {
+                console.error("COD Exception:", error);
+                const errMsg = error.response?.data?.error?.message || error.response?.data?.message || error.message || "An error occurred while confirming Cash on Delivery.";
+                toast.error(errMsg);
+                setIsSubmitting(false);
+            }
+        } else {
+            const booking = await processBackendBooking();
+            if (booking) {
+                setBookingResult(booking);
+                setStep(4);
+                setIsSubmitting(false);
+            }
         }
     }
 
@@ -233,6 +375,15 @@ export default function BookingWizardPage() {
                                                     placeholder="Enter your contact number"
                                                 />
                                             </div>
+                                            <div>
+                                                <Label className="text-slate-500 text-xs uppercase tracking-wider">Address *</Label>
+                                                <Input
+                                                    className="mt-1"
+                                                    value={contactAddress}
+                                                    onChange={(e) => setContactAddress(e.target.value)}
+                                                    placeholder="Enter your service address"
+                                                />
+                                            </div>
                                         </div>
                                     </div>
 
@@ -301,7 +452,16 @@ export default function BookingWizardPage() {
                                         <Wallet className="w-8 h-8 text-purple-600" />
                                     </div>
                                     <h2 className="text-2xl font-bold text-slate-900">Payment Processing</h2>
-                                    <p className="text-slate-500 mt-2">Choose your preferred payment logic to secure your booking instantly.</p>
+                                    <p className="text-slate-500 mt-2">Choose your preferred payment method to secure your booking instantly.</p>
+                                </div>
+
+                                {/* Amount Display */}
+                                <div className="max-w-xl mx-auto mb-6">
+                                    <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-2xl p-6 text-center">
+                                        <p className="text-sm text-slate-500 uppercase tracking-wider font-semibold mb-1">Total Amount to Pay</p>
+                                        <p className="text-4xl font-extrabold text-purple-700">{displayPrice}</p>
+                                        <p className="text-xs text-slate-400 mt-1">for {service.name}</p>
+                                    </div>
                                 </div>
 
                                 <div className="max-w-xl mx-auto space-y-4">
@@ -316,20 +476,26 @@ export default function BookingWizardPage() {
                                         <div className="flex-1">
                                             <div className="flex items-center justify-between">
                                                 <h4 className="font-bold text-lg text-slate-900">Pay with Khalti</h4>
-                                                <img src="https://web.khalti.com/static/img/logo1.png" alt="Khalti" className="h-6" />
+                                                <img src="/khalti image.png" alt="Khalti" className="h-6" />
                                             </div>
                                             <p className="text-sm text-slate-500 mt-1">Fast and secure digital wallet payment prominent in Nepal.</p>
 
                                             {paymentMethod === 'KHALTI' && (
                                                 <div className="mt-4 bg-white p-4 rounded-lg border border-purple-100 text-sm space-y-2">
-                                                    <p className="font-semibold text-slate-700 flex items-center gap-2">
-                                                        <ShieldCheck className="w-4 h-4 text-emerald-500" /> Test Environment Credentials
+                                                    {/* <p className="font-semibold text-slate-700 flex items-center gap-2">
+                                                        <ShieldCheck className="w-4 h-4 text-emerald-500" /> Sandbox Test Credentials
+                                                    </p> */}
+                                                    {/* <div className="grid grid-cols-[80px_1fr] gap-y-1.5 gap-x-2 items-center">
+                                                        <span className="text-slate-500">Mobile:</span>
+                                                        <code className="bg-slate-100 px-2 py-0.5 rounded text-xs text-slate-700 font-mono">9800000000</code>
+                                                        <span className="text-slate-500">MPIN:</span>
+                                                        <code className="bg-slate-100 px-2 py-0.5 rounded text-xs text-slate-700 font-mono">1111</code>
+                                                        <span className="text-slate-500">OTP:</span>
+                                                        <code className="bg-slate-100 px-2 py-0.5 rounded text-xs text-slate-700 font-mono">987654</code>
+                                                    </div> */}
+                                                    <p className="text-xs text-purple-600 mt-2 font-medium">
+                                                        You will be redirected to Khalti&apos;s secure payment portal.
                                                     </p>
-                                                    <div className="grid grid-cols-[80px_1fr] gap-2 items-center">
-                                                        <span className="text-slate-500">Public Key:</span>
-                                                        <code className="bg-slate-100 px-2 py-1 rounded text-xs text-slate-700 font-mono">9ab2fdc2af6b40f9848c9364ad2db1ab</code>
-                                                    </div>
-                                                    <p className="text-xs text-slate-400 mt-2 italic">*This API will be initialized in the next step automatically during confirm.*</p>
                                                 </div>
                                             )}
                                         </div>
@@ -337,13 +503,15 @@ export default function BookingWizardPage() {
 
                                     {/* Cash Option */}
                                     <div onClick={() => setPaymentMethod('CASH')} className={cn(
-                                        "border-2 rounded-xl p-5 cursor-pointer flex items-center gap-4 transition-all opacity-50",
-                                        paymentMethod === 'CASH' ? "border-emerald-500 bg-emerald-50" : "border-slate-200 bg-white"
+                                        "border-2 rounded-xl p-5 cursor-pointer flex items-center gap-4 transition-all",
+                                        paymentMethod === 'CASH' ? "border-emerald-500 bg-emerald-50" : "border-slate-200 bg-white hover:border-slate-300"
                                     )}>
-                                        <div className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0", paymentMethod === 'CASH' ? "border-emerald-500" : "border-slate-300")}></div>
+                                        <div className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0", paymentMethod === 'CASH' ? "border-emerald-500" : "border-slate-300")}>
+                                            {paymentMethod === 'CASH' && <div className="w-3 h-3 bg-emerald-500 rounded-full" />}
+                                        </div>
                                         <div>
                                             <h4 className="font-bold text-lg text-slate-900">Cash on Delivery</h4>
-                                            <p className="text-sm text-slate-500">Pay the technician after the service is completed. (Currently Disabled)</p>
+                                            <p className="text-sm text-slate-500 mt-1">Pay the technician after the service is completed securely.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -380,6 +548,11 @@ export default function BookingWizardPage() {
                                                 <p className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Phone Contact</p>
                                                 <p className="font-medium text-slate-800">{contactPhone || "Not provided"}</p>
                                             </div>
+                                            <Separator />
+                                            <div>
+                                                <p className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Address</p>
+                                                <p className="font-medium text-slate-800">{contactAddress || "Not provided"}</p>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -400,7 +573,7 @@ export default function BookingWizardPage() {
                                             <div className="grid grid-cols-2 gap-4 bg-white p-3 rounded-lg border border-slate-100">
                                                 <div>
                                                     <p className="text-xs text-slate-400 uppercase tracking-wider font-semibold mb-1">Schedule</p>
-                                                    <p className="font-medium text-slate-800 text-sm leading-tight text-sky-700">
+                                                    <p className="font-medium text-sm leading-tight text-sky-700">
                                                         {bookingDate ? format(bookingDate, "MMM d, yyyy") : ""} <br />
                                                         {bookingTime && (function () {
                                                             const [h, m] = bookingTime.split(":");
@@ -412,8 +585,8 @@ export default function BookingWizardPage() {
                                                 </div>
                                                 <div>
                                                     <p className="text-xs text-slate-400 uppercase tracking-wider font-semibold mb-1">Payment</p>
-                                                    <p className="font-bold text-emerald-600">
-                                                        NPR {service.price || "N/A"}<br />
+                                                    <p className="font-bold text-emerald-600 text-xl">
+                                                        {displayPrice}
                                                     </p>
                                                 </div>
                                             </div>
@@ -429,38 +602,123 @@ export default function BookingWizardPage() {
                             </div>
                         )}
 
-                        {/* STEP 4: Success */}
+                        {/* STEP 4: Success / Verifying / Error */}
                         {step === 4 && (
                             <div className="py-12 px-4 text-center animate-in zoom-in-95 duration-700">
-                                <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner ring-8 ring-emerald-50">
-                                    <CheckCircle className="w-12 h-12 text-emerald-500" />
-                                </div>
-                                <h2 className="text-4xl font-extrabold text-slate-900 mb-4">Booking Confirmed!</h2>
-                                <p className="text-lg text-slate-600 max-w-md mx-auto">
-                                    Your service has been successfully booked. Our technicians have been notified.
-                                </p>
-
-                                <div className="mt-8 max-w-sm mx-auto bg-slate-50 rounded-2xl border border-slate-200 p-6 shadow-sm">
-                                    <p className="text-sm font-semibold uppercase tracking-widest text-slate-400 mb-2">Transaction / Booking ID</p>
-                                    <p className="text-xl font-mono font-bold text-slate-800 tracking-wider">
-                                        {bookingResult?.id ? bookingResult.id.split("-")[0].toUpperCase() : "METRO-9AB2FDC"}
-                                    </p>
-                                    <Separator className="my-4" />
-                                    <div className="flex justify-between items-center text-sm">
-                                        <span className="text-slate-500">Service</span>
-                                        <span className="font-bold text-slate-800">{service.name}</span>
+                                {/* Verifying Payment State */}
+                                {isVerifyingPayment && (
+                                    <div>
+                                        <div className="w-24 h-24 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6 ring-8 ring-purple-50">
+                                            <Loader2 className="w-12 h-12 text-purple-500 animate-spin" />
+                                        </div>
+                                        <h2 className="text-3xl font-extrabold text-slate-900 mb-4">Verifying Payment...</h2>
+                                        <p className="text-lg text-slate-600 max-w-md mx-auto">
+                                            Please wait while we confirm your payment with Khalti.
+                                        </p>
                                     </div>
-                                    <div className="flex justify-between items-center text-sm mt-2">
-                                        <span className="text-slate-500">Payment Status</span>
-                                        <span className="font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded text-xs uppercase">Authorized</span>
-                                    </div>
-                                </div>
+                                )}
 
-                                <div className="mt-10">
-                                    <Button size="lg" className="bg-slate-900 hover:bg-slate-800 rounded-full px-8" onClick={() => router.push('/dashboard')}>
-                                        View in Dashboard
-                                    </Button>
-                                </div>
+                                {/* Payment Error State */}
+                                {!isVerifyingPayment && paymentError && !bookingResult && (
+                                    <div>
+                                        <div className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6 ring-8 ring-red-50">
+                                            <XCircle className="w-12 h-12 text-red-500" />
+                                        </div>
+                                        <h2 className="text-3xl font-extrabold text-slate-900 mb-4">Payment Issue</h2>
+                                        <p className="text-lg text-slate-600 max-w-md mx-auto mb-6">
+                                            {paymentError}
+                                        </p>
+                                        <div className="flex gap-3 justify-center">
+                                            <Button
+                                                variant="outline"
+                                                size="lg"
+                                                className="rounded-full px-8"
+                                                onClick={() => {
+                                                    setPaymentError(null)
+                                                    setStep(3)
+                                                    // Clean URL params
+                                                    window.history.replaceState({}, "", `/booking/${serviceId}`)
+                                                }}
+                                            >
+                                                Try Again
+                                            </Button>
+                                            <Button
+                                                size="lg"
+                                                className="bg-slate-900 hover:bg-slate-800 rounded-full px-8"
+                                                onClick={() => router.push('/')}
+                                            >
+                                                Go Home
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Success State */}
+                                {!isVerifyingPayment && bookingResult && (
+                                    <div>
+                                        <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner ring-8 ring-emerald-50">
+                                            <CheckCircle className="w-12 h-12 text-emerald-500" />
+                                        </div>
+                                        <h2 className="text-4xl font-extrabold text-slate-900 mb-4">Booking Confirmed!</h2>
+                                        <p className="text-lg text-slate-600 max-w-md mx-auto">
+                                            Your service has been successfully booked and payment has been verified. Our technicians have been notified.
+                                        </p>
+
+                                        <div className="mt-8 max-w-sm mx-auto bg-slate-50 rounded-2xl border border-slate-200 p-6 shadow-sm">
+                                            <p className="text-sm font-semibold uppercase tracking-widest text-slate-400 mb-2">Transaction / Booking ID</p>
+                                            <p className="text-xl font-mono font-bold text-slate-800 tracking-wider">
+                                                {bookingResult?.id ? bookingResult.id.split("-")[0].toUpperCase() : "METRO-9AB2FDC"}
+                                            </p>
+                                            <Separator className="my-4" />
+                                            <div className="flex justify-between items-center text-sm">
+                                                <span className="text-slate-500">Service</span>
+                                                <span className="font-bold text-slate-800">{service.name}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-sm mt-2">
+                                                <span className="text-slate-500">Amount</span>
+                                                <span className="font-bold text-purple-700">{displayPrice}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-sm mt-2">
+                                                <span className="text-slate-500">Payment Status</span>
+                                                <span className={cn(
+                                                    "font-bold px-2 py-0.5 rounded text-xs uppercase",
+                                                    (bookingResult?.paymentStatus || "Paid").toString().toLowerCase().includes("pending")
+                                                        ? "text-red-600 bg-red-100"
+                                                        : "text-emerald-600 bg-emerald-100"
+                                                )}>
+                                                    {bookingResult?.paymentStatus || "Paid"}
+                                                </span>
+                                            </div>
+                                            {bookingResult?.transactionId && (
+                                                <div className="flex justify-between items-center text-sm mt-2">
+                                                    <span className="text-slate-500">Transaction</span>
+                                                    <span className="font-mono text-xs text-slate-600">
+                                                        {bookingResult.transactionId.substring(0, 12)}...
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="mt-10">
+                                            <Button size="lg" className="bg-slate-900 hover:bg-slate-800 rounded-full px-8" onClick={() => router.push('/')}>
+                                                Back to Home
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Fallback: No callback params, direct success (e.g., cash) */}
+                                {!isVerifyingPayment && !paymentError && !bookingResult && (
+                                    <div>
+                                        <div className="w-24 h-24 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6 ring-8 ring-amber-50">
+                                            <AlertTriangle className="w-12 h-12 text-amber-500" />
+                                        </div>
+                                        <h2 className="text-3xl font-extrabold text-slate-900 mb-4">Processing...</h2>
+                                        <p className="text-lg text-slate-600 max-w-md mx-auto">
+                                            Your payment is being processed. If you were redirected here, please wait.
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
@@ -491,8 +749,17 @@ export default function BookingWizardPage() {
                                     onClick={handleConfirmBooking}
                                     disabled={isSubmitting}
                                 >
-                                    {isSubmitting ? "Processing..." : "Confirm Securely"}
-                                    {!isSubmitting && <ShieldCheck className="w-5 h-5 ml-2" />}
+                                    {isSubmitting ? (
+                                        <>
+                                            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                                            Processing...
+                                        </>
+                                    ) : (
+                                        <>
+                                            {paymentMethod === 'KHALTI' ? 'Pay & Book' : 'Confirm Booking'}
+                                            <ShieldCheck className="w-5 h-5 ml-2" />
+                                        </>
+                                    )}
                                 </Button>
                             )}
                         </div>

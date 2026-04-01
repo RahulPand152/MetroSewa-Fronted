@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axiosInstance from '../lib/axios';
+import { toast } from 'sonner';
 
 export const useGetUsers = () => {
     return useQuery({
@@ -148,6 +149,32 @@ export const useDeleteService = () => {
         },
     });
 };
+
+export const useGetBookings = () => {
+    return useQuery({
+        queryKey: ['admin', 'bookings'],
+        queryFn: async () => {
+            const response = await axiosInstance.get('/admin/bookings');
+            return response.data.data;
+        },
+    });
+};
+
+export const useUpdateBookingStatus = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ id, status }: { id: string; status: string }) => {
+            const response = await axiosInstance.patch(`/admin/bookings/${id}/status`, { status });
+            return response.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin', 'bookings'] });
+            toast.success("Booking status updated successfully");
+        },
+    });
+};
+
+
 
 export const useToggleService = () => {
     const queryClient = useQueryClient();
