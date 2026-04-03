@@ -31,9 +31,9 @@ import {
     MessageSquare,
     Settings,
     LogOut,
-    Hammer,
     Wrench
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useLogout, useProfile } from "@/src/hooks/useAuth";
@@ -74,14 +74,24 @@ export default function AdminSidebar() {
     return (
         <Sidebar collapsible="icon">
             <SidebarHeader className="p-4">
-                <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20">
-                        <Hammer className="h-6 w-6 text-white" />
-                    </div>
-                    <h1 className="text-xl font-bold tracking-tight text-primary truncate group-data-[collapsible=icon]:hidden">
-                        MetroSewa
-                    </h1>
-                </div>
+                  <div
+                            className="flex items-center cursor-pointer"
+                            onClick={() => router.push("/")}
+                          >
+                            <div className="flex items-center">
+                              <Image
+                                alt="MetroSewa logo"
+                                className="object-contain p-1"
+                                src="/metrosewalogo.png"
+                                width={80}
+                                height={50}
+                              />
+                            </div>
+                            <div className="font-bold text-xl tracking-tight flex items-center">
+                              <span className="text-[#236b9d]">Metro</span>
+                              <span className="text-[#2baba8] ml-0.5"> Sewa</span>
+                            </div>
+                          </div>
             </SidebarHeader>
 
             <SidebarContent>

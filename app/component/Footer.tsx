@@ -7,7 +7,6 @@ import {
     MapPin,
     Phone,
     Mail,
-    Wrench,
 } from "lucide-react";
 import Link from "next/link";
 

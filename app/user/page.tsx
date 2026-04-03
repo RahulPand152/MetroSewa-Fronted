@@ -6,21 +6,56 @@ import { CalendarCheck, Clock, Settings, Wallet, ArrowRight, HelpCircle } from "
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { useProfile } from "@/src/hooks/useAuth";
-
-const stats = [
-    { label: "Active Bookings", value: 2, icon: CalendarCheck, color: "text-sky-500", bg: "bg-sky-100 dark:bg-sky-900/20" },
-    { label: "Past Services", value: 15, icon: Clock, color: "text-emerald-500", bg: "bg-emerald-100 dark:bg-emerald-900/20" },
-    { label: "Wallet Balance", value: "Rs. 1,500", icon: Wallet, color: "text-amber-500", bg: "bg-amber-100 dark:bg-amber-900/20" },
-];
-
-const recentBookings = [
-    { id: "B-1029", service: "Plumbing Repair", date: "Today, 3:00 PM", status: "Upcoming", statusColor: "bg-sky-100 text-sky-700" },
-    { id: "B-1028", service: "AC Servicing", date: "Feb 23, 10:00 AM", status: "Completed", statusColor: "bg-emerald-100 text-emerald-700" },
-];
+import { useGetMyBookings } from "@/src/hooks/useBookings";
+import { format } from "date-fns";
 
 export default function UserDashboard() {
     const { data: userProfile } = useProfile();
-    const firstName = userProfile?.data?.firstName || "User";
+    const { data: realBookings = [] } = useGetMyBookings();
+    const firstName = userProfile?.data?.firstName || userProfile?.firstName || "User";
+
+    // Computed real data
+    const activeBookings = realBookings.filter((b: any) =>
+        ['PENDING', 'ASSIGNED', 'IN_PROGRESS'].includes((b.status || "").toUpperCase())
+    ).length;
+
+    const pastServices = realBookings.filter((b: any) =>
+        ['COMPLETED'].includes((b.status || "").toUpperCase())
+    ).length;
+
+    const stats = [
+        { label: "Active Bookings", value: activeBookings, icon: CalendarCheck, color: "text-sky-500", bg: "bg-sky-100 dark:bg-sky-900/20" },
+        { label: "Past Services", value: pastServices, icon: Clock, color: "text-emerald-500", bg: "bg-emerald-100 dark:bg-emerald-900/20" },
+        { label: "Wallet Balance", value: "Rs. 0", icon: Wallet, color: "text-amber-500", bg: "bg-amber-100 dark:bg-amber-900/20" },
+    ];
+
+    // Format top 5 recent bookings
+    const recentBookings = [...realBookings]
+        .sort((a, b) => new Date(b.scheduledDate || 0).getTime() - new Date(a.scheduledDate || 0).getTime())
+        .slice(0, 5)
+        .map((b: any) => {
+            const statusUpper = (b.status || "").toUpperCase();
+            let statusColor = "bg-amber-100 text-amber-700";
+            let displayStatus = b.status;
+
+            if (statusUpper === "PENDING" || statusUpper === "ASSIGNED") {
+                statusColor = "bg-sky-100 text-sky-700";
+            } else if (statusUpper === "COMPLETED") {
+                statusColor = "bg-emerald-100 text-emerald-700";
+            } else if (statusUpper === "CANCELLED") {
+                statusColor = "bg-rose-100 text-rose-700";
+            }
+
+            const dateStr = b.scheduledDate ? format(new Date(b.scheduledDate), "MMM d, yyyy 'at' h:mm a") : "Soon";
+
+            return {
+                id: b.id.substring(0, 5).toUpperCase(),
+                service: b.service?.name || "Service",
+                date: dateStr,
+                status: displayStatus,
+                statusColor
+            };
+        });
 
     return (
         <div className="flex flex-col gap-6 max-w-5xl">
@@ -31,7 +66,7 @@ export default function UserDashboard() {
                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Here is what&apos;s happening with your services today.</p>
                 </div>
                 <Link href="/user/book-service">
-                    <Button className="bg-sky-500 hover:bg-sky-600 text-white shadow-sm gap-2">
+                    <Button className="bg-[#1e5b87] hover:bg-[#1e5b87] text-white shadow-sm gap-2">
                         Book a New Service <ArrowRight className="h-4 w-4" />
                     </Button>
                 </Link>
@@ -62,20 +97,26 @@ export default function UserDashboard() {
                         <Link href="/user/my-bookings" className="text-sm font-medium text-sky-500 hover:text-sky-600 dark:text-sky-400">View all</Link>
                     </CardHeader>
                     <CardContent className="p-0 divide-y divide-slate-100 dark:divide-slate-800">
-                        {recentBookings.map((booking, i) => (
-                            <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 py-4 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors">
-                                <div className="flex items-center gap-4">
-                                    <div className="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 font-semibold text-xs">
-                                        {booking.id.split('-')[1]}
+                        {recentBookings.length > 0 ? (
+                            recentBookings.map((booking, i) => (
+                                <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 py-4 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors">
+                                    <div className="flex items-center gap-4">
+                                        <div className="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 font-semibold text-xs shrink-0">
+                                            {booking.id}
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">{booking.service}</p>
+                                            <p className="text-xs text-slate-500 mt-0.5">{booking.date}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">{booking.service}</p>
-                                        <p className="text-xs text-slate-500 mt-0.5">{booking.date}</p>
-                                    </div>
+                                    <Badge variant="secondary" className={`${booking.statusColor} border-0 rounded-full px-3 capitalize`}>{booking.status}</Badge>
                                 </div>
-                                <Badge variant="secondary" className={`${booking.statusColor} border-0 rounded-full px-3`}>{booking.status}</Badge>
+                            ))
+                        ) : (
+                            <div className="px-6 py-8 text-center text-sm text-slate-500">
+                                You have no recent bookings.
                             </div>
-                        ))}
+                        )}
                     </CardContent>
                 </Card>
 

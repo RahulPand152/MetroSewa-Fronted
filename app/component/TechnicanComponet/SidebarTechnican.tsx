@@ -24,14 +24,14 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import Image from "next/image";
 import {
     LayoutDashboard,
     Briefcase,
     User,
     Settings,
     LogOut,
-    Wrench,
+    
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -72,22 +72,24 @@ export default function SidebarTechnican() {
         <Sidebar collapsible="icon">
             {/* ── Header ─────────────────────────────────── */}
             <SidebarHeader className="p-4">
-                <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-500 shadow-lg shadow-sky-500/30 flex-shrink-0">
-                        <Wrench className="h-5 w-5 text-white" />
-                    </div>
-                    <div className="group-data-[collapsible=icon]:hidden min-w-0">
-                        <p className="text-base font-bold tracking-tight text-slate-900 dark:text-slate-100 truncate leading-tight">
-                            MetroSewa
-                        </p>
-                        <Badge
-                            variant="secondary"
-                            className="text-[10px] font-semibold bg-sky-50 text-sky-600 dark:bg-sky-900/30 dark:text-sky-400 border-0 px-1.5 mt-0.5"
-                        >
-                            Technician Portal
-                        </Badge>
-                    </div>
-                </div>
+                  <div
+                            className="flex items-center cursor-pointer"
+                            onClick={() => router.push("/")}
+                          >
+                            <div className="flex items-center">
+                              <Image
+                                alt="MetroSewa logo"
+                                className="object-contain p-1"
+                                src="/metrosewalogo.png"
+                                width={80}
+                                height={50}
+                              />
+                            </div>
+                            <div className="font-bold text-xl tracking-tight flex items-center">
+                              <span className="text-[#236b9d]">Metro</span>
+                              <span className="text-[#2baba8] ml-0.5"> Sewa</span>
+                            </div>
+                          </div>
             </SidebarHeader>
 
             <SidebarSeparator />

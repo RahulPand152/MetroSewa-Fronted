@@ -297,10 +297,10 @@ export default function BookingWizardPage() {
             {/* Auth Dialog */}
             <AuthDialog open={showAuthDialog} onOpenChange={setShowAuthDialog} />
 
-            <div className="max-w-4xl mx-auto px-4 py-8">
+            <div className="max-w-4xl mx-auto px-4 py-8 mt-10">
                 {/* Header & Stepper */}
                 <div className="mb-10">
-                    <button onClick={() => router.back()} className="flex items-center gap-2 text-sm text-slate-500 hover:text-sky-600 transition mb-6">
+                    <button onClick={() => router.back()} className="flex items-center gap-2 text-sm text-slate-500 hover:text-[#236b9d] transition mb-6">
                         <ArrowLeft className="w-4 h-4" /> Back to service
                     </button>
                     <h1 className="text-3xl font-bold text-slate-900">Book {service.name}</h1>
@@ -310,7 +310,7 @@ export default function BookingWizardPage() {
                 <div className="relative mb-12">
                     <div className="absolute top-5 left-[12.5%] right-[12.5%] h-1 bg-slate-200 -translate-y-1/2 rounded-full overflow-hidden z-0">
                         <div
-                            className="h-full bg-sky-500 transition-all duration-500 ease-in-out"
+                            className="h-full bg-[#2baba8] transition-all duration-500 ease-in-out"
                             style={{ width: `${((step - 1) / (STEPS.length - 1)) * 100}%` }}
                         />
                     </div>
@@ -322,8 +322,8 @@ export default function BookingWizardPage() {
                                 <div key={idx} className="flex flex-col items-center">
                                     <div className={cn(
                                         "w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-sm transition-all duration-300",
-                                        isCurrent ? "bg-sky-500 text-white ring-4 ring-sky-100" :
-                                            isCompleted ? "bg-sky-500 text-white" : "bg-white text-slate-400 border border-slate-200"
+                                        isCurrent ? "bg-[#2baba8] text-white ring-4 ring-[#2baba8]/20" :
+                                            isCompleted ? "bg-[#2baba8] text-white" : "bg-white text-slate-400 border border-slate-200"
                                     )}>
                                         {isCompleted ? <Check className="w-5 h-5" /> : idx + 1}
                                     </div>
@@ -416,17 +416,119 @@ export default function BookingWizardPage() {
                                                 </Popover>
                                             </div>
 
-                                            {/* Time */}
-                                            <div className="flex flex-col gap-1.5">
+                                            {/* Time: Chrome-style Dropdown Picker */}
+                                            <div className="flex flex-col gap-2">
                                                 <Label>Preferred Time *</Label>
-                                                <div className="mt-1">
-                                                    <Input
-                                                        type="time"
-                                                        className="w-full"
-                                                        value={bookingTime}
-                                                        onChange={(e) => setBookingTime(e.target.value)}
-                                                    />
-                                                </div>
+                                                <Popover>
+                                                    <PopoverTrigger asChild>
+                                                        <div className="w-full justify-start h-10 text-left font-normal flex gap-1 cursor-pointer border border-slate-200 rounded-md px-3 py-2 shadow-sm items-center hover:border-slate-300 transition-colors bg-white">
+                                                            {(() => {
+                                                                let displayH = "10";
+                                                                let displayM = "00";
+                                                                let displayAmPm = "AM";
+                                                                if (bookingTime) {
+                                                                    const [h, m] = bookingTime.split(":");
+                                                                    const h24 = Number(h);
+                                                                    displayAmPm = h24 >= 12 ? "PM" : "AM";
+                                                                    const h12 = h24 % 12 || 12;
+                                                                    displayH = h12.toString().padStart(2, "0");
+                                                                    displayM = m.toString().padStart(2, "0");
+                                                                }
+
+                                                                return (
+                                                                    <>
+                                                                        <div className={cn(
+                                                                            "px-2 py-0.5 rounded text-sm font-medium transition-colors border",
+                                                                            bookingTime ? "bg-slate-100 border-slate-200 text-slate-800" : "bg-transparent border-transparent text-slate-400"
+                                                                        )}>
+                                                                            {bookingTime ? displayH : "--"}
+                                                                        </div>
+                                                                        <div className="flex flex-col justify-center font-bold text-slate-400 text-sm">:</div>
+                                                                        <div className={cn(
+                                                                            "px-2 py-0.5 rounded text-sm font-medium transition-colors border",
+                                                                            bookingTime ? "bg-slate-100 border-slate-200 text-slate-800" : "bg-transparent border-transparent text-slate-400"
+                                                                        )}>
+                                                                            {bookingTime ? displayM : "--"}
+                                                                        </div>
+                                                                        <div className={cn(
+                                                                            "px-2 py-0.5 rounded text-sm font-medium ml-1 transition-colors border",
+                                                                            bookingTime ? "bg-slate-100 border-slate-200 text-slate-800" : "bg-transparent border-transparent text-slate-400"
+                                                                        )}>
+                                                                            {bookingTime ? displayAmPm : "--"}
+                                                                        </div>
+                                                                    </>
+                                                                );
+                                                            })()}
+                                                        </div>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-fit p-1 border border-slate-200 rounded-lg shadow-xl" align="start">
+                                                        {(() => {
+                                                            let currentH = "10";
+                                                            let currentM = "00";
+                                                            let currentAmPm = "AM";
+
+                                                            if (bookingTime) {
+                                                                const [h, m] = bookingTime.split(":");
+                                                                const h24 = Number(h);
+                                                                currentAmPm = h24 >= 12 ? "PM" : "AM";
+                                                                const h12 = h24 % 12 || 12;
+                                                                currentH = h12.toString().padStart(2, "0");
+                                                                currentM = m.toString().padStart(2, "0");
+                                                            }
+
+                                                            const setTimePart = (type: 'h' | 'm' | 'ampm', val: string) => {
+                                                                let newH = currentH;
+                                                                let newM = currentM;
+                                                                let newAmPm = currentAmPm;
+
+                                                                if (type === 'h') newH = val;
+                                                                if (type === 'm') newM = val;
+                                                                if (type === 'ampm') newAmPm = val;
+
+                                                                let h24 = Number(newH);
+                                                                if (newAmPm === "PM" && h24 !== 12) h24 += 12;
+                                                                if (newAmPm === "AM" && h24 === 12) h24 = 0;
+
+                                                                setBookingTime(`${h24.toString().padStart(2, '0')}:${newM}`);
+                                                            };
+
+                                                            return (
+                                                                <div className="flex h-[280px] bg-white gap-2 text-sm select-none justify-between px-2" style={{ WebkitUserSelect: "none" }}>
+                                                                    <style>{`.hide-scroll::-webkit-scrollbar { display: none; } .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }`}</style>
+                                                                    {/* Hours */}
+                                                                    <div className="w-16 overflow-y-auto hide-scroll flex flex-col gap-1.5 pr-2 overscroll-contain">
+                                                                        {Array.from({ length: 12 }).map((_, i) => {
+                                                                            const val = (i + 1).toString().padStart(2, "0");
+                                                                            const isSelected = currentH === val;
+                                                                            return (
+                                                                                <div key={`h-${val}`} onClick={() => setTimePart('h', val)} className={cn("px-3 py-3 text-center rounded-xl cursor-pointer transition-all duration-200", isSelected ? "bg-[#2baba8] text-white font-bold shadow-md scale-105" : "hover:bg-slate-100 text-slate-600 font-medium")}>{val}</div>
+                                                                            )
+                                                                        })}
+                                                                    </div>
+                                                                    {/* Minutes */}
+                                                                    <div className="w-16 overflow-y-auto hide-scroll flex flex-col gap-1.5 px-1 overscroll-contain">
+                                                                        {Array.from({ length: 60 }).map((_, i) => {
+                                                                            const val = (i).toString().padStart(2, "0");
+                                                                            const isSelected = currentM === val;
+                                                                            return (
+                                                                                <div key={`m-${val}`} onClick={() => setTimePart('m', val)} className={cn("px-3 py-3 text-center rounded-xl cursor-pointer transition-all duration-200", isSelected ? "bg-[#2baba8] text-white font-bold shadow-md scale-105" : "hover:bg-slate-100 text-slate-600 font-medium")}>{val}</div>
+                                                                            )
+                                                                        })}
+                                                                    </div>
+                                                                    {/* AM/PM */}
+                                                                    <div className="w-16 overflow-y-auto hide-scroll flex flex-col gap-1.5 pl-2 overscroll-contain">
+                                                                        {["AM", "PM"].map((val) => {
+                                                                            const isSelected = currentAmPm === val;
+                                                                            return (
+                                                                                <div key={`ampm-${val}`} onClick={() => setTimePart('ampm', val)} className={cn("px-3 py-3 text-center rounded-xl cursor-pointer transition-all duration-200", isSelected ? "bg-[#2baba8] text-white font-bold shadow-md scale-105" : "hover:bg-slate-100 text-slate-600 font-medium")}>{val}</div>
+                                                                            )
+                                                                        })}
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })()}
+                                                    </PopoverContent>
+                                                </Popover>
                                             </div>
 
                                             <div className="flex flex-col gap-1.5">
@@ -737,7 +839,7 @@ export default function BookingWizardPage() {
 
                             {step < 3 ? (
                                 <Button
-                                    className="bg-sky-500 hover:bg-sky-600 px-8 rounded-full shadow-sm"
+                                    className="bg-[#236b9d] hover:bg-[#1a5177] text-white px-8 rounded-full shadow-sm"
                                     onClick={handleNextStep}
                                     disabled={step === 1 && !isStep1Valid}
                                 >

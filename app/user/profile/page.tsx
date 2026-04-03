@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Phone, Mail, MapPin, Edit, Shield, Key } from "lucide-react";
+import { Phone, Mail, MapPin, Edit, Shield, Key, Eye, EyeOff } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,11 @@ export default function UserProfilePage() {
     const { mutate: uploadImage, isPending: isUploading } = useUploadProfileImage();
     const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
     const [isEditOpen, setIsEditOpen] = useState(false);
+
+    // Password visibility state
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     if (isLoading) {
@@ -90,7 +95,7 @@ export default function UserProfilePage() {
 
             <Card className="border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 {/* Sky banner */}
-                <div className="h-28 bg-gradient-to-r from-sky-400 to-sky-600" />
+                <div className="h-28 bg-gradient-to-r from-[#2baba8] to-[#123854]" />
 
                 <CardContent className="px-6 pb-6 -mt-12">
                     {/* Avatar & Action */}
@@ -100,9 +105,8 @@ export default function UserProfilePage() {
                                 {user.avatar && (
                                     <AvatarImage src={user.avatar} alt={name} className="object-cover" />
                                 )}
-                                <AvatarFallback className="bg-sky-500 text-white text-2xl font-bold">{initials}</AvatarFallback>
+                                <AvatarFallback className="bg-[#1e5b87] text-white text-2xl font-bold">{initials}</AvatarFallback>
                             </Avatar>
-                            <span className="absolute bottom-1 right-1 h-5 w-5 rounded-full bg-emerald-400 border-2 border-white dark:border-slate-900" />
                             {isUploading && (
                                 <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center">
                                     <Spinner className="h-8 w-8 text-white animate-spin" />
@@ -120,7 +124,7 @@ export default function UserProfilePage() {
                             <DialogTrigger asChild>
                                 <Button
                                     variant="outline"
-                                    className="gap-2 border-sky-200 dark:border-sky-800 text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/20"
+                                    className="gap-2 border-[#1e5b87]  hover:bg-[#1e5b87] hover:text-white"
                                 >
                                     <Edit className="h-4 w-4" /> Edit Profile
                                 </Button>
@@ -152,7 +156,7 @@ export default function UserProfilePage() {
                                         </div>
                                     </div>
                                     <DialogFooter>
-                                        <Button type="submit" disabled={isUpdating} className="bg-sky-500 hover:bg-sky-600 text-white w-full sm:w-auto">
+                                        <Button type="submit" disabled={isUpdating} className="bg-[#1e5b87] hover:bg-[#1e5b87] text-white w-full sm:w-auto">
                                             {isUpdating ? "Saving..." : "Save changes"}
                                         </Button>
                                     </DialogFooter>
@@ -165,7 +169,7 @@ export default function UserProfilePage() {
                         <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{name}</h2>
                         <div className="flex items-center gap-2 mt-1">
                             {user.isEmailVerified && (
-                                <Badge className="bg-sky-100 text-sky-700 hover:bg-sky-200 dark:bg-sky-900/30 dark:text-sky-400 border-0">Verified User</Badge>
+                                <Badge className="bg-[#1e5b87]/10 text-[#1e5b87] hover:bg-[#1e5b87]/20 border-0">Verified User</Badge>
                             )}
                             <Badge variant="outline" className="border-slate-200 dark:border-slate-700 text-slate-500">Joined {joinedDate}</Badge>
                         </div>
@@ -177,7 +181,7 @@ export default function UserProfilePage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 text-sm text-slate-600 dark:text-slate-400">
                         <div className="flex items-center gap-3">
                             <div className="h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                                <Phone className="h-4 w-4 text-sky-500" />
+                                <Phone className="h-4 w-4 text-[#2baba8]" />
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-xs text-slate-500">Phone Number</span>
@@ -186,7 +190,7 @@ export default function UserProfilePage() {
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                                <Mail className="h-4 w-4 text-sky-500" />
+                                <Mail className="h-4 w-4 text-[#2baba8]" />
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-xs text-slate-500">Email Address</span>
@@ -195,7 +199,7 @@ export default function UserProfilePage() {
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                                <MapPin className="h-4 w-4 text-sky-500" />
+                                <MapPin className="h-4 w-4 text-[#2baba8]" />
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-xs text-slate-500">Address</span>
@@ -211,8 +215,8 @@ export default function UserProfilePage() {
                     <DialogTrigger asChild>
                         <Card className="border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:shadow-md cursor-pointer">
                             <CardHeader className="p-4 flex flex-row items-center gap-4 space-y-0">
-                                <div className="h-10 w-10 rounded-lg bg-sky-50 dark:bg-sky-900/20 flex items-center justify-center shrink-0">
-                                    <Key className="h-5 w-5 text-sky-500" />
+                                <div className="h-10 w-10 rounded-lg bg-[#1e5b87]/10 flex items-center justify-center shrink-0">
+                                    <Key className="h-5 w-5 text-[#2baba8]" />
                                 </div>
                                 <div>
                                     <CardTitle className="text-base">Password</CardTitle>
@@ -231,19 +235,34 @@ export default function UserProfilePage() {
                         <div className="grid gap-4 py-4">
                             <div className="flex flex-col gap-2">
                                 <Label htmlFor="current-password">Current Password</Label>
-                                <Input id="current-password" type="password" placeholder="Enter current password" />
+                                <div className="relative">
+                                    <Input id="current-password" type={showCurrentPassword ? "text" : "password"} placeholder="Enter current password" className="pr-10" />
+                                    <button type="button" onClick={() => setShowCurrentPassword(!showCurrentPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700">
+                                        {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    </button>
+                                </div>
                             </div>
                             <div className="flex flex-col gap-2">
                                 <Label htmlFor="new-password">New Password</Label>
-                                <Input id="new-password" type="password" placeholder="Enter new password" />
+                                <div className="relative">
+                                    <Input id="new-password" type={showNewPassword ? "text" : "password"} placeholder="Enter new password" className="pr-10" />
+                                    <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700">
+                                        {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    </button>
+                                </div>
                             </div>
                             <div className="flex flex-col gap-2">
                                 <Label htmlFor="confirm-password">Confirm Password</Label>
-                                <Input id="confirm-password" type="password" placeholder="Confirm new password" />
+                                <div className="relative">
+                                    <Input id="confirm-password" type={showConfirmPassword ? "text" : "password"} placeholder="Confirm new password" className="pr-10" />
+                                    <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700">
+                                        {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button type="button" className="bg-sky-500 hover:bg-sky-600 text-white w-full sm:w-auto">
+                            <Button type="button" className="bg-[#1e5b87] hover:bg-[#1e5b87] text-white w-full sm:w-auto">
                                 Update Password
                             </Button>
                         </DialogFooter>
