@@ -1,42 +1,45 @@
 "use client";
 
 import Link from "next/link";
-import { Search, Star, Calendar, Clock, FileText, CreditCard, CheckCircle, Loader2 } from "lucide-react";
+import { Search, Star,  Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-    DialogFooter,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Separator } from "@/components/ui/separator";
-import { Calendar as CalendarUI } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 import { NavbarPage } from "../component/Navbar";
 import { useGetPublicCategories, useGetPublicServices } from "@/src/hooks/useServices";
 import { useProfile } from "@/src/hooks/useAuth";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-const timeSlots = [
-    "8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM",
-    "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM",
-    "4:00 PM", "5:00 PM", "6:00 PM",
-];
+// Basic fuzzy match utility identical to HomeSection
+function fuzzyMatch(str: string, pattern: string) {
+    if (!pattern) return true;
+    let patternIdx = 0;
+    const s = str.toLowerCase();
+    const p = pattern.toLowerCase();
+    for (let i = 0; i < s.length; i++) {
+        if (s[i] === p[patternIdx]) patternIdx++;
+        if (patternIdx === p.length) return true;
+    }
+    return false;
+}
 
-export default function ServicesPage() {
-    const [search, setSearch] = useState("");
+function ServicesContent() {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const querySearchParam = searchParams.get("search") || "";
+
+    const [search, setSearch] = useState(querySearchParam);
     const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
-    const router = useRouter();
+    // Sync input when URL parameter changes
+    useEffect(() => {
+        if (querySearchParam !== search) {
+            setSearch(querySearchParam);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [querySearchParam]);
+
     const { data: userProfile } = useProfile();
     const isEligibleToBook = userProfile?.role !== 'ADMIN' && userProfile?.role !== 'TECHNICIAN';
 
@@ -55,13 +58,21 @@ export default function ServicesPage() {
     const { data: categories = [], isLoading: catLoading } = useGetPublicCategories();
     const { data: services = [], isLoading: svcLoading } = useGetPublicServices();
 
-    const filteredServices = services.filter((s: any) => {
-        const matchesSearch =
-            (s.name?.toLowerCase() || "").includes(search.toLowerCase()) ||
-            (s.description?.toLowerCase() || "").includes(search.toLowerCase());
-        const matchesCategory = selectedCategory === "all" || s.categoryId === selectedCategory;
-        return matchesSearch && matchesCategory;
-    });
+    // Use memoized fuzzy filtering 
+    const filteredServices = useMemo(() => {
+        return services.filter((s: any) => {
+            const matchesSearch = fuzzyMatch(s.name || "", search) || fuzzyMatch(s.description || "", search);
+            const matchesCategory = selectedCategory === "all" || s.categoryId === selectedCategory;
+            return matchesSearch && matchesCategory;
+        });
+    }, [services, search, selectedCategory]);
+
+    const handleSearchChange = (value: string) => {
+        setSearch(value);
+        // Optionally update the URL to share references
+        const newUrl = value ? `/services?search=${encodeURIComponent(value)}` : "/services";
+        router.replace(newUrl, { scroll: false });
+    };
 
     return (
         <>
@@ -70,7 +81,7 @@ export default function ServicesPage() {
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 flex flex-col gap-10">
 
                     {/* Header */}
-                    <div>
+                    <div className="mt-8">
                         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
                             All Services
                         </h1>
@@ -85,7 +96,7 @@ export default function ServicesPage() {
                         <Input
                             placeholder="Search for any service..."
                             value={search}
-                            onChange={(e) => setSearch(e.target.value)}
+                            onChange={(e) => handleSearchChange(e.target.value)}
                             className="pl-9 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 h-11"
                         />
                     </div>
@@ -233,7 +244,7 @@ export default function ServicesPage() {
                                                     </span>
                                                     <Button
                                                         size="sm"
-                                                        className="bg-sky-500 hover:bg-sky-600 text-white text-xs h-8 px-4 ml-auto"
+                                                        className="bg-[#236b9d] hover:bg-[#1a5a8c] text-white text-xs h-8 px-4 ml-auto"
                                                         onClick={() => handleBookRoute(service.id)}
                                                     >
                                                         Book Now
@@ -251,5 +262,13 @@ export default function ServicesPage() {
 
 
         </>
+    );
+}
+
+export default function ServicesPage() {
+    return (
+        <Suspense fallback={<div className="flex justify-center items-center h-screen"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>}>
+            <ServicesContent />
+        </Suspense>
     );
 }

@@ -179,7 +179,7 @@ export default function BookingManagement() {
                 time: b.scheduledDate ? format(dateObj, "hh:mm a") : 'N/A',
                 status: b.status ? b.status.charAt(0).toUpperCase() + b.status.slice(1).toLowerCase().replace('_', ' ') : 'Unknown', // e.g. IN_PROGRESS -> In progress -> In Progress
                 amount: b.service?.price || 0,
-                address: b.user?.address || 'No Address',
+                address: b.address || b.user?.address || 'No Address',
                 paymentStatus: b.payment?.status === "PAID" 
                     ? "Paid (Khalti)" 
                     : b.payment?.paymentMethod === "COD" 

@@ -110,7 +110,7 @@ export default function HelpSupportPage() {
                                     <Label htmlFor="message">Message</Label>
                                     <Textarea id="message" placeholder="Describe your issue or question..." className="min-h-[120px] resize-none" />
                                 </div>
-                                <Button type="button" className="bg-sky-500 hover:bg-sky-600 text-white self-start px-8">
+                                <Button type="button" className="bg-[#236b9d] hover:bg-[#236b8d] text-white self-start px-8">
                                     Send Message
                                 </Button>
                             </form>

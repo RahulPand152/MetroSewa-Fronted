@@ -5,7 +5,13 @@ import { Menu, LogOut, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import Image from "next/image";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useProfile, useLogout } from "@/src/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";
@@ -41,15 +47,29 @@ export const NavbarPage = () => {
     }
 
     if (profile?.data) {
-      const fullName = `${profile.data.firstName || ""} ${profile.data.lastName || ""}`.trim() || "User";
-      const initials = fullName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
+      const fullName =
+        `${profile.data.firstName || ""} ${profile.data.lastName || ""}`.trim() ||
+        "User";
+      const initials = fullName
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
 
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0 overflow-hidden ring-2 ring-transparent transition-all focus-visible:ring-blue-500 hover:ring-blue-200">
+            <Button
+              variant="ghost"
+              className="relative h-10 w-10 rounded-full p-0 overflow-hidden ring-2 ring-transparent transition-all focus-visible:ring-blue-500 hover:ring-blue-200"
+            >
               <Avatar className="h-full w-full">
-                <AvatarImage src={profile.data.avatar || ""} alt={fullName} className="object-cover" />
+                <AvatarImage
+                  src={profile.data.avatar || ""}
+                  alt={fullName}
+                  className="object-cover"
+                />
                 <AvatarFallback className="bg-blue-600 text-white font-semibold text-sm">
                   {initials}
                 </AvatarFallback>
@@ -60,7 +80,9 @@ export const NavbarPage = () => {
             <div className="flex items-center justify-start gap-2 p-2">
               <div className="flex flex-col space-y-1 leading-none">
                 <p className="font-semibold text-sm">{fullName}</p>
-                <p className="text-xs text-slate-500 truncate">{profile.data.email}</p>
+                <p className="text-xs text-slate-500 truncate">
+                  {profile.data.email}
+                </p>
               </div>
             </div>
             <div className="px-2 py-1">
@@ -90,18 +112,18 @@ export const NavbarPage = () => {
       <>
         <Link
           href="/signin"
-          className="text-sm font-semibold text-white bg-slate-500 hover:bg-slate-600 px-5 py-2 rounded-full transition-colors"
+          className="text-sm font-semibold text-[#236b9d] bg-white border border-[#236b9d] hover:bg-[#236b9d] hover:text-white h-9 px-4 flex items-center justify-center rounded-sm transition-colors"
         >
           Sign In
         </Link>
         <Link
           href="/signup"
-          className="text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded-full shadow-sm transition-colors"
+          className="text-sm font-semibold text-white bg-[#236b9d] hover:bg-[#1a5175] h-9 px-4 flex items-center justify-center rounded-sm shadow-sm transition-colors"
         >
           Sign Up
         </Link>
-        <Link href="/technician-register">
-          <Button className="rounded-full px-5 shadow-sm bg-slate-800 font-semibold hover:bg-slate-900 transition-colors">
+        <Link href="/technician-register" className="flex">
+          <Button className="rounded-sm h-9 px-4 text-sm shadow-sm bg-[#2baba8] text-white font-semibold hover:bg-[#208f8c] transition-colors flex items-center justify-center border-none">
             Become a Technician
           </Button>
         </Link>
@@ -110,27 +132,46 @@ export const NavbarPage = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-sm">
-      <div className="mx-auto max-w-7xl flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="fixed top-0 left-0 w-full z-50 bg-white border-b border-slate-100 shadow-sm">
+      <div className="mx-auto max-w-7xl flex h-14 items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white font-bold shadow-md group-hover:bg-blue-700 transition-colors">
-            ✕
+        <div
+            className="flex items-center cursor-pointer"
+            onClick={() => router.push("/")}
+          >
+            <div className="flex items-center">
+              <Image
+                alt="MetroSewa logo"
+                className="object-contain p-1"
+                src="/metrosewalogo.png"
+                width={80}
+                height={50}
+              />
+            </div>
+            <div className="font-bold text-xl tracking-tight flex items-center">
+              <span className="text-[#236b9d]">Metro</span>
+              <span className="text-[#2baba8] ml-0.5"> Sewa</span>
+            </div>
           </div>
-          <span className="text-lg font-bold tracking-tight text-slate-900">
-            MetroSewa
-          </span>
-        </Link>
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8 font-medium">
-          <Link href="/" className="font-semibold text-sm text-slate-700 hover:text-blue-600 transition-colors">
+          <Link
+            href="/"
+            className="font-semibold text-sm text-slate-800 hover:text-[#236b9d] transition-colors"
+          >
             Home
           </Link>
-          <Link href="/services" className="font-semibold text-sm text-slate-700 hover:text-blue-600 transition-colors">
+          <Link
+            href="/services"
+            className="font-semibold text-sm text-slate-800 hover:text-[#236b9d] transition-colors"
+          >
             Services
           </Link>
-          <Link href="/contact" className="font-semibold text-sm text-slate-700 hover:text-blue-600 transition-colors">
+          <Link
+            href="/contact"
+            className="font-semibold text-sm text-slate-800 hover:text-[#236b9d] transition-colors"
+          >
             Contacts
           </Link>
         </nav>
@@ -149,9 +190,11 @@ export const NavbarPage = () => {
               </Button>
             </SheetTrigger>
 
-            <SheetContent side="right" className="w-72 bg-black text-white border-l border-gray-800">
+            <SheetContent
+              side="right"
+              className="w-72 bg-black text-white border-l border-gray-800"
+            >
               <div className="mt-8 flex flex-col gap-4">
-
                 {/* Navigation Links */}
                 <Link
                   href="/"
@@ -181,24 +224,20 @@ export const NavbarPage = () => {
                     <Link href="/signin" className="w-full">
                       <Button
                         variant="outline"
-                        className="w-full justify-start border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800 transition font-semibold"
+                        className="w-full h-10 justify-start border-[#236b9d] text-gray-300 hover:text-white hover:bg-[#236b9d] transition font-semibold"
                       >
                         Sign In
                       </Button>
                     </Link>
 
                     <Link href="/signup" className="w-full">
-                      <Button
-                        className="w-full justify-start bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 transition font-bold shadow-md"
-                      >
+                      <Button className="w-full h-10 justify-start bg-[#236b9d] text-white hover:bg-[#1a5175] transition font-bold shadow-md">
                         Sign Up
                       </Button>
                     </Link>
 
                     <Link href="/technician-register" className="w-full">
-                      <Button
-                        className="w-full justify-start bg-gray-900 text-white hover:bg-gray-700 transition font-semibold"
-                      >
+                      <Button className="w-full h-10 justify-start bg-[#2baba8] text-white hover:bg-[#208f8c] border-none transition font-semibold shadow-md">
                         Become a Technician
                       </Button>
                     </Link>

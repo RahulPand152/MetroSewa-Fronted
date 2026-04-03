@@ -4,14 +4,14 @@ import { usePathname } from "next/navigation";
 import Footer from "./Footer";
 
 // Routes where the Footer should NOT be shown
-const DASHBOARD_PREFIXES = ["/admin", "/technican", "/user"];
+const NO_FOOTER_PREFIXES = ["/admin", "/technican", "/user", "/signin", "/signup", "/forget-password", "/otp-verification", "/technician-register"];
 
 export default function ConditionalFooter() {
     const pathname = usePathname();
-    const isDashboard = DASHBOARD_PREFIXES.some((prefix) =>
+    const shouldHideFooter = NO_FOOTER_PREFIXES.some((prefix) =>
         pathname.startsWith(prefix)
     );
 
-    if (isDashboard) return null;
+    if (shouldHideFooter) return null;
     return <Footer />;
 }
