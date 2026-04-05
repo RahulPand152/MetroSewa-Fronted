@@ -1,12 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Mail, MessageSquare, PhoneCall } from "lucide-react";
+import { Mail, MessageSquare, PhoneCall, Loader2 } from "lucide-react";
+import { useProfile } from "@/src/hooks/useAuth";
+import { useSubmitContact } from "@/src/hooks/useContact";
 
 const faqs = [
     {
@@ -23,11 +26,42 @@ const faqs = [
     },
     {
         question: "How can I pay for the service?",
-        answer: "You can pay securely online via eSewa, Khalti, or mobile banking directly through the app. We also accept cash on delivery once the job is completed."
+        answer: "You can pay securely online via Khalti. We also accept cash on delivery once the job is completed."
     }
 ];
 
 export default function HelpSupportPage() {
+    const { data: profile } = useProfile();
+    const { mutate: submitContact, isPending } = useSubmitContact();
+
+    const [subject, setSubject] = useState("");
+    const [phone, setPhone] = useState(profile?.data?.phoneNumber || "");
+    const [message, setMessage] = useState("");
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!subject.trim() || !message.trim() || !phone.trim()) return;
+
+        const fullName = profile?.data
+            ? `${profile.data.firstName || ""} ${profile.data.lastName || ""}`.trim() || "User"
+            : "User";
+        const email = profile?.data?.email || "user@example.com";
+
+        submitContact({
+            title: subject,
+            phone: phone,
+            message: message,
+            fullName: fullName,
+            email: email
+        }, {
+            onSuccess: () => {
+                setSubject("");
+                setPhone("");
+                setMessage("");
+            }
+        });
+    };
+
     return (
         <div className="flex flex-col gap-6 max-w-4xl">
             {/* Header */}
@@ -48,7 +82,7 @@ export default function HelpSupportPage() {
                             <CardDescription className="text-sky-700/70 dark:text-sky-300">Mon-Sun, 8am to 8pm</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-lg font-bold text-sky-900 dark:text-sky-100">+977-98XXXXXXXX</p>
+                            <p className="text-lg font-bold text-sky-900 dark:text-sky-100">+977-9826871444</p>
                         </CardContent>
                     </Card>
                     <Card className="border-slate-200 dark:border-slate-800 shadow-sm">
@@ -76,7 +110,7 @@ export default function HelpSupportPage() {
                             <Accordion type="single" collapsible className="w-full">
                                 {faqs.map((faq, i) => (
                                     <AccordionItem value={`item-${i}`} key={i} className="px-6 border-b border-slate-100 dark:border-slate-800 last:border-0">
-                                        <AccordionTrigger className="text-sm font-medium hover:no-underline hover:text-sky-600 dark:hover:text-sky-400 py-4 text-left">
+                                        <AccordionTrigger className="text-sm font-medium hover:no-underline hover:text-[#2baba8] dark:hover:text-[#2baba8] py-4 text-left">
                                             {faq.question}
                                         </AccordionTrigger>
                                         <AccordionContent className="text-sm text-slate-600 dark:text-slate-400 pb-4 leading-relaxed">
@@ -95,23 +129,53 @@ export default function HelpSupportPage() {
                             <CardDescription>We'll get back to you as soon as possible.</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <form className="flex flex-col gap-4">
+                            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="flex flex-col gap-1.5">
-                                        <Label htmlFor="subject">Subject</Label>
-                                        <Input id="subject" placeholder="What is this about?" />
+                                        <Label htmlFor="subject">Subject <span className="text-red-500">*</span></Label>
+                                        <Input
+                                            id="subject"
+                                            placeholder="What is this about?"
+                                            value={subject}
+                                            onChange={(e) => setSubject(e.target.value)}
+                                            required
+                                        />
                                     </div>
                                     <div className="flex flex-col gap-1.5">
-                                        <Label htmlFor="bookingId">Booking ID (Optional)</Label>
-                                        <Input id="bookingId" placeholder="e.g. B-1029" />
+                                        <Label htmlFor="phone">Phone Number <span className="text-red-500">*</span></Label>
+                                        <Input
+                                            id="phone"
+                                            placeholder="e.g. 98XXXXXXXX"
+                                            value={phone}
+                                            onChange={(e) => setPhone(e.target.value)}
+                                            required
+                                        />
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-1.5">
-                                    <Label htmlFor="message">Message</Label>
-                                    <Textarea id="message" placeholder="Describe your issue or question..." className="min-h-[120px] resize-none" />
+                                    <Label htmlFor="message">Message <span className="text-red-500">*</span></Label>
+                                    <Textarea
+                                        id="message"
+                                        placeholder="Describe your issue or question..."
+                                        className="min-h-[120px] resize-none"
+                                        value={message}
+                                        onChange={(e) => setMessage(e.target.value)}
+                                        required
+                                    />
                                 </div>
-                                <Button type="button" className="bg-[#236b9d] hover:bg-[#236b8d] text-white self-start px-8">
-                                    Send Message
+                                <Button
+                                    type="submit"
+                                    disabled={isPending}
+                                    className="bg-[#236b9d] hover:bg-[#1a5175] text-white self-start px-8"
+                                >
+                                    {isPending ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Sending...
+                                        </>
+                                    ) : (
+                                        "Send Message"
+                                    )}
                                 </Button>
                             </form>
                         </CardContent>

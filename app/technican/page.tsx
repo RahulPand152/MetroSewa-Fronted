@@ -112,12 +112,6 @@ export default function TechnicanDashboard() {
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
                         Analytical Dashboard
                     </h1>
-                    <div className="flex items-center gap-2 mt-1">
-                        <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">
-                            Live Updates Active
-                        </span>
-                    </div>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                     <Button variant="outline" size="sm" className="flex items-center gap-1.5 rounded-xl border-slate-200 dark:border-slate-700">
@@ -177,7 +171,7 @@ export default function TechnicanDashboard() {
                         </CardTitle>
                         <Badge
                             variant="secondary"
-                            className="bg-sky-50 dark:bg-sky-900/20 text-sky-600 dark:text-sky-400 border-0 flex items-center gap-1.5"
+                            className="bg-[#236b9d] text-white  border-0 flex items-center gap-1.5"
                         >
                             <TrendingUp className="h-3 w-3" /> Jobs Completed
                         </Badge>
@@ -193,7 +187,7 @@ export default function TechnicanDashboard() {
                                 />
                                 <YAxis hide />
                                 <Tooltip content={<BarTooltip />} cursor={{ fill: "rgba(14,165,233,0.06)" }} />
-                                <Bar dataKey="jobs" fill="#0ea5e9" radius={[6, 6, 0, 0]} />
+                                <Bar dataKey="jobs" fill="#2baba8" radius={[6, 6, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
                     </CardContent>
@@ -250,11 +244,11 @@ export default function TechnicanDashboard() {
                         <CardTitle className="text-base font-bold text-slate-800 dark:text-slate-200">
                             New Job Requests
                         </CardTitle>
-                        <Badge className="bg-sky-500 hover:bg-sky-600 text-white text-xs px-2 py-0.5">
+                        <Badge className="bg-[#236b9d] hover:bg-[#236b8d] text-white text-xs px-2 py-0.5">
                             {newJobs.length}
                         </Badge>
                     </div>
-                    <Button variant="ghost" size="sm" className="text-sky-500 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-sky-900/20 text-sm font-semibold gap-1">
+                    <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-400 hover:bg-sky-50  text-sm font-semibold gap-1">
                         View all <ChevronRight className="h-4 w-4" />
                     </Button>
                 </CardHeader>
@@ -265,7 +259,7 @@ export default function TechnicanDashboard() {
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap">
                                     <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">{job.title}</p>
-                                    <Badge variant="secondary" className="text-xs bg-sky-50 dark:bg-sky-900/20 text-sky-600 dark:text-sky-400 border-0">
+                                    <Badge variant="secondary" className="text-xs bg-[#236b9d] text-white dark:text-sky-400 border-0">
                                         {job.category}
                                     </Badge>
                                     {job.urgency === "Urgent" && (
@@ -274,16 +268,16 @@ export default function TechnicanDashboard() {
                                 </div>
                                 <div className="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-slate-500 dark:text-slate-400">
                                     <span className="flex items-center gap-1">
-                                        <MapPin className="h-3.5 w-3.5 text-sky-400" />{job.location}
+                                        <MapPin className="h-3.5 w-3.5 text-gray-600" />{job.location}
                                     </span>
                                     <span className="flex items-center gap-1">
-                                        <Clock className="h-3.5 w-3.5 text-sky-400" />{job.time}
+                                        <Clock className="h-3.5 w-3.5 text-gray-600" />{job.time}
                                     </span>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3 flex-shrink-0">
                                 <span className="text-sm font-bold text-slate-700 dark:text-slate-300">{job.budget}</span>
-                                <Button size="sm" className="bg-sky-500 hover:bg-sky-600 text-white rounded-xl shadow-sm shadow-sky-500/20 text-xs px-4">
+                                <Button size="sm" className="bg-[#236b9d] hover:bg-[#236b8d] text-white rounded-xl shadow-sm shadow-sky-500/20 text-xs px-4">
                                     Accept
                                 </Button>
                                 <Button size="sm" variant="outline" className="rounded-xl text-xs px-4 border-slate-200 dark:border-slate-700">

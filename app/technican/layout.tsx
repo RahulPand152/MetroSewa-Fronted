@@ -15,22 +15,7 @@ export default function TechnicanLayout({
             <SidebarInset>
                 {/* Top header bar */}
                 <header className="flex h-14 shrink-0 items-center gap-3 border-b border-slate-200 dark:border-slate-800 px-4 bg-white dark:bg-slate-950 sticky top-0 z-10">
-                    <SidebarTrigger className="-ml-1 text-sky-600 hover:bg-sky-50 dark:hover:bg-sky-900/20" />
-                    <Separator orientation="vertical" className="h-5" />
-                    <div className="flex items-center gap-2">
-                        <Wrench className="h-4 w-4 text-sky-500" />
-                        <span className="font-semibold text-sm text-slate-700 dark:text-slate-300">
-                            Technician Portal
-                        </span>
-                    </div>
-                    <div className="ml-auto">
-                        <Badge
-                            variant="secondary"
-                            className="bg-sky-50 text-sky-600 dark:bg-sky-900/30 dark:text-sky-400 border-0 text-xs font-semibold"
-                        >
-                            ● Live
-                        </Badge>
-                    </div>
+                    <SidebarTrigger className="-ml-1 text-gray-600 hover:text-gray-800" />
                 </header>
 
                 {/* Page content */}

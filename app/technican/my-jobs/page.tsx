@@ -49,7 +49,7 @@ export default function MyJobsPage() {
                 <CardHeader className="border-b border-slate-100 dark:border-slate-800 py-4">
                     <div className="flex items-center justify-between">
                         <CardTitle className="text-base text-slate-800 dark:text-slate-200">All Jobs</CardTitle>
-                        <Badge className="bg-sky-500 hover:bg-sky-600 text-white text-xs">{jobs.length} jobs</Badge>
+                        <Badge className="bg-[#236b9d]  text-white text-xs">{jobs.length} jobs</Badge>
                     </div>
                 </CardHeader>
                 <CardContent className="p-0 divide-y divide-slate-100 dark:divide-slate-800">
@@ -67,10 +67,10 @@ export default function MyJobsPage() {
                                 </div>
                                 <div className="flex items-center gap-3 mt-1.5 text-xs text-slate-500 dark:text-slate-400 flex-wrap">
                                     <span className="flex items-center gap-1">
-                                        <Briefcase className="h-3.5 w-3.5 text-sky-400" />{job.category}
+                                        <Briefcase className="h-3.5 w-3.5 text-[#236b9d]" />{job.category}
                                     </span>
                                     <span className="flex items-center gap-1">
-                                        <Calendar className="h-3.5 w-3.5 text-sky-400" />{job.date}
+                                        <Calendar className="h-3.5 w-3.5 text-[#236b9d]" />{job.date}
                                     </span>
                                 </div>
                             </div>
@@ -78,7 +78,7 @@ export default function MyJobsPage() {
                                 <span className="text-sm font-bold text-slate-700 dark:text-slate-300">{job.pay}</span>
                                 <Dialog>
                                     <DialogTrigger asChild>
-                                        <Button size="sm" variant="outline" className="rounded-xl text-xs border-sky-200 text-sky-600 hover:bg-sky-50 dark:border-sky-800 dark:text-sky-400 dark:hover:bg-sky-900/20">
+                                        <Button size="sm" variant="outline" className="rounded-xl text-xs bg-[#236b9d] text-white hover:bg-[#236b8d] hover:text-white">
                                             Details
                                         </Button>
                                     </DialogTrigger>
@@ -114,7 +114,7 @@ export default function MyJobsPage() {
                                                     </div>
                                                 </div>
                                                 <div className="flex items-start gap-3">
-                                                    <Calendar className="h-4 w-4 mt-0.5 text-sky-500 flex-shrink-0" />
+                                                    <Calendar className="h-4 w-4 mt-0.5 text-[#236b9d] flex-shrink-0" />
                                                     <div className="flex flex-col">
                                                         <span className="text-sm font-medium text-slate-900 dark:text-slate-100">Date & Time</span>
                                                         <span className="text-xs text-slate-500 dark:text-slate-400">{job.date}</span>

@@ -86,7 +86,7 @@ export default function SidebarUser() {
     .slice(0, 2);
 
   return (
-    <Sidebar collapsible="icon" className="bg-blue-500">
+    <Sidebar collapsible="icon" className="bg-[#020817]">
       {/* ── Header ─────────────────────────────────── */}
       <SidebarHeader className="p-4">
         <div
@@ -207,14 +207,13 @@ export default function SidebarUser() {
                 {initials}
               </AvatarFallback>
             </Avatar>
-            <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white dark:border-slate-900 bg-emerald-400" />
           </div>
 
           <div className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
             <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100 leading-tight">
               {fullName}
             </p>
-            <p className="truncate text-xs text-sky-500 dark:text-sky-400 font-medium">
+            <p className="truncate text-xs text-gray-600 hover:text-gray-400  font-medium">
               View Profile →
             </p>
           </div>

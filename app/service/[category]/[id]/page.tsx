@@ -118,19 +118,17 @@ export default function ServiceDetails() {
   const images = service.images?.map((img: any) => img.url) || [];
   if (images.length === 0) images.push("https://picsum.photos/800/600"); // placeholder if missing
 
-  const price =
-    service.price != null ? `Rs. ${service.price}` : "Contact for Price";
+  const isPremium = service.isPremium || false;
+  const price = service.price != null ? `Rs. ${service.price}` : "Contact for Price";
   const duration = service.duration || "Variable";
-  const rating = service.rating || 4.5;
+  const rating = service.rating || 0;
   const reviewsCount = service.reviewsCount || 0;
   const longDescription = service.description || "";
-  const features = service.features || [
+  const features: string[] = service.features || [
     "Professional Service",
     "Verified Expert",
     "Satisfaction Guaranteed",
   ];
-  const isPremium = service.isPremium || false;
-  const reviews = service.reviews || [];
 
   return (
     <div className="min-h-screen bg-[#f8f9fa]">
@@ -269,11 +267,8 @@ export default function ServiceDetails() {
           <div>
             <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
               Customer Reviews
-              <span className="text-base font-normal text-gray-500">
-                ({reviews.length})
-              </span>
             </h3>
-            <Reviews reviews={reviews} />
+            <Reviews serviceId={service.id} />
           </div>
         </div>
 
