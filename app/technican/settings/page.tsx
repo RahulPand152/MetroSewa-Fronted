@@ -33,14 +33,14 @@ const sections: Section[] = [
         ],
     },
 
-    {
-        title: "Preferences",
-        icon: Globe,
-        settings: [
-            { id: "dark-mode", label: "Dark Mode", description: "Use dark theme across the portal", defaultOn: false },
+    // {
+    //     title: "Preferences",
+    //     icon: Globe,
+    //     settings: [
+    //         { id: "dark-mode", label: "Dark Mode", description: "Use dark theme across the portal", defaultOn: false },
 
-        ],
-    },
+    //     ],
+    // },
 ];
 
 function SettingsSection({ section }: { section: Section }) {

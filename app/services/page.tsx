@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Search, Star,  Loader2 } from "lucide-react";
+import { Search, Star, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -45,7 +45,7 @@ function ServicesContent() {
 
     const handleBookRoute = (serviceId: string) => {
         if (!userProfile) {
-            router.push("/login");
+            router.push("/signin");
             return;
         }
         if (!isEligibleToBook) {

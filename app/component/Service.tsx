@@ -18,11 +18,11 @@ export const ServicePage = () => {
         <div className="w-full pb-10">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between mb-8">
-                    <span className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-gray-900">
+                    <span className="text-xl sm:text-xl md:text-2xl lg:text-3xl font-bold tracking-tight text-[#236b9d]">
                         Services
                     </span>
-                    <Link href="/services" className="text-sm font-medium text-sky-500 hover:text-sky-600 whitespace-nowrap ml-4">
-                        View All →
+                    <Link href="/services"
+                        className="ml-4 text-sm font-medium  bg-gray-400 whitespace-nowrap px-3 py-1.5 rounded-md transition-all duration-200 hover:text-[#236b9d]"> View All →
                     </Link>
                 </div>
 
@@ -106,6 +106,6 @@ export const ServicePage = () => {
 
 
             </div>
-        </div>
+        </div >
     );
 };

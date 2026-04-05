@@ -72,17 +72,17 @@ export default function BookServicePage() {
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                         {filteredCategories.map((cat: any) => {
                             const isActive = selectedCategory === cat.id;
-                            const imageUrl = cat.iconPublicId || cat.imageUrl || cat.icon || "https://picsum.photos/200/300";
+                            const imageUrl = cat.icon || cat.imageUrl || " ";
                             return (
                                 <button
                                     key={cat.id}
                                     onClick={() => setSelectedCategory(isActive ? "all" : cat.id)}
-                                    className={`group relative rounded-xl overflow-hidden border transition-all duration-300 cursor-pointer text-left ${isActive
-                                        ? "border-sky-500 ring-2 ring-sky-200 dark:ring-sky-900"
-                                        : "border-slate-200 dark:border-slate-800 hover:border-sky-300 hover:shadow-sm"
+                                    className={`group relative rounded-xl overflow-hidden border transition-all duration-300 cursor-pointer text-left flex flex-col ${isActive
+                                        ? "border-[#236b9d] ring-2 ring-[#236b9d]/30 dark:ring-[#236b9d]/50"
+                                        : "border-slate-200 dark:border-slate-800 hover:border-[#236b9d]/50 hover:shadow-md"
                                         }`}
                                 >
-                                    <div className="relative h-20 w-full overflow-hidden flex items-center justify-center bg-slate-100">
+                                    <div className="relative h-32 w-full overflow-hidden flex items-center justify-center bg-slate-100">
                                         <img
                                             src={imageUrl}
                                             alt={cat.name}
@@ -90,8 +90,8 @@ export default function BookServicePage() {
                                         />
                                         <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition duration-300" />
                                     </div>
-                                    <div className="p-2 bg-white dark:bg-slate-900">
-                                        <p className={`text-xs sm:text-sm font-semibold text-center truncate ${isActive ? "text-sky-600 dark:text-sky-400" : "text-slate-700 dark:text-slate-200"}`}>
+                                    <div className="p-3 bg-white dark:bg-slate-900 w-full mt-auto">
+                                        <p className={`text-sm font-semibold text-center truncate ${isActive ? "text-[#236b9d]" : "text-slate-700 dark:text-slate-200"}`}>
                                             {cat.name}
                                         </p>
                                     </div>
@@ -139,31 +139,35 @@ export default function BookServicePage() {
                                     className="group relative rounded-xl overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col"
                                 >
                                     {/* Image */}
-                                    <div className="relative h-36 w-full overflow-hidden shrink-0">
-                                        <img
-                                            src={mainImg}
-                                            alt={service.name}
-                                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                        />
-                                        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition duration-300" />
-                                        {service.priority && (
-                                            <Badge className="absolute top-2 left-2 bg-amber-500 text-white text-[10px] px-2 py-0.5">
-                                                {service.badge || "Priority"}
-                                            </Badge>
-                                        )}
-                                        {service.isPremium && !service.priority && (
-                                            <Badge className="absolute top-2 left-2 bg-sky-500 text-white text-[10px] px-2 py-0.5">
-                                                Premium
-                                            </Badge>
-                                        )}
-                                    </div>
+                                    <Link href={`/service/${service.categoryId ?? 'all'}/${service.id}`}>
+                                        <div className="relative h-36 w-full overflow-hidden shrink-0 cursor-pointer">
+                                            <img
+                                                src={mainImg}
+                                                alt={service.name}
+                                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                            />
+                                            <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition duration-300" />
+                                            {service.priority && (
+                                                <Badge className="absolute top-2 left-2 bg-amber-500 text-white text-[10px] px-2 py-0.5">
+                                                    {service.badge || "Priority"}
+                                                </Badge>
+                                            )}
+                                            {service.isPremium && !service.priority && (
+                                                <Badge className="absolute top-2 left-2 bg-sky-500 text-white text-[10px] px-2 py-0.5">
+                                                    Premium
+                                                </Badge>
+                                            )}
+                                        </div>
+                                    </Link>
 
                                     {/* Content */}
                                     <div className="p-4 flex flex-col flex-1 gap-2">
                                         <div>
-                                            <h3 className="text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-100 leading-tight">
-                                                {service.name}
-                                            </h3>
+                                            <Link href={`/service/${service.categoryId ?? 'all'}/${service.id}`}>
+                                                <h3 className="text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-100 leading-tight hover:text-[#236b9d] cursor-pointer transition-colors">
+                                                    {service.name}
+                                                </h3>
+                                            </Link>
                                             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed line-clamp-2" dangerouslySetInnerHTML={{ __html: service.description ?? '' }} />
                                         </div>
 

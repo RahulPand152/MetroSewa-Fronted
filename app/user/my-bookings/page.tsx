@@ -24,9 +24,9 @@ export default function MyBookingsPage() {
     const mappedBookings = realBookings.map((b: any) => {
         const d = new Date(b.scheduledDate || new Date());
         let statusColor = "";
-        let displayStatus = b.status; 
-        
-        switch(displayStatus) {
+        let displayStatus = b.status;
+
+        switch (displayStatus) {
             case "PENDING":
             case "ASSIGNED":
                 statusColor = "bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-400";
@@ -38,34 +38,34 @@ export default function MyBookingsPage() {
                 statusColor = "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-400";
                 break;
             default:
-                statusColor = "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400"; 
+                statusColor = "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400";
                 displayStatus = "In Progress";
         }
 
         let paymentStatus = "Pending";
         let paymentColor = "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400";
         if (b.payment?.status === "PAID") {
-             paymentStatus = "Paid";
-             paymentColor = "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400";
+            paymentStatus = "Paid";
+            paymentColor = "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400";
         } else if (b.payment?.paymentMethod === "COD") {
-             paymentStatus = "Cash on Delivery";
-             paymentColor = "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400";
+            paymentStatus = "Cash on Delivery";
+            paymentColor = "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400";
         }
 
         return {
-             id: b.id,
-             shortId: b.id.substring(0, 4).toUpperCase(),
-             service: b.service?.name || "Unknown Service",
-             category: b.service?.category?.name || "General",
-             status: displayStatus,
-             date: format(d, "MMM d, yyyy"),
-             time: format(d, "hh:mm a"),
-             price: `Rs. ${b.service?.price || 0}`,
-             statusColor,
-             description: b.description || "No specific details provided.",
-             paymentStatus,
-             paymentColor,
-             address: "No address provided"
+            id: b.id,
+            shortId: b.id.substring(0, 4).toUpperCase(),
+            service: b.service?.name || "Unknown Service",
+            category: b.service?.category?.name || "General",
+            status: displayStatus,
+            date: format(d, "MMM d, yyyy"),
+            time: format(d, "hh:mm a"),
+            price: `Rs. ${b.service?.price || 0}`,
+            statusColor,
+            description: b.description || "No specific details provided.",
+            paymentStatus,
+            paymentColor,
+            address: "No address provided"
         };
     });
 
@@ -115,7 +115,7 @@ export default function MyBookingsPage() {
                 <CardHeader className="border-b border-slate-100 dark:border-slate-800 py-4">
                     <div className="flex items-center justify-between">
                         <CardTitle className="text-base text-slate-800 dark:text-slate-200">All Bookings</CardTitle>
-                        <Badge className="bg-sky-500 hover:bg-sky-600 text-white text-xs">{mappedBookings.length} total</Badge>
+                        <Badge className="bg-[#0077b6]  text-white text-xs">{mappedBookings.length} total</Badge>
                     </div>
                 </CardHeader>
                 <CardContent className="p-0 divide-y divide-slate-100 dark:divide-slate-800">
@@ -135,10 +135,10 @@ export default function MyBookingsPage() {
                                         <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">{booking.service}</p>
                                         <div className="flex items-center gap-3 mt-1 text-xs text-slate-500 dark:text-slate-400 flex-wrap">
                                             <span className="flex items-center gap-1">
-                                                <Briefcase className="h-3.5 w-3.5 text-sky-400" />{booking.category}
+                                                <Briefcase className="h-3.5 w-3.5 text-[#0077b6]" />{booking.category}
                                             </span>
                                             <span className="flex items-center gap-1">
-                                                <Calendar className="h-3.5 w-3.5 text-sky-400" />{booking.date}, {booking.time}
+                                                <Calendar className="h-3.5 w-3.5 text-[#0077b6]" />{booking.date}, {booking.time}
                                             </span>
                                         </div>
                                     </div>

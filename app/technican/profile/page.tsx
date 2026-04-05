@@ -94,8 +94,8 @@ export default function ProfilePage() {
                         <Button
                             variant="outline"
                             size="sm"
-                            className="gap-2 rounded-xl border-sky-200 dark:border-sky-800 text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/20"
-                        >
+                            className="gap-2 rounded-xl hover:bg-[#236b9d] hover-text-white ">
+
                             <Edit className="h-4 w-4" /> Edit Profile
                         </Button>
                     </DialogTrigger>
@@ -152,7 +152,7 @@ export default function ProfilePage() {
             {/* Profile Card */}
             <Card className="rounded-2xl border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 {/* Sky blue banner */}
-                <div className="h-24 bg-gradient-to-r from-sky-400 to-sky-600" />
+                <div className="h-28 bg-gradient-to-r from-[#2baba8] to-[#123854]" />
 
                 <CardContent className="px-6 pb-6 -mt-12">
                     {/* Avatar */}
@@ -164,7 +164,6 @@ export default function ProfilePage() {
                                 )}
                                 <AvatarFallback className="bg-sky-500 text-white text-xl font-bold">{initials}</AvatarFallback>
                             </Avatar>
-                            <span className="absolute bottom-1 right-1 h-4 w-4 rounded-full bg-emerald-400 border-2 border-white dark:border-slate-900" />
                             {isUploading && (
                                 <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center">
                                     <Spinner className="h-6 w-6 text-white animate-spin" />
@@ -192,9 +191,9 @@ export default function ProfilePage() {
 
                     {/* Contact info */}
                     <div className="flex flex-wrap gap-4 mt-5 text-sm text-slate-600 dark:text-slate-400">
-                        <span className="flex items-center gap-1.5"><Phone className="h-4 w-4 text-sky-400" /> {user.phoneNumber || "-"}</span>
-                        <span className="flex items-center gap-1.5"><Mail className="h-4 w-4 text-sky-400" /> {user.email}</span>
-                        <span className="flex items-center gap-1.5"><MapPin className="h-4 w-4 text-sky-400" /> {user.address || "-"}</span>
+                        <span className="flex items-center gap-1.5"><Phone className="h-4 w-4 text-[#236b9d]" /> {user.phoneNumber || "-"}</span>
+                        <span className="flex items-center gap-1.5"><Mail className="h-4 w-4 text-[#236b9d]" /> {user.email}</span>
+                        <span className="flex items-center gap-1.5"><MapPin className="h-4 w-4 text-[#236b9d]" /> {user.address || "-"}</span>
                     </div>
 
                     <Separator className="my-5" />
@@ -222,7 +221,7 @@ export default function ProfilePage() {
                         <Badge
                             key={tag}
                             variant="secondary"
-                            className="px-3 py-1.5 text-xs font-semibold bg-sky-50 dark:bg-sky-900/20 text-sky-600 dark:text-sky-400 border-0 rounded-full"
+                            className="px-3 py-1.5 text-xs font-semibold  text-gray-500 border-0 rounded-full"
                         >
                             {tag}
                         </Badge>

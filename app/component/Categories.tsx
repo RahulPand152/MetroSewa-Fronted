@@ -19,13 +19,16 @@ export const Categories = () => {
         <div className="w-full bg-background pt-10 pb-4">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between">
-                    <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-center">
+                    <div className="text-xl sm:text-xl md:text-2xl lg:text-3xl font-bold tracking-tight text-center">
                         <span className="text-gray-900">Service</span>{" "}
-                        <span className="bg-gradient-to-r from-black to-gray-500 bg-clip-text text-transparent">
+                        <span className="text-[#236b9d]">
                             Categories
                         </span>
                     </div>
-                    <Link href="/services" className="text-sm font-medium text-sky-500 hover:text-sky-600 whitespace-nowrap ml-4">
+                    <Link
+                        href="/services"
+                        className="ml-4 text-sm font-medium  bg-gray-400 whitespace-nowrap px-3 py-1.5 rounded-md transition-all duration-200 hover:text-[#236b9d]"
+                    >
                         View All →
                     </Link>
                 </div>

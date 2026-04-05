@@ -31,7 +31,8 @@ import {
     MessageSquare,
     Settings,
     LogOut,
-    Wrench
+    Wrench,
+    Star
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -45,6 +46,7 @@ const navItems = [
     { label: "Services", href: "/admin/services", icon: Wrench, tooltip: "Services" },
     { label: "Technicians", href: "/admin/technicians", icon: UserCog, tooltip: "Technicians" },
     { label: "User Inquiries", href: "/admin/inquiries", icon: MessageSquare, tooltip: "User Inquiries" },
+    { label: "Reviews", href: "/admin/reviews", icon: Star, tooltip: "Reviews" },
 ];
 
 export default function AdminSidebar() {
