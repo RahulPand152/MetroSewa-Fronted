@@ -160,6 +160,24 @@ export const useGetBookings = () => {
     });
 };
 
+export const useGetAdminBookingById = (bookingId: string) => {
+    return useQuery({
+        queryKey: ['admin', 'bookings', bookingId],
+        queryFn: async () => {
+            // Fetch all bookings and find the specific one by ID since
+            // the backend might not have a dedicated GET /admin/bookings/:id endpoint
+            const response = await axiosInstance.get('/admin/bookings');
+            const allBookings = response.data.data || [];
+            const booking = allBookings.find((b: any) => b.id === bookingId);
+            if (!booking) {
+                throw new Error("Booking not found");
+            }
+            return booking;
+        },
+        enabled: !!bookingId,
+    });
+};
+
 export const useUpdateBookingStatus = () => {
     const queryClient = useQueryClient();
     return useMutation({
@@ -190,3 +208,24 @@ export const useToggleService = () => {
     });
 };
 
+export const useAssignTechnician = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ bookingId, technicianId }: { bookingId: string; technicianId: string }) => {
+            // Note: Update to use standard path patterns, try /assign or similar if admin/assign-technician fails:
+            const response = await axiosInstance.post(`/admin/bookings/${bookingId}/assign`, { technicianId }).catch(async (err) => {
+                 // Fallback to the original route if parameter-based path fails:
+                 const res = await axiosInstance.post('/admin/assign-technician', { bookingId, technicianId });
+                 return res;
+            });
+            return response.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin', 'bookings'] });
+            toast.success('Technician assigned successfully!');
+        },
+        onError: () => {
+            toast.error('Failed to assign technician');
+        },
+    });
+};
