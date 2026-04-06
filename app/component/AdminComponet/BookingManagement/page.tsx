@@ -2,13 +2,12 @@
 
 import React, { useState, useMemo } from "react";
 import { format } from "date-fns";
-import { useGetBookings, useUpdateBookingStatus } from "@/src/hooks/useAdmin";
-import { toast } from "sonner";
+import { useGetBookings, useUpdateBookingStatus, useGetTechnicians, useAssignTechnician } from "@/src/hooks/useAdmin";
 import { cn } from "@/lib/utils";
-    
-import{
+import Link from "next/link";
+
+import {
     Search,
-    Filter,
     Calendar,
     Clock,
     MapPin,
@@ -21,12 +20,13 @@ import{
     ChevronUp,
     ChevronDown,
     ChevronsUpDown,
-    Eye
+    Eye,
+    UserPlus,
+    Loader2
 } from "lucide-react";
 import {
     Card,
     CardContent,
-    CardDescription,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
@@ -61,7 +61,7 @@ const PAGE_SIZE = 10;
 
 function StatusBadge({ status }: { status: string }) {
     const s = (status || "UNKNOWN").toUpperCase().replace(' ', '_');
-    
+
     const map: Record<string, string> = {
         PENDING: "bg-amber-100 text-amber-700 border-amber-200",
         ASSIGNED: "bg-blue-100 text-blue-700 border-blue-200",
@@ -69,7 +69,7 @@ function StatusBadge({ status }: { status: string }) {
         COMPLETED: "bg-green-100 text-green-700 border-green-200",
         CANCELLED: "bg-red-100 text-red-700 border-red-200",
     };
-    
+
     const iconMap: Record<string, React.ElementType> = {
         PENDING: Clock3,
         ASSIGNED: CheckCircle2,
@@ -77,7 +77,7 @@ function StatusBadge({ status }: { status: string }) {
         COMPLETED: CheckCircle2,
         CANCELLED: XCircle,
     };
-    
+
     const Icon = iconMap[s] || Clock;
     const styleStr = map[s] || "bg-slate-100 text-slate-700 border-slate-200";
 
@@ -102,67 +102,11 @@ function SortHeader({ label, field, sortField, sortDir, onSort }: { label: strin
     );
 }
 
-// ─── Booking Detail Dialog ────────────────────────────────────────────────────
-function BookingDetailDialog({ booking, open, onClose }: { booking: any; open: boolean; onClose: () => void }) {
-    if (!booking) return null;
-
-    return (
-        <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="max-w-md">
-                <DialogHeader>
-                    <DialogTitle>Booking Details</DialogTitle>
-                    <DialogDescription>ID: {booking.id}</DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                    <div className="flex justify-between items-center bg-slate-50 p-3 rounded-lg">
-                        <span className="text-sm font-medium text-slate-500">Status</span>
-                        <StatusBadge status={booking.status} />
-                    </div>
-
-                    <div className="space-y-3">
-                        <div className="flex items-start gap-3">
-                            <User className="h-4 w-4 text-slate-400 mt-1" />
-                            <div>
-                                <p className="text-xs text-slate-400">Customer</p>
-                                <p className="font-medium">{booking.customerName}</p>
-                            </div>
-                        </div>
-                        <div className="flex items-start gap-3">
-                            <MapPin className="h-4 w-4 text-slate-400 mt-1" />
-                            <div>
-                                <p className="text-xs text-slate-400">Address</p>
-                                <p className="font-medium">{booking.address}</p>
-                            </div>
-                        </div>
-                        <div className="flex items-start gap-3">
-                            <Calendar className="h-4 w-4 text-slate-400 mt-1" />
-                            <div>
-                                <p className="text-xs text-slate-400">Date & Time</p>
-                                <p className="font-medium">{booking.date} at {booking.time}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <Separator />
-
-                    <div className="flex justify-between items-center">
-                        <span className="font-medium text-slate-600">Total Amount</span>
-                        <span className="text-lg font-bold">Rs. {booking.amount}</span>
-                    </div>
-                </div>
-                <DialogFooter>
-                    <Button onClick={onClose}>Close</Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    );
-}
-
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function BookingManagement() {
     const { data: rawBookings = [], isLoading } = useGetBookings();
     const { mutate: updateStatus } = useUpdateBookingStatus();
-    
+
     // Process backend bookings into our display format
     const bookings = useMemo(() => {
         if (!Array.isArray(rawBookings)) return [];
@@ -172,18 +116,21 @@ export default function BookingManagement() {
                 id: b.id,
                 customerName: `${b.user?.firstName || ''} ${b.user?.lastName || ''}`.trim() || 'Unknown',
                 serviceName: b.service?.name || 'Unknown Service',
-                technicianName: b.technicians && b.technicians.length > 0 
+                technicianName: b.technicians && b.technicians.length > 0
                     ? `${b.technicians[0].user?.firstName || ''} ${b.technicians[0].user?.lastName || ''}`.trim()
                     : null,
                 date: b.scheduledDate ? format(dateObj, "yyyy-MM-dd") : 'N/A',
                 time: b.scheduledDate ? format(dateObj, "hh:mm a") : 'N/A',
-                status: b.status ? b.status.charAt(0).toUpperCase() + b.status.slice(1).toLowerCase().replace('_', ' ') : 'Unknown', // e.g. IN_PROGRESS -> In progress -> In Progress
+                status: b.status ? b.status.toUpperCase() : 'UNKNOWN',
                 amount: b.service?.price || 0,
                 address: b.address || b.user?.address || 'No Address',
-                paymentStatus: b.payment?.status === "PAID" 
-                    ? "Paid (Khalti)" 
-                    : b.payment?.paymentMethod === "COD" 
-                        ? "Cash on Delivery" 
+                user: b.user,
+                service: b.service,
+                technicians: b.technicians,
+                paymentStatus: b.payment?.status === "PAID"
+                    ? "Paid (Khalti)"
+                    : b.payment?.paymentMethod === "COD"
+                        ? "Cash on Delivery"
                         : "Pending",
             };
         });
@@ -195,9 +142,7 @@ export default function BookingManagement() {
     const [sortDir, setSortDir] = useState<SortDir>("asc");
     const [page, setPage] = useState(1);
 
-    // Detail dialog
-    const [selectedBooking, setSelectedBooking] = useState<any>(null);
-    const [detailOpen, setDetailOpen] = useState(false);
+
 
     const filtered = useMemo(() => {
         let list = bookings.filter((b: any) => {
@@ -236,22 +181,20 @@ export default function BookingManagement() {
 
     const handleStatusChange = async (id: string, status: string) => {
         let backendStatus = status.toUpperCase().replace(' ', '_');
-        if (backendStatus === "CONFIRMED") backendStatus = "ASSIGNED"; // Map confirmed to assigned or similar if matching schema
-        
         updateStatus({ id, status: backendStatus });
     };
 
     if (isLoading) {
         return (
-            <div className="flex flex-1 flex-col items-center justify-center h-full p-6">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-900"></div>
-                <p className="mt-4 text-slate-500">Loading bookings...</p>
+            <div className="flex flex-1 flex-col items-center justify-center h-[60vh]">
+                <Loader2 className="h-10 w-10 animate-spin text-[#236b9d]" />
+                <p className="mt-4 text-slate-500 font-medium">Loading bookings...</p>
             </div>
         );
     }
 
     return (
-        <div className="flex flex-1 flex-col gap-6 p-6">
+        <div className="flex flex-1 flex-col gap-6 p-6 max-w-full">
             <div className="flex justify-between items-center">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Booking Management</h1>
@@ -261,130 +204,144 @@ export default function BookingManagement() {
 
             {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Card>
-                    <CardContent className="p-4 flex items-center gap-4">
-                        <div className="bg-blue-100 p-2 rounded-lg text-blue-600"><Calendar className="h-6 w-6" /></div>
-                        <div><p className="text-sm text-slate-500">Total Bookings</p><p className="text-xl font-bold">{bookings.length}</p></div>
+                <Card className="rounded-2xl border-slate-200">
+                    <CardContent className="p-4 flex items-center gap-4 hover:bg-slate-50 transition-colors">
+                        <div className="bg-blue-100 p-3 rounded-xl text-blue-600"><Calendar className="h-5 w-5" /></div>
+                        <div><p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Total</p><p className="text-2xl font-bold text-slate-900">{bookings.length}</p></div>
                     </CardContent>
                 </Card>
-                <Card>
-                    <CardContent className="p-4 flex items-center gap-4">
-                        <div className="bg-amber-100 p-2 rounded-lg text-amber-600"><Clock className="h-6 w-6" /></div>
-                        <div><p className="text-sm text-slate-500">Pending</p><p className="text-xl font-bold">{bookings.filter((b:any) => (b.status || "").toUpperCase() === "PENDING").length}</p></div>
+                <Card className="rounded-2xl border-slate-200">
+                    <CardContent className="p-4 flex items-center gap-4 hover:bg-slate-50 transition-colors">
+                        <div className="bg-amber-100 p-3 rounded-xl text-amber-600"><Clock className="h-5 w-5" /></div>
+                        <div><p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Pending</p><p className="text-2xl font-bold text-slate-900">{bookings.filter((b: any) => b.status === "PENDING").length}</p></div>
                     </CardContent>
                 </Card>
-                <Card>
-                    <CardContent className="p-4 flex items-center gap-4">
-                        <div className="bg-green-100 p-2 rounded-lg text-green-600"><CheckCircle2 className="h-6 w-6" /></div>
-                        <div><p className="text-sm text-slate-500">Completed</p><p className="text-xl font-bold">{bookings.filter((b:any) => (b.status || "").toUpperCase() === "COMPLETED").length}</p></div>
+                <Card className="rounded-2xl border-slate-200">
+                    <CardContent className="p-4 flex items-center gap-4 hover:bg-slate-50 transition-colors">
+                        <div className="bg-green-100 p-3 rounded-xl text-green-600"><CheckCircle2 className="h-5 w-5" /></div>
+                        <div><p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Completed</p><p className="text-2xl font-bold text-slate-900">{bookings.filter((b: any) => b.status === "COMPLETED").length}</p></div>
                     </CardContent>
                 </Card>
-                <Card>
-                    <CardContent className="p-4 flex items-center gap-4">
-                        <div className="bg-orange-100 p-2 rounded-lg text-orange-600"><AlertCircle className="h-6 w-6" /></div>
-                        <div><p className="text-sm text-slate-500">Cancelled</p><p className="text-xl font-bold">{bookings.filter((b:any) => (b.status || "").toUpperCase() === "CANCELLED").length}</p></div>
+                <Card className="rounded-2xl border-slate-200">
+                    <CardContent className="p-4 flex items-center gap-4 hover:bg-slate-50 transition-colors">
+                        <div className="bg-rose-100 p-3 rounded-xl text-rose-600"><AlertCircle className="h-5 w-5" /></div>
+                        <div><p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Cancelled</p><p className="text-2xl font-bold text-slate-900">{bookings.filter((b: any) => b.status === "CANCELLED").length}</p></div>
                     </CardContent>
                 </Card>
             </div>
 
             {/* Filters */}
-            <div className="flex items-center gap-3">
-                <div className="relative flex-1 max-w-sm">
+            <div className="flex flex-col sm:flex-row items-center gap-3 bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
+                <div className="relative flex-1 w-full max-w-sm">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                    <Input placeholder="Search bookings..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} className="pl-9" />
+                    <Input placeholder="Search bookings..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} className="pl-9 h-10 border-slate-200" />
                 </div>
-                <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }} className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-                    <option value="All">All Status</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Confirmed">Confirmed</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Cancelled">Cancelled</option>
-                </select>
+                <div className="w-full sm:w-auto">
+                    <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }} className="h-10 w-full sm:w-40 rounded-md border border-slate-200 bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                        <option value="All">All Status</option>
+                        <option value="PENDING">Pending</option>
+                        <option value="ASSIGNED">Assigned</option>
+                        <option value="IN_PROGRESS">In Progress</option>
+                        <option value="COMPLETED">Completed</option>
+                        <option value="CANCELLED">Cancelled</option>
+                    </select>
+                </div>
             </div>
 
             {/* Table */}
-            <Card>
+            <Card className="border-slate-200 rounded-2xl shadow-sm overflow-hidden">
                 <CardContent className="p-0">
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm">
                             <thead>
-                                <tr className="border-b bg-muted/50">
-                                    <th className="px-6 py-3 text-left font-medium text-muted-foreground">Booking ID</th>
-                                    <th className="px-6 py-3 text-left font-medium text-muted-foreground">
+                                <tr className="border-b bg-slate-50/50">
+                                    <th className="px-6 py-4 text-left font-semibold text-slate-500">Booking ID</th>
+                                    <th className="px-6 py-4 text-left font-semibold text-slate-500">
                                         <SortHeader label="Customer" field="customerName" sortField={sortField} sortDir={sortDir} onSort={handleSort} />
                                     </th>
-                                    <th className="px-6 py-3 text-left font-medium text-muted-foreground">Service</th>
-                                    <th className="px-6 py-3 text-left font-medium text-muted-foreground">
+                                    <th className="px-6 py-4 text-left font-semibold text-slate-500">Service</th>
+                                    <th className="px-6 py-4 text-left font-semibold text-slate-500">
                                         <SortHeader label="Date" field="date" sortField={sortField} sortDir={sortDir} onSort={handleSort} />
                                     </th>
-                                    <th className="px-6 py-3 text-left font-medium text-muted-foreground">Technician</th>
-                                    <th className="px-6 py-3 text-left font-medium text-muted-foreground">Status</th>
-                                    <th className="px-6 py-3 text-left font-medium text-muted-foreground">Payment</th>
-                                    <th className="px-6 py-3 text-left font-medium text-muted-foreground">
+                                    <th className="px-6 py-4 text-left font-semibold text-slate-500">Technician</th>
+                                    <th className="px-6 py-4 text-left font-semibold text-slate-500">Status</th>
+                                    <th className="px-6 py-4 text-left font-semibold text-slate-500">Payment</th>
+                                    <th className="px-6 py-4 text-left font-semibold text-slate-500">
                                         <SortHeader label="Amount" field="amount" sortField={sortField} sortDir={sortDir} onSort={handleSort} />
                                     </th>
-                                    <th className="px-6 py-3 text-right font-medium text-muted-foreground">Actions</th>
+                                    <th className="px-6 py-4 text-right font-semibold text-slate-500">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {paginated.map((booking: any) => (
-                                    <tr key={booking.id} className="border-b hover:bg-muted/50 transition-colors">
-                                        <td className="px-6 py-4 font-medium">{String(booking.id || "").substring(0, 8).toUpperCase()}</td>
+                            <tbody className="divide-y divide-slate-100">
+                                {paginated.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={9} className="text-center py-10 text-slate-500">
+                                            No bookings found matching your filters.
+                                        </td>
+                                    </tr>
+                                ) : paginated.map((booking: any) => (
+                                    <tr key={booking.id} className="hover:bg-slate-50 transition-colors group">
                                         <td className="px-6 py-4">
-                                            <div>
-                                                <p className="font-medium text-slate-900 dark:text-slate-100">{booking.customerName}</p>
-                                                <p className="text-xs text-slate-500">{booking.address}</p>
+                                            <span className="font-mono text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded">
+                                                {String(booking.id || "").substring(0, 8).toUpperCase()}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex flex-col">
+                                                <span className="font-semibold text-slate-900">{booking.customerName}</span>
+                                                <span className="text-xs text-slate-500 max-w-[150px] truncate">{booking.address}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">{booking.serviceName}</td>
+                                        <td className="px-6 py-4 font-medium text-slate-700">{booking.serviceName}</td>
                                         <td className="px-6 py-4">
-                                            <div>
-                                                <p className="text-slate-900 dark:text-slate-100">{booking.date}</p>
-                                                <p className="text-xs text-slate-500">{booking.time}</p>
+                                            <div className="flex flex-col">
+                                                <span className="text-slate-900 font-medium">{booking.date}</span>
+                                                <span className="text-xs text-slate-500">{booking.time}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 text-slate-600">
+                                        <td className="px-6 py-4">
                                             {booking.technicianName ? (
-                                                <span className="flex items-center gap-1.5">
-                                                    <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-medium border border-emerald-100">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                                                     {booking.technicianName}
                                                 </span>
                                             ) : (
-                                                <span className="text-slate-400 italic">Unassigned</span>
+                                                <span className="text-slate-400 text-xs italic bg-slate-50 px-2.5 py-1 rounded-full border border-slate-100">Unassigned</span>
                                             )}
                                         </td>
                                         <td className="px-6 py-4"><StatusBadge status={booking.status} /></td>
                                         <td className="px-6 py-4">
                                             <span className={cn(
-                                                "px-2 py-1 rounded-full text-xs font-medium",
+                                                "px-2 py-1 rounded-full text-xs font-semibold",
                                                 booking.paymentStatus.includes("Paid") ? "bg-green-100 text-green-700" :
-                                                booking.paymentStatus.includes("Cash") ? "bg-blue-100 text-blue-700" :
-                                                "bg-amber-100 text-amber-700"
+                                                    booking.paymentStatus.includes("Cash") ? "bg-blue-100 text-blue-700" :
+                                                        "bg-amber-100 text-amber-700"
                                             )}>
                                                 {booking.paymentStatus}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 font-medium">Rs. {booking.amount}</td>
+                                        <td className="px-6 py-4 font-bold text-slate-700">Rs. {booking.amount}</td>
                                         <td className="px-6 py-4 text-right">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 group-hover:text-slate-700">
                                                         <MoreHorizontal className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
-                                                <DropdownMenuContent side="top" align="center">
+                                                <DropdownMenuContent side="bottom" align="end" className="w-48">
                                                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                    <DropdownMenuItem onClick={() => { setSelectedBooking(booking); setDetailOpen(true); }}>
-                                                        <Eye className="mr-2 h-4 w-4" /> View Details
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuItem asChild className="cursor-pointer">
+                                                        <Link href={`/admin/bookings/${booking.id}`}>
+                                                            <Eye className="mr-2 h-4 w-4 text-slate-500" /> View Details & Assign
+                                                        </Link>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
-                                                    <DropdownMenuLabel>Update Status</DropdownMenuLabel>
-                                                    <DropdownMenuItem onClick={() => handleStatusChange(booking.id, "Confirmed")}>Mark Confirmed</DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => handleStatusChange(booking.id, "In Progress")}>Mark In Progress</DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => handleStatusChange(booking.id, "Completed")}>Mark Completed</DropdownMenuItem>
+                                                    <DropdownMenuLabel className="text-xs text-slate-400">Update Status</DropdownMenuLabel>
+                                                    <DropdownMenuItem onClick={() => handleStatusChange(booking.id, "IN_PROGRESS")} className="cursor-pointer">Mark In Progress</DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleStatusChange(booking.id, "COMPLETED")} className="cursor-pointer text-emerald-600 focus:text-emerald-700">Mark Completed</DropdownMenuItem>
                                                     <DropdownMenuSeparator />
-                                                    <DropdownMenuItem onClick={() => handleStatusChange(booking.id, "Cancelled")} className="text-red-600">Cancel Booking</DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleStatusChange(booking.id, "CANCELLED")} className="cursor-pointer text-rose-600 focus:text-rose-700 focus:bg-rose-50">Cancel Booking</DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </td>
@@ -394,7 +351,7 @@ export default function BookingManagement() {
                         </table>
                     </div>
                     {/* Pagination */}
-                    <div className="flex items-center justify-between px-6 py-3 border-t">
+                    <div className="flex items-center justify-between px-6 py-4 border-t bg-slate-50/30">
                         <span className="text-sm text-slate-500">
                             Showing {filtered.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length} bookings
                         </span>
@@ -407,8 +364,8 @@ export default function BookingManagement() {
                             >
                                 Previous
                             </Button>
-                            <span className="text-sm font-medium text-slate-600">
-                                Page {page} of {totalPages}
+                            <span className="text-sm font-medium text-slate-600 px-2">
+                                {page} / {totalPages}
                             </span>
                             <Button
                                 variant="outline"
@@ -423,7 +380,6 @@ export default function BookingManagement() {
                 </CardContent>
             </Card>
 
-            <BookingDetailDialog booking={selectedBooking} open={detailOpen} onClose={() => setDetailOpen(false)} />
         </div>
     );
 }

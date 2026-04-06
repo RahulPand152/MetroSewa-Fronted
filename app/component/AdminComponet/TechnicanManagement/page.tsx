@@ -187,6 +187,11 @@ function TechnicianProfilePopup({
                         value={technician.experience ? `${technician.experience} years` : "-"}
                     />
                     <InfoRow
+                        icon={<Star className="h-4 w-4 text-amber-500" />}
+                        label="Average Rating"
+                        value={typeof technician.rating === 'number' ? `${technician.rating.toFixed(1)} Stars` : "New"}
+                    />
+                    <InfoRow
                         icon={<Wrench className="h-4 w-4 text-slate-400" />}
                         label="Specializations"
                         value={technician.specializations?.map(s => s.name).join(", ") || "-"}

@@ -73,11 +73,14 @@ export default function ProfilePage() {
     const name = `${user.firstName} ${user.lastName}`;
     const initials = user.firstName?.[0]?.toUpperCase() || "?";
 
+    const techStats = user.technician || {};
+    const ratingNode = typeof techStats.rating === 'number' ? techStats.rating.toFixed(1) : "New";
+
     // In a real app we would get these from the technician profile extension
     const specializations = ["Plumbing", "Electrical"];
     const profileStats = [
-        { icon: Briefcase, label: "Jobs Done", value: "-", iconClass: "text-sky-500" },
-        { icon: Star, label: "Avg Rating", value: "-", iconClass: "text-amber-500" },
+        { icon: Briefcase, label: "Experience", value: techStats.experience ? `${techStats.experience} Yrs` : "New", iconClass: "text-sky-500" },
+        { icon: Star, label: "Avg Rating", value: ratingNode, iconClass: "text-amber-500" },
         { icon: DollarSign, label: "Earned", value: "-", iconClass: "text-emerald-500" },
     ];
 

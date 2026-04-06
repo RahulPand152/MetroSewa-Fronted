@@ -50,6 +50,7 @@ export default function UserDashboard() {
 
             return {
                 id: b.id.substring(0, 5).toUpperCase(),
+                originalId: b.id,
                 service: b.service?.name || "Service",
                 date: dateStr,
                 status: displayStatus,
@@ -99,7 +100,7 @@ export default function UserDashboard() {
                     <CardContent className="p-0 divide-y divide-slate-100 dark:divide-slate-800">
                         {recentBookings.length > 0 ? (
                             recentBookings.map((booking, i) => (
-                                <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 py-4 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors">
+                                <Link href={`/user/my-bookings/${booking.originalId}`} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 py-4 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors">
                                     <div className="flex items-center gap-4">
                                         <div className="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 font-semibold text-xs shrink-0">
                                             {booking.id}
@@ -110,7 +111,7 @@ export default function UserDashboard() {
                                         </div>
                                     </div>
                                     <Badge variant="secondary" className={`${booking.statusColor} border-0 rounded-full px-3 capitalize`}>{booking.status}</Badge>
-                                </div>
+                                </Link>
                             ))
                         ) : (
                             <div className="px-6 py-8 text-center text-sm text-slate-500">
