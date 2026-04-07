@@ -1,8 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { TrendingUp, Users, DollarSign, CreditCard, Activity } from "lucide-react"
-import { Bar, BarChart, CartesianGrid, XAxis, Pie, PieChart, Cell, Label } from "recharts"
+import { TrendingUp, Users, DollarSign, CreditCard, Activity, Loader2 } from "lucide-react"
+import { Bar, BarChart, CartesianGrid, XAxis, Pie, PieChart, Label } from "recharts"
 
 import {
     Card,
@@ -20,95 +20,144 @@ import {
     ChartLegend,
     ChartLegendContent
 } from "@/components/ui/chart"
-
-// --- Mock Data ---
-const chartData = [
-    { month: "January", revenue: 18600, bookings: 8000 },
-    { month: "February", revenue: 30500, bookings: 2000 },
-    { month: "March", revenue: 23700, bookings: 1200 },
-    { month: "April", revenue: 7300, bookings: 1900 },
-    { month: "May", revenue: 20900, bookings: 1300 },
-    { month: "June", revenue: 21400, bookings: 1400 },
-]
-
-const serviceData = [
-    { service: "plumbing", visitors: 275, fill: "var(--color-plumbing)" },
-    { service: "electrical", visitors: 200, fill: "var(--color-electrical)" },
-    { service: "cleaning", visitors: 287, fill: "var(--color-cleaning)" },
-    { service: "repairs", visitors: 173, fill: "var(--color-repairs)" },
-    { service: "other", visitors: 190, fill: "var(--color-other)" },
-]
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import axiosInstance from "@/src/lib/axios"
 
 // --- Chart Configs ---
 const barChartConfig = {
     revenue: {
         label: "Revenue",
-        color: "#22c55e", // Green-500
+        color: "#22c55e", // Green
     },
-    bookings: {
-        label: "Bookings",
-        color: "#64748b", // Slate-500 (Gray)
-    },
-} satisfies ChartConfig
-
-const pieChartConfig = {
-    visitors: {
-        label: "Visitors",
-    },
-    plumbing: {
-        label: "Plumbing",
-        color: "var(--chart-1)",
-    },
-    electrical: {
-        label: "Electrical",
-        color: "var(--chart-2)",
-    },
-    cleaning: {
-        label: "Cleaning",
-        color: "var(--chart-3)",
-    },
-    repairs: {
-        label: "Repairs",
-        color: "var(--chart-4)",
-    },
-    other: {
-        label: "Other",
-        color: "var(--chart-5)",
+    users: {
+        label: "New Users",
+        color: "#3b82f6", // Blue
     },
 } satisfies ChartConfig
-
-// --- Stats Data Array ---
-const statsData = [
-    {
-        title: "Total Revenue",
-        value: "Rs. 45,231",
-        description: "+20.1% from last month",
-        icon: DollarSign,
-    },
-    {
-        title: "Total Users",
-        value: "12,482",
-        description: "+180 new users",
-        icon: Users,
-    },
-    {
-        title: "Bookings",
-        value: "1,204",
-        description: "+19% month over month",
-        icon: CreditCard,
-    },
-    {
-        title: "Active Now",
-        value: "573",
-        description: "+201 since last hour",
-        icon: Activity,
-    },
-]
 
 export default function AdminDashboard() {
-    const totalVisitors = React.useMemo(() => {
-        return serviceData.reduce((acc, curr) => acc + curr.visitors, 0)
+    const [dashboardStats, setDashboardStats] = React.useState<any>(null)
+    const [analytics, setAnalytics] = React.useState<any>(null)
+    const [recentUsers, setRecentUsers] = React.useState<any[]>([])
+    const [recentBookings, setRecentBookings] = React.useState<any[]>([])
+    const [isLoading, setIsLoading] = React.useState(true)
+
+    React.useEffect(() => {
+        const fetchAllData = async () => {
+            try {
+                const [statsRes, analyticsRes, usersRes, bookingsRes] = await Promise.all([
+                    axiosInstance.get("/admin/dashboard"),
+                    axiosInstance.get("/admin/analytics"),
+                    axiosInstance.get("/admin/users"),
+                    axiosInstance.get("/admin/bookings?limit=5")
+                ])
+
+                setDashboardStats(statsRes.data?.data || statsRes.data)
+                setAnalytics(analyticsRes.data?.data || analyticsRes.data)
+                
+                // Get all users and limit to 5 on frontend
+                const allUsers = usersRes.data?.data || usersRes.data || []
+                setRecentUsers(allUsers.slice(0, 5))
+                
+                // Bookings are already limited by backend query parameter
+                setRecentBookings(bookingsRes.data?.data || bookingsRes.data || [])
+
+            } catch (error) {
+                console.error("Failed to load admin dashboard data:", error)
+            } finally {
+                setIsLoading(false)
+            }
+        }
+        fetchAllData()
     }, [])
+
+    const statsData = dashboardStats ? [
+        {
+            title: "Total Revenue",
+            value: `Rs. ${dashboardStats.totalRevenue?.toLocaleString() || 0}`,
+            description: "Total gross volume",
+            icon: DollarSign,
+        },
+        {
+            title: "Total Users",
+            value: dashboardStats.totalUsers?.toLocaleString() || "0",
+            description: "Registered customers",
+            icon: Users,
+        },
+        {
+            title: "Bookings",
+            value: dashboardStats.totalBookings?.toLocaleString() || "0",
+            description: `${dashboardStats.completedBookings || 0} completed`,
+            icon: CreditCard,
+        },
+        {
+            title: "Services",
+            value: dashboardStats.totalServices?.toLocaleString() || "0",
+            description: `Across ${dashboardStats.totalCategories || 0} categories`,
+            icon: Activity,
+        },
+    ] : []
+
+    // Map analytics data into charts
+    const chartData = React.useMemo(() => {
+        if (!analytics) return []
+        
+        const revMonths = Object.keys(analytics.revenueByMonth || {})
+        const userMonths = Object.keys(analytics.usersByMonth || {})
+        const allMonths = Array.from(new Set([...revMonths, ...userMonths]))
+        
+        return allMonths.map(month => ({
+            month,
+            revenue: analytics.revenueByMonth?.[month] || 0,
+            users: analytics.usersByMonth?.[month] || 0
+        }))
+    }, [analytics])
+
+    const serviceData = React.useMemo(() => {
+        if (!analytics?.servicesByCategory) return []
+        
+        return analytics.servicesByCategory.map((item: any, i: number) => {
+            // Transform category into a valid CSS variable key (e.g. "Air Conditioning" -> "airconditioning")
+            const safeKey = item.category.replace(/[^a-zA-Z0-9]/g, "").toLowerCase() || `category${i}`
+            return {
+                service: safeKey,
+                displayName: item.category,
+                visitors: Math.max(item.count || 0, 1), // Minimum of 1 so it always visually renders
+                actualCount: item.count || 0,
+                fill: `var(--color-${safeKey})`
+            }
+        })
+    }, [analytics])
+
+    const totalVisitors = React.useMemo(() => {
+        // Show the true count in the center of the pie
+        return serviceData.reduce((acc: number, curr: any) => acc + curr.actualCount, 0)
+    }, [serviceData])
+
+    const pieChartConfig = React.useMemo(() => {
+        const config: Record<string, any> = {
+            visitors: { label: "Services" }
+        }
+        serviceData.forEach((s: any, i: number) => {
+            config[s.service] = {
+                label: s.displayName, // Display original name in legend & tooltip
+                color: `var(--chart-${(i % 5) + 1})`
+            }
+        })
+        return config satisfies ChartConfig
+    }, [serviceData])
+
+    if (isLoading) {
+        return (
+            <div className="flex flex-1 items-center justify-center p-8">
+                <div className="flex flex-col items-center gap-2">
+                    <Loader2 className="h-8 w-8 animate-spin text-sky-500" />
+                    <p className="text-sm text-slate-500">Loading dashboard...</p>
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div className="flex flex-1 flex-col gap-6 p-6">
@@ -133,11 +182,11 @@ export default function AdminDashboard() {
             </div>
 
             <div className="grid gap-6 lg:grid-cols-3">
-                {/* Bar Chart - Revenue & Bookings */}
+                {/* Bar Chart - Revenue & Users */}
                 <Card className="lg:col-span-2 flex flex-col">
                     <CardHeader>
-                        <CardTitle>Revenue & Bookings</CardTitle>
-                        <CardDescription>January - June 2024</CardDescription>
+                        <CardTitle>Revenue & New Users</CardTitle>
+                        <CardDescription>Metrics over the last few months</CardDescription>
                     </CardHeader>
                     <CardContent className="flex-1">
                         <ChartContainer config={barChartConfig} className="min-h-[200px] w-full">
@@ -156,25 +205,17 @@ export default function AdminDashboard() {
                                 />
                                 <ChartLegend content={<ChartLegendContent />} />
                                 <Bar dataKey="revenue" fill="var(--color-revenue)" radius={4} />
-                                <Bar dataKey="bookings" fill="var(--color-bookings)" radius={4} />
+                                <Bar dataKey="users" fill="var(--color-users)" radius={4} />
                             </BarChart>
                         </ChartContainer>
                     </CardContent>
-                    <CardFooter className="flex-col items-start gap-2 text-sm">
-                        <div className="flex gap-2 font-medium leading-none">
-                            Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-                        </div>
-                        <div className="leading-none text-muted-foreground">
-                            Showing total revenue and bookings for the last 6 months
-                        </div>
-                    </CardFooter>
                 </Card>
 
                 {/* Pie Chart - Service Distribution */}
                 <Card className="flex flex-col">
                     <CardHeader className="items-center pb-0">
                         <CardTitle>Service Distribution</CardTitle>
-                        <CardDescription>Jan - Jun 2024</CardDescription>
+                        <CardDescription>Available services by category</CardDescription>
                     </CardHeader>
                     <CardContent className="flex-1 pb-0">
                         <ChartContainer
@@ -231,14 +272,78 @@ export default function AdminDashboard() {
                             </PieChart>
                         </ChartContainer>
                     </CardContent>
-                    <CardFooter className="flex-col gap-2 text-sm">
-                        <div className="flex items-center gap-2 font-medium leading-none">
-                            Cleaning is trending up by 5.2% <TrendingUp className="h-4 w-4" />
-                        </div>
-                        <div className="leading-none text-muted-foreground">
-                            Showing total service requests distribution
-                        </div>
-                    </CardFooter>
+                </Card>
+            </div>
+
+            {/* Recent Bookings and Users */}
+            <div className="grid gap-6 md:grid-cols-2">
+                {/* Recent Bookings */}
+                <Card className="flex flex-col">
+                    <CardHeader>
+                        <CardTitle>Recent Bookings</CardTitle>
+                        <CardDescription>Latest 5 service bookings</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                         <div className="space-y-6">
+                             {recentBookings.length > 0 ? recentBookings.map((b) => (
+                                  <div key={b.id} className="flex items-center justify-between">
+                                      <div className="flex items-center gap-4">
+                                          <Avatar className="h-10 w-10 border border-slate-100 shadow-sm">
+                                             <AvatarFallback className="bg-sky-50 text-sky-600 font-semibold">
+                                                {b.user?.firstName?.charAt(0) || "U"}
+                                             </AvatarFallback>
+                                          </Avatar>
+                                          <div>
+                                              <p className="text-sm font-semibold text-slate-800">{b.user?.firstName} {b.user?.lastName}</p>
+                                              <p className="text-xs text-muted-foreground mt-0.5">{b.service?.name || "Unknown Service"}</p>
+                                          </div>
+                                      </div>
+                                      <div className="text-right">
+                                          <Badge variant={b.status === "COMPLETED" ? "default" : "secondary"} className="shadow-sm">
+                                              {b.status}
+                                          </Badge>
+                                          <p className="text-xs text-muted-foreground mt-1.5 font-medium">Rs. {b.amount || b.service?.price || 0}</p>
+                                      </div>
+                                  </div>
+                             )) : (
+                                <div className="text-sm text-slate-500 py-4 text-center">No recent bookings</div>
+                             )}
+                         </div>
+                    </CardContent>
+                </Card>
+
+                {/* Recent Users */}
+                <Card className="flex flex-col">
+                    <CardHeader>
+                        <CardTitle>Recent Users</CardTitle>
+                        <CardDescription>Latest 5 registered customers</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                         <div className="space-y-6">
+                             {recentUsers.length > 0 ? recentUsers.map((u) => (
+                                  <div key={u.id} className="flex items-center justify-between">
+                                      <div className="flex items-center gap-4">
+                                          <Avatar className="h-10 w-10 border border-slate-100 shadow-sm">
+                                             <AvatarImage src={u.avatar} />
+                                             <AvatarFallback className="bg-emerald-50 text-emerald-600 font-semibold">
+                                                {u.firstName?.charAt(0) || "U"}
+                                             </AvatarFallback>
+                                          </Avatar>
+                                          <div>
+                                              <p className="text-sm font-semibold text-slate-800">{u.firstName} {u.lastName}</p>
+                                              <p className="text-xs text-muted-foreground mt-0.5">{u.email}</p>
+                                          </div>
+                                      </div>
+                                      <div className="text-right">
+                                          <p className="text-sm font-bold text-slate-700">{u._count?.bookings || 0} <span className="font-normal text-xs text-slate-500">Bookings</span></p>
+                                          <p className="text-xs text-muted-foreground mt-1.5">{new Date(u.createdAt).toLocaleDateString()}</p>
+                                      </div>
+                                  </div>
+                             )) : (
+                                <div className="text-sm text-slate-500 py-4 text-center">No recent users</div>
+                             )}
+                         </div>
+                    </CardContent>
                 </Card>
             </div>
         </div>

@@ -11,8 +11,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
                 staleTime: 60 * 1000,
                 refetchOnWindowFocus: false,
                 retry: (failureCount, error: any) => {
-                    // Do not retry if the error is an auth failure (401/403)
-                    if (error?.response?.status === 401 || error?.response?.status === 403) {
+                    // Do not retry if the error is an auth failure (401/403) or rate limit (429)
+                    if (error?.response?.status === 401 || error?.response?.status === 403 || error?.response?.status === 429) {
                         return false;
                     }
                     // Otherwise, retry up to 3 times 

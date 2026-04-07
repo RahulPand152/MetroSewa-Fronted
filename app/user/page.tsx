@@ -100,7 +100,7 @@ export default function UserDashboard() {
                     <CardContent className="p-0 divide-y divide-slate-100 dark:divide-slate-800">
                         {recentBookings.length > 0 ? (
                             recentBookings.map((booking, i) => (
-                                <Link href={`/user/my-bookings/${booking.originalId}`} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 py-4 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors">
+                                <Link key={booking.originalId || i} href={`/user/my-bookings/${booking.originalId}`} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 py-4 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors">
                                     <div className="flex items-center gap-4">
                                         <div className="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 font-semibold text-xs shrink-0">
                                             {booking.id}

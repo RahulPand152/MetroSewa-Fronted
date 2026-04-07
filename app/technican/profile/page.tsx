@@ -81,7 +81,7 @@ export default function ProfilePage() {
     const profileStats = [
         { icon: Briefcase, label: "Experience", value: techStats.experience ? `${techStats.experience} Yrs` : "New", iconClass: "text-sky-500" },
         { icon: Star, label: "Avg Rating", value: ratingNode, iconClass: "text-amber-500" },
-        { icon: DollarSign, label: "Earned", value: "-", iconClass: "text-emerald-500" },
+        // { icon: DollarSign, label: "Earned", value: "-", iconClass: "text-emerald-500" },
     ];
 
     return (
