@@ -1,7 +1,6 @@
 import SidebarUser from "@/app/component/UserComponent/SidebarUser";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
-import { UserCircle } from "lucide-react";
+import NotificationBell from "@/app/component/NotificationBell";
 
 export default function UserLayout({
     children,
@@ -14,7 +13,8 @@ export default function UserLayout({
             <SidebarInset>
                 <header className="flex h-14 shrink-0 items-center gap-3 border-b border-slate-200 dark:border-slate-800 px-4 bg-white dark:bg-slate-950 sticky top-0 z-10">
                     <SidebarTrigger className="-ml-1 text-gray-600 hover:text-gray-400" />
-
+                    <div className="flex-1" />
+                    <NotificationBell role="user" />
                 </header>
 
                 {/* Page content */}
