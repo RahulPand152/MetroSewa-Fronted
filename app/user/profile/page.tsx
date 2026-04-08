@@ -95,7 +95,7 @@ export default function UserProfilePage() {
 
             <Card className="border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 {/* Sky banner */}
-                <div className="h-28 bg-gradient-to-r from-[#2baba8] to-[#123854]" />
+                <div className="h-28 bg-gradient-to-r from-[#1e5b87] to-[#1e5b97]" />
 
                 <CardContent className="px-6 pb-6 -mt-12">
                     {/* Avatar & Action */}
@@ -181,7 +181,7 @@ export default function UserProfilePage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 text-sm text-slate-600 dark:text-slate-400">
                         <div className="flex items-center gap-3">
                             <div className="h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                                <Phone className="h-4 w-4 text-[#2baba8]" />
+                                <Phone className="h-4 w-4 text-green-500" />
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-xs text-slate-500">Phone Number</span>
@@ -190,7 +190,7 @@ export default function UserProfilePage() {
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                                <Mail className="h-4 w-4 text-[#2baba8]" />
+                                <Mail className="h-4 w-4 text-blue-500" />
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-xs text-slate-500">Email Address</span>
@@ -199,7 +199,7 @@ export default function UserProfilePage() {
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                                <MapPin className="h-4 w-4 text-[#2baba8]" />
+                                <MapPin className="h-4 w-4 text-rose-500" />
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-xs text-slate-500">Address</span>
@@ -216,7 +216,7 @@ export default function UserProfilePage() {
                         <Card className="border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:shadow-md cursor-pointer">
                             <CardHeader className="p-4 flex flex-row items-center gap-4 space-y-0">
                                 <div className="h-10 w-10 rounded-lg bg-[#1e5b87]/10 flex items-center justify-center shrink-0">
-                                    <Key className="h-5 w-5 text-[#2baba8]" />
+                                    <Key className="h-5 w-5 text-amber-500" />
                                 </div>
                                 <div>
                                     <CardTitle className="text-base">Password</CardTitle>

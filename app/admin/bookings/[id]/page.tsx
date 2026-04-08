@@ -10,6 +10,7 @@ import {
     Receipt, Loader2, AlertTriangle, MapPin, Wrench
 } from "lucide-react";
 import { format } from "date-fns";
+import { formatBookingDate } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -121,7 +122,7 @@ export default function AdminBookingDetailPage() {
                                 <InfoRow icon={User} label="Customer Name" value={customerName || 'N/A'} />
                                 <InfoRow icon={Phone} label="Customer Contact" value={booking.user?.phoneNumber || 'N/A'} />
                                 <InfoRow icon={MapPin} label="Service Address" value={booking.address || booking.user?.address || 'N/A'} />
-                                <InfoRow icon={Calendar} label="Scheduled Date" value={booking.scheduledDate ? format(d, "EEEE, MMMM d, yyyy") : 'N/A'} />
+                                <InfoRow icon={Calendar} label="Scheduled Date" value={booking.scheduledDate ? formatBookingDate(d, "EEEE, MMMM d, yyyy") : 'N/A'} />
                                 <InfoRow icon={Clock} label="Scheduled Time" value={booking.scheduledDate ? format(d, "hh:mm a") : 'N/A'} />
                                 <InfoRow icon={Receipt} label="Service Price" value={`Rs. ${booking.service?.price || 0}`} />
                             </div>

@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Briefcase, Calendar, ChevronRight, Clock, UserCheck, XCircle, Loader2, Package } from "lucide-react";
 import { format } from "date-fns";
+import { formatBookingDate } from "@/lib/utils";
 import Link from "next/link";
 import { useState } from "react";
+import { BarChart3, Activity, CheckCircle } from "lucide-react";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -68,19 +70,67 @@ export default function MyBookingsPage() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                 {[
-                    { label: "Total", value: stats.total, color: "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300" },
-                    { label: "Active", value: stats.active, color: "bg-blue-50 dark:bg-blue-900/20 text-blue-600" },
-                    { label: "Completed", value: stats.completed, color: "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600" },
-                ].map((s) => (
-                    <Card key={s.label} className="rounded-2xl border-slate-200 dark:border-slate-800 shadow-sm">
-                        <CardContent className="p-5">
-                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{s.label}</p>
-                            <p className={`text-3xl font-bold mt-1 ${s.color}`}>{s.value}</p>
-                        </CardContent>
-                    </Card>
-                ))}
+                    {
+                        label: "Total",
+                        value: stats.total,
+                        icon: BarChart3,
+                        bg: "from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-900",
+                        text: "text-slate-700 dark:text-slate-200",
+                        iconColor: "text-slate-500",
+                    },
+                    {
+                        label: "Active",
+                        value: stats.active,
+                        icon: Activity,
+                        bg: "from-blue-100 to-blue-50 dark:from-blue-900/30 dark:to-blue-800/10",
+                        text: "text-blue-700 dark:text-blue-300",
+                        iconColor: "text-blue-500",
+                    },
+                    {
+                        label: "Completed",
+                        value: stats.completed,
+                        icon: CheckCircle,
+                        bg: "from-emerald-100 to-emerald-50 dark:from-emerald-900/30 dark:to-emerald-800/10",
+                        text: "text-emerald-700 dark:text-emerald-300",
+                        iconColor: "text-emerald-500",
+                    },
+                ].map((s) => {
+                    const Icon = s.icon;
+
+                    return (
+                        <Card
+                            key={s.label}
+                            className={`rounded-2xl border border-slate-200 dark:border-slate-800 
+        bg-gradient-to-br ${s.bg} shadow-md hover:shadow-xl 
+        transition-all duration-300 hover:-translate-y-1`}
+                        >
+                            <CardContent className="p-5 flex items-center justify-between">
+
+                                {/* Left Content */}
+                                <div>
+                                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                        {s.label}
+                                    </p>
+
+                                    <p className={`font-bold text-2xl transition mt-1 ${s.text}`}>
+                                        {s.value}
+                                    </p>
+                                </div>
+
+                                {/* Icon */}
+                                <div
+                                    className={`h-12 w-12 flex items-center justify-center rounded-xl 
+            bg-white/60 dark:bg-slate-800/60 shadow-inner`}
+                                >
+                                    <Icon className={`h-6 w-6 ${s.iconColor}`} />
+                                </div>
+
+                            </CardContent>
+                        </Card>
+                    );
+                })}
             </div>
 
             {/* Bookings List */}
@@ -88,7 +138,7 @@ export default function MyBookingsPage() {
                 <CardHeader className="border-b border-slate-100 dark:border-slate-800 py-4">
                     <div className="flex items-center justify-between">
                         <CardTitle className="text-base text-slate-800 dark:text-slate-200">All Bookings</CardTitle>
-                        <Badge className="bg-[#0077b6] text-white text-xs">{bookings.length} total</Badge>
+                        <Badge className=" text-white text-xs">{bookings.length} total</Badge>
                     </div>
                 </CardHeader>
                 <CardContent className="p-0 divide-y divide-slate-100 dark:divide-slate-800">
@@ -125,24 +175,24 @@ export default function MyBookingsPage() {
                                             </p>
                                             <div className="flex items-center gap-3 mt-1 text-xs text-slate-500 flex-wrap">
                                                 <span className="flex items-center gap-1">
-                                                    <Briefcase className="h-3.5 w-3.5 text-[#0077b6]" />
+                                                    <Briefcase className="h-3.5 w-3.5 text-purple-500" />
                                                     {b.service?.category?.name || "General"}
                                                 </span>
                                                 <span className="flex items-center gap-1">
-                                                    <Calendar className="h-3.5 w-3.5 text-[#0077b6]" />
-                                                    {format(d, "MMM d, yyyy")}
+                                                    <Calendar className="h-3.5 w-3.5 text-blue-500" />
+                                                    {formatBookingDate(d, "MMM d, yyyy")}
                                                 </span>
                                                 <span className="flex items-center gap-1">
-                                                    <Clock className="h-3.5 w-3.5 text-[#0077b6]" />
+                                                    <Clock className="h-3.5 w-3.5 text-amber-500" />
                                                     {format(d, "hh:mm a")}
                                                 </span>
                                                 {techName && (
                                                     <span className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-medium bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded-full">
                                                         {techAvatar ? (
-                                                            <img 
-                                                                src={techAvatar} 
-                                                                alt={techName} 
-                                                                className="h-4 w-4 rounded-full object-cover" 
+                                                            <img
+                                                                src={techAvatar}
+                                                                alt={techName}
+                                                                className="h-4 w-4 rounded-full object-cover"
                                                             />
                                                         ) : (
                                                             <UserCheck className="h-3.5 w-3.5" />
@@ -174,7 +224,7 @@ export default function MyBookingsPage() {
                                                 </Button>
                                             )}
                                             <Link href={`/user/my-bookings/${b.id}`}>
-                                                <Button size="sm" variant="outline" className="text-xs gap-1">
+                                                <Button size="sm" variant="outline" className="text-xs gap-1 hover:bg-[#236b9d] hover:text-white">
                                                     Details
                                                     <ChevronRight className="h-3.5 w-3.5" />
                                                 </Button>

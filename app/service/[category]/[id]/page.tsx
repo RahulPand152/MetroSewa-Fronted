@@ -78,6 +78,8 @@ export default function ServiceDetails() {
   const isEligibleToBook =
     userProfile?.role !== "ADMIN" && userProfile?.role !== "TECHNICIAN";
   const [showAuthDialog, setShowAuthDialog] = React.useState(false);
+  const [lightboxOpen, setLightboxOpen] = React.useState(false);
+  const [activeIndex, setActiveIndex] = React.useState(0);
 
   const handleBookNow = () => {
     if (!userProfile) {
@@ -130,6 +132,9 @@ export default function ServiceDetails() {
     "Satisfaction Guaranteed",
   ];
 
+  const nextLightboxImage = () => setActiveIndex((prev) => (prev + 1) % images.length);
+  const prevLightboxImage = () => setActiveIndex((prev) => (prev - 1 + images.length) % images.length);
+
   return (
     <div className="min-h-screen bg-[#f8f9fa]">
       <NavbarPage />
@@ -141,7 +146,7 @@ export default function ServiceDetails() {
       />
 
       {/* Hero Carousel */}
-      <div className="max-w-7xl mx-auto px-4 pt-8">
+      <div className="max-w-7xl mx-auto px-4 pt-8 mt-8">
         <button
           onClick={() => router.back()}
           className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition mb-6 bg-gray-200 text-2xl px-2 py-1 rounded-lg"
@@ -161,13 +166,16 @@ export default function ServiceDetails() {
           <CarouselContent>
             {images.map((img: string, index: number) => (
               <CarouselItem key={index}>
-                <div className="relative h-[200px] md:h-[400px] w-full overflow-hidden rounded-3xl shadow-lg">
+                <div
+                  className="relative h-full md:h-[400px] w-full overflow-hidden rounded-sm shadow-lg cursor-pointer"
+                  onClick={() => { setActiveIndex(index); setLightboxOpen(true); }}
+                >
                   <img
                     src={img}
                     alt={service.name}
-                    className="h-fit w-full object-cover transition-all duration-700 hover:scale-105"
+                    className="h-full w-full object-contain bg-gray-100 transition-all duration-700 hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none" />
                   <div className="absolute bottom-8 left-6 md:bottom-12 md:left-12 text-white max-w-2xl">
                     {isPremium && (
                       <div className="mb-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/30">
@@ -185,16 +193,6 @@ export default function ServiceDetails() {
               </CarouselItem>
             ))}
           </CarouselContent>
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 w-max">
-            <Button
-              size="lg"
-              className="rounded-full shadow-2xl bg-white text-black hover:bg-gray-100 font-bold text-lg px-4 py-2 h-auto border border-gray-100 flex items-center gap-2 transition-all duration-300 hover:scale-105"
-            >
-              <ShoppingCart className="w-5 h-5" />
-              Add to Cart
-            </Button>
-          </div>
-
           <CarouselPrevious className="left-4 hidden md:flex h-12 w-12 border-none bg-white/20 hover:bg-white/40 text-gray-800" />
           <CarouselNext className="right-4 hidden md:flex h-12 w-12 border-none bg-white/20 hover:bg-white/40 text-gray-800" />
         </Carousel>
@@ -295,9 +293,9 @@ export default function ServiceDetails() {
                     <span className="text-gray-600">Rating</span>
                     <div className="flex items-center gap-1">
                       <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                      <span className="font-semibold text-gray-900">
+                      {/* <span className="font-semibold text-gray-900">
                         {rating}
-                      </span>
+                      </span> */}
                       <span className="text-gray-400">({reviewsCount})</span>
                     </div>
                   </div>
@@ -311,6 +309,7 @@ export default function ServiceDetails() {
                   >
                     Book Now
                   </Button>
+
                 ) : (
                   <div className="w-full p-3 bg-red-50 text-red-600 rounded-xl text-center font-medium text-sm border border-red-100">
                     For security reasons,{" "}
@@ -318,7 +317,10 @@ export default function ServiceDetails() {
                     cannot book services.
                   </div>
                 )}
+
+
               </CardContent>
+
             </Card>
 
             <div className="bg-blue-50 rounded-3xl p-6 text-center space-y-2">
@@ -335,6 +337,35 @@ export default function ServiceDetails() {
           </div>
         </div>
       </div>
+
+      {/* Lightbox Overlay */}
+      {lightboxOpen && (
+        <div
+          className="fixed inset-0 bg-black/85 z-[100] flex items-center justify-center p-4 sm:p-8"
+          onClick={() => setLightboxOpen(false)}
+        >
+          <button
+            className="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 p-2 sm:p-4 text-white hover:text-gray-300 transition-colors z-50 bg-black/20 hover:bg-black/40 rounded-full"
+            onClick={e => { e.stopPropagation(); prevLightboxImage(); }}
+          >
+            <ArrowLeft className="w-6 h-6 sm:w-8 sm:h-8" />
+          </button>
+
+          <img
+            src={images[activeIndex]}
+            className="max-h-[85vh] max-w-[90vw] object-contain rounded-xl"
+            alt={`Lightbox image ${activeIndex + 1}`}
+            onClick={e => e.stopPropagation()}
+          />
+
+          <button
+            className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 p-2 sm:p-4 text-white hover:text-gray-300 transition-colors z-50 bg-black/20 hover:bg-black/40 rounded-full"
+            onClick={e => { e.stopPropagation(); nextLightboxImage(); }}
+          >
+            <ArrowLeft className="w-6 h-6 sm:w-8 sm:h-8 rotate-180" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

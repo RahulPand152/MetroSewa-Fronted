@@ -168,11 +168,10 @@ export default function AdminReviewsPage() {
                         <button
                             key={r}
                             onClick={() => setFilterRating(r)}
-                            className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-all ${
-                                filterRating === r
+                            className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-all ${filterRating === r
                                     ? "bg-[#236b9d] text-white border-[#236b9d]"
                                     : "bg-white text-gray-500 border-gray-200 hover:border-[#236b9d] hover:text-[#236b9d]"
-                            }`}
+                                }`}
                         >
                             {r === "all" ? "All Ratings" : `${r} ⭐`}
                         </button>
@@ -213,7 +212,7 @@ export default function AdminReviewsPage() {
                                 {/* Left: Avatar + Meta */}
                                 <div className="flex items-start gap-3 sm:w-56 shrink-0">
                                     <Avatar className="h-9 w-9 border border-gray-100">
-                                        <AvatarImage src={review.user?.avatar || `https://i.pravatar.cc/80?u=${review.user?.id}`} />
+                                        <AvatarImage src={review.user?.avatar || ""} />
                                         <AvatarFallback className="bg-sky-50 text-sky-700 text-sm font-semibold">
                                             {fallback}
                                         </AvatarFallback>

@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
+import { formatBookingDate } from "@/lib/utils";
 import Link from "next/link";
 import { useMemo } from "react";
 
@@ -120,7 +121,7 @@ export default function MyJobsPage() {
                                                 </span>
                                                 <span className="flex items-center gap-1.5">
                                                     <Calendar className="h-3.5 w-3.5 text-[#236b9d]" />
-                                                    {format(d, "MMM d, yyyy")} at {format(d, "hh:mm a")}
+                                                    {formatBookingDate(d, "MMM d, yyyy")} at {format(d, "hh:mm a")}
                                                 </span>
                                             </div>
                                         </div>

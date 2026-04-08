@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { format } from "date-fns"
+import { formatBookingDate } from "@/lib/utils"
 import { Calendar as CalendarIcon, Clock, ArrowLeft, ArrowRight, ShieldCheck, CreditCard, User, Mail, Phone, FileText, CheckCircle, Wallet, Check, Loader2, XCircle, AlertTriangle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
@@ -401,7 +402,7 @@ export default function BookingWizardPage() {
                                                             className={cn("w-full justify-start text-left font-normal border-slate-200", !bookingDate && "text-slate-400")}
                                                         >
                                                             <CalendarIcon className="mr-2 h-4 w-4 text-sky-500" />
-                                                            {bookingDate ? format(bookingDate, "PPP") : "Select a date"}
+                                                            {bookingDate ? formatBookingDate(bookingDate, "PPP") : "Select a date"}
                                                         </Button>
                                                     </PopoverTrigger>
                                                     <PopoverContent className="w-auto p-0" align="start">
@@ -676,7 +677,7 @@ export default function BookingWizardPage() {
                                                 <div>
                                                     <p className="text-xs text-slate-400 uppercase tracking-wider font-semibold mb-1">Schedule</p>
                                                     <p className="font-medium text-sm leading-tight text-sky-700">
-                                                        {bookingDate ? format(bookingDate, "MMM d, yyyy") : ""} <br />
+                                                        {bookingDate ? formatBookingDate(bookingDate, "MMM d, yyyy") : ""} <br />
                                                         {bookingTime && (function () {
                                                             const [h, m] = bookingTime.split(":");
                                                             const d = new Date();

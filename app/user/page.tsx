@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useProfile } from "@/src/hooks/useAuth";
 import { useGetMyBookings } from "@/src/hooks/useBookings";
 import { format } from "date-fns";
+import { formatBookingDate } from "@/lib/utils";
 
 export default function UserDashboard() {
     const { data: userProfile } = useProfile();
@@ -26,12 +27,12 @@ export default function UserDashboard() {
     const stats = [
         { label: "Active Bookings", value: activeBookings, icon: CalendarCheck, color: "text-sky-500", bg: "bg-sky-100 dark:bg-sky-900/20" },
         { label: "Past Services", value: pastServices, icon: Clock, color: "text-emerald-500", bg: "bg-emerald-100 dark:bg-emerald-900/20" },
-        { label: "Wallet Balance", value: "Rs. 0", icon: Wallet, color: "text-amber-500", bg: "bg-amber-100 dark:bg-amber-900/20" },
+        // { label: "Wallet Balance", value: "Rs. 0", icon: Wallet, color: "text-amber-500", bg: "bg-amber-100 dark:bg-amber-900/20" },
     ];
 
     // Format top 5 recent bookings
     const recentBookings = [...realBookings]
-        .sort((a, b) => new Date(b.scheduledDate || 0).getTime() - new Date(a.scheduledDate || 0).getTime())
+        .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
         .slice(0, 5)
         .map((b: any) => {
             const statusUpper = (b.status || "").toUpperCase();
@@ -46,7 +47,7 @@ export default function UserDashboard() {
                 statusColor = "bg-rose-100 text-rose-700";
             }
 
-            const dateStr = b.scheduledDate ? format(new Date(b.scheduledDate), "MMM d, yyyy 'at' h:mm a") : "Soon";
+            const dateStr = b.scheduledDate ? `${formatBookingDate(b.scheduledDate, "MMM d, yyyy")} at ${format(new Date(b.scheduledDate), "h:mm a")}` : "Soon";
 
             return {
                 id: b.id.substring(0, 5).toUpperCase(),
@@ -74,28 +75,46 @@ export default function UserDashboard() {
             </div>
 
             {/* Quick Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                 {stats.map((stat, i) => (
-                    <Card key={i} className="border-slate-200 dark:border-slate-800 shadow-sm">
-                        <CardContent className="p-6 flex items-center gap-4">
-                            <div className={`h-12 w-12 rounded-lg flex items-center justify-center ${stat.bg}`}>
+                    <Card
+                        key={i}
+                        className="rounded-2xl border border-slate-200 dark:border-slate-800 
+      bg-white/80 dark:bg-slate-900/60 backdrop-blur 
+      shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                    >
+                        <CardContent className="p-6 flex items-center justify-between">
+
+                            {/* Left Content */}
+                            <div>
+                                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                                    {stat.label}
+                                </p>
+
+                                <h3 className="font-bold text-2xl transition mt-1">
+                                    {stat.value}
+                                </h3>
+                            </div>
+
+                            {/* Icon Box */}
+                            <div
+                                className={`h-12 w-12 rounded-xl flex items-center justify-center 
+          bg-gradient-to-br ${stat.bg} shadow-inner`}
+                            >
                                 <stat.icon className={`h-6 w-6 ${stat.color}`} />
                             </div>
-                            <div>
-                                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{stat.label}</p>
-                                <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stat.value}</h3>
-                            </div>
+
                         </CardContent>
                     </Card>
                 ))}
             </div>
-
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Recent Bookings */}
                 <Card className="lg:col-span-2 border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                     <CardHeader className="border-b border-slate-100 dark:border-slate-800 py-4 flex flex-row items-center justify-between">
                         <CardTitle className="text-base text-slate-800 dark:text-slate-200">Recent Bookings</CardTitle>
-                        <Link href="/user/my-bookings" className="text-sm font-medium text-sky-500 hover:text-sky-600 dark:text-sky-400">View all</Link>
+                        <Link href="/user/my-bookings" className="text-sm font-medium text-gray-800 hover:text-gray-600">View all</Link>
                     </CardHeader>
                     <CardContent className="p-0 divide-y divide-slate-100 dark:divide-slate-800">
                         {recentBookings.length > 0 ? (

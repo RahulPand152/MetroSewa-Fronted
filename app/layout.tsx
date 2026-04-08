@@ -44,11 +44,11 @@ export const metadata: Metadata = {
     description:
       "Book trusted electricians, plumbers, cleaners, and other professionals instantly with Metrosew. Fast, reliable, and secure service at your doorstep.",
     url: "/",
-    siteName: "Metrosew",
+    siteName: "Metrosewa",
     type: "website",
     images: [
       {
-        url: "/og-image.jpg", // recommended 1200x630
+        url: "/metrosewalogo.png", // recommended 1200x630
         width: 1200,
         height: 630,
         alt: "Metrosewa On-Demand Services",
