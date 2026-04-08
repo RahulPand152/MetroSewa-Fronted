@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { format } from "date-fns";
+import { formatBookingDate } from "@/lib/utils";
 import { useGetBookings, useUpdateBookingStatus, useGetTechnicians, useAssignTechnician } from "@/src/hooks/useAdmin";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -119,7 +120,7 @@ export default function BookingManagement() {
                 technicianName: b.technicians && b.technicians.length > 0
                     ? `${b.technicians[0].user?.firstName || ''} ${b.technicians[0].user?.lastName || ''}`.trim()
                     : null,
-                date: b.scheduledDate ? format(dateObj, "yyyy-MM-dd") : 'N/A',
+                date: b.scheduledDate ? formatBookingDate(dateObj, "MMM d, yyyy") : 'N/A',
                 time: b.scheduledDate ? format(dateObj, "hh:mm a") : 'N/A',
                 status: b.status ? b.status.toUpperCase() : 'UNKNOWN',
                 amount: b.service?.price || 0,

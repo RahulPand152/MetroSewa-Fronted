@@ -22,7 +22,7 @@ export const ServicePage = () => {
                         Services
                     </span>
                     <Link href="/services"
-                        className="ml-4 text-sm font-medium  bg-gray-400 whitespace-nowrap px-3 py-1.5 rounded-md transition-all duration-200 hover:text-[#236b9d]"> View All →
+                        className="ml-4 text-sm font-medium border border-gray-300 hover:bg-[#236b9d] hover:text-white hover:border-[#236b9d] whitespace-nowrap px-3 py-1.5 rounded-md transition-all duration-200"> View All →
                     </Link>
                 </div>
 

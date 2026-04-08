@@ -11,6 +11,7 @@ import {
     AlertTriangle, Star
 } from "lucide-react";
 import { format } from "date-fns";
+import { formatBookingDate } from "@/lib/utils";
 import { useState } from "react";
 import {
     AlertDialog,
@@ -24,10 +25,10 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const TIMELINE_STEPS = [
-    { key: "PENDING", label: "Booking Placed", desc: "Your request has been received" },
-    { key: "ASSIGNED", label: "Technician Assigned", desc: "A technician has been assigned" },
-    { key: "IN_PROGRESS", label: "Work In Progress", desc: "The technician is on the job" },
-    { key: "COMPLETED", label: "Completed", desc: "Service completed successfully" },
+    { key: "PENDING", label: "Booking Placed", desc: "Your request has been received", color: "bg-amber-500 border-amber-500 text-white", ring: "ring-amber-500/20", activeText: "text-amber-600" },
+    { key: "ASSIGNED", label: "Technician Assigned", desc: "A technician has been assigned", color: "bg-blue-500 border-blue-500 text-white", ring: "ring-blue-500/20", activeText: "text-blue-600" },
+    { key: "IN_PROGRESS", label: "Work In Progress", desc: "The technician is on the job", color: "bg-indigo-500 border-indigo-500 text-white", ring: "ring-indigo-500/20", activeText: "text-indigo-600" },
+    { key: "COMPLETED", label: "Completed", desc: "Service completed successfully", color: "bg-emerald-500 border-emerald-500 text-white", ring: "ring-emerald-500/20", activeText: "text-emerald-600" },
 ];
 
 const STEP_ORDER = ["PENDING", "ASSIGNED", "IN_PROGRESS", "COMPLETED"];
@@ -40,11 +41,11 @@ const STATUS_BADGE: Record<string, string> = {
     CANCELLED: "bg-rose-100 text-rose-700 border-rose-200",
 };
 
-function InfoRow({ label, value, icon: Icon }: { label: string; value: string; icon: any }) {
+function InfoRow({ label, value, icon: Icon, iconColor, bg }: { label: string; value: string; icon: any; iconColor?: string; bg?: string; }) {
     return (
         <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 mt-0.5">
-                <Icon className="h-4 w-4 text-[#0077b6]" />
+            <div className={`w-8 h-8 rounded-lg ${bg || "bg-slate-100 dark:bg-slate-800"} flex items-center justify-center shrink-0 mt-0.5`}>
+                <Icon className={`h-4 w-4 ${iconColor || "text-[#0077b6]"}`} />
             </div>
             <div>
                 <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">{label}</p>
@@ -106,8 +107,8 @@ export default function BookingDetailPage() {
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                     <div>
-                        <p className="text-xs text-slate-400 font-medium mb-1">Booking ID</p>
-                        <p className="font-mono text-xs text-slate-500 dark:text-slate-400">{booking.id}</p>
+                        {/* <p className="text-xs text-slate-400 font-medium mb-1">Booking ID</p> */}
+                        {/* <p className="font-mono text-xs text-slate-500 dark:text-slate-400">{booking.id}</p> */}
                         <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 mt-2">{booking.service?.name}</h1>
                         <p className="text-sm text-slate-500 mt-0.5">{booking.service?.category?.name || "General"}</p>
                     </div>
@@ -119,11 +120,13 @@ export default function BookingDetailPage() {
                 <Separator className="my-5" />
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <InfoRow icon={Calendar} label="Scheduled Date" value={format(d, "EEEE, MMMM d, yyyy")} />
-                    <InfoRow icon={Clock} label="Scheduled Time" value={format(d, "hh:mm a")} />
-                    <InfoRow icon={Receipt} label="Service Price" value={`Rs. ${booking.service?.price ?? "N/A"}`} />
+                    <InfoRow icon={Calendar} iconColor="text-blue-500" bg="bg-blue-50 dark:bg-blue-900/20" label="Scheduled Date" value={formatBookingDate(d, "EEEE, MMMM d, yyyy")} />
+                    <InfoRow icon={Clock} iconColor="text-amber-500" bg="bg-amber-50 dark:bg-amber-900/20" label="Scheduled Time" value={format(d, "hh:mm a")} />
+                    <InfoRow icon={Receipt} iconColor="text-emerald-500" bg="bg-emerald-50 dark:bg-emerald-900/20" label="Service Price" value={`Rs. ${booking.service?.price ?? "N/A"}`} />
                     <InfoRow
                         icon={Receipt}
+                        iconColor="text-purple-500"
+                        bg="bg-purple-50 dark:bg-purple-900/20"
                         label="Payment Status"
                         value={booking.payment?.status === "PAID" ? "Paid (Khalti)" : booking.payment?.paymentMethod === "COD" ? "Cash on Delivery" : "Pending"}
                     />
@@ -134,7 +137,7 @@ export default function BookingDetailPage() {
                         <Separator className="my-5" />
                         <div>
                             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2 flex items-center gap-1.5">
-                                <Briefcase className="h-3.5 w-3.5" /> Issue Description
+                                <Briefcase className="h-3.5 w-3.5 text-purple-500" /> Issue Description
                             </p>
                             <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{booking.description}</p>
                         </div>
@@ -156,16 +159,16 @@ export default function BookingDetailPage() {
                                     <div key={step.key} className="relative flex items-start gap-4 pl-10">
                                         <div className={`absolute left-0 w-8 h-8 rounded-full flex items-center justify-center border-2 z-10 transition-all
                                             ${isDone
-                                                ? "bg-[#0077b6] border-[#0077b6] text-white"
+                                                ? step.color
                                                 : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-400"
-                                            } ${isCurrent ? "ring-4 ring-[#0077b6]/20" : ""}`}
+                                            } ${isCurrent ? `ring-4 ${step.ring}` : ""}`}
                                         >
                                             {isDone ? <CheckCircle2 className="h-4 w-4" /> : <Circle className="h-4 w-4" />}
                                         </div>
                                         <div className="pb-1">
                                             <p className={`text-sm font-semibold ${isDone ? "text-slate-900 dark:text-slate-100" : "text-slate-400"}`}>
                                                 {step.label}
-                                                {isCurrent && <span className="ml-2 text-xs text-[#0077b6] font-medium">(Current)</span>}
+                                                {isCurrent && <span className={`ml-2 text-xs ${step.activeText} font-medium`}>(Current)</span>}
                                             </p>
                                             <p className="text-xs text-slate-400 mt-0.5">{step.desc}</p>
                                         </div>

@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import axiosInstance from "@/src/lib/axios";
 import { format, subDays, isSameDay } from "date-fns";
+import { formatBookingDate } from "@/lib/utils";
 
 // ── Components ────────────────────────────────────────────────────────────────
 function StatCard({
@@ -85,9 +86,9 @@ export default function TechnicanDashboard() {
     const weeklyData = useMemo(() => {
         const days = Array.from({ length: 7 }).map((_, i) => subDays(new Date(), 6 - i));
         return days.map(d => {
-            const jobsCount = realBookings.filter(b => 
-                (b.status === "COMPLETED" || b.status === "IN_PROGRESS") && 
-                b.updatedAt && 
+            const jobsCount = realBookings.filter(b =>
+                (b.status === "COMPLETED" || b.status === "IN_PROGRESS") &&
+                b.updatedAt &&
                 isSameDay(new Date(b.updatedAt), d)
             ).length;
 
@@ -102,19 +103,19 @@ export default function TechnicanDashboard() {
     const categoryData = useMemo(() => {
         const serviceCounts: Record<string, number> = {};
         realBookings.forEach(b => {
-             const name = b.service?.name || "Other";
-             serviceCounts[name] = (serviceCounts[name] || 0) + 1;
+            const name = b.service?.name || "Other";
+            serviceCounts[name] = (serviceCounts[name] || 0) + 1;
         });
 
         const segments = Object.entries(serviceCounts).map(([name, value], i) => ({
-             name: name.length > 15 ? name.substring(0, 15) + "..." : name,
-             value,
-             color: COLORS[i % COLORS.length]
+            name: name.length > 15 ? name.substring(0, 15) + "..." : name,
+            value,
+            color: COLORS[i % COLORS.length]
         }));
-        
+
         // Return a visually stable array if there are zero real entries yet
         if (segments.length === 0) {
-            return [{ name: "No Data", value: 1, color: "#cbd5e1" }]; 
+            return [{ name: "No Data", value: 1, color: "#cbd5e1" }];
         }
         return segments;
     }, [realBookings]);
@@ -123,12 +124,12 @@ export default function TechnicanDashboard() {
 
     if (isLoading) {
         return (
-             <div className="flex flex-1 items-center justify-center p-8 min-h-[500px]">
-                 <div className="flex flex-col items-center gap-2">
-                     <Loader2 className="h-8 w-8 animate-spin text-[#236b9d]" />
-                     <p className="text-sm text-slate-500">Loading your board...</p>
-                 </div>
-             </div>
+            <div className="flex flex-1 items-center justify-center p-8 min-h-[500px]">
+                <div className="flex flex-col items-center gap-2">
+                    <Loader2 className="h-8 w-8 animate-spin text-[#236b9d]" />
+                    <p className="text-sm text-slate-500">Loading your board...</p>
+                </div>
+            </div>
         );
     }
 
@@ -244,7 +245,7 @@ export default function TechnicanDashboard() {
                                     <div className="flex items-center gap-2">
                                         <span className="h-2.5 w-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
                                         <span className="text-sm text-slate-600 dark:text-slate-400">
-                                             {item.name === "No Data" ? "No Jobs Yet" : item.name}
+                                            {item.name === "No Data" ? "No Jobs Yet" : item.name}
                                         </span>
                                     </div>
                                     <Badge variant="secondary" className="font-bold text-xs">{item.value}</Badge>
@@ -293,7 +294,7 @@ export default function TechnicanDashboard() {
                                         </span>
                                         <span className="flex items-center gap-1">
                                             <Clock className="h-3.5 w-3.5 text-gray-500" />
-                                            {job.scheduledDate ? format(new Date(job.scheduledDate), "PPp") : "Awaiting Schedule"}
+                                            {job.scheduledDate ? `${formatBookingDate(new Date(job.scheduledDate), "PP")} at ${format(new Date(job.scheduledDate), "p")}` : "Awaiting Schedule"}
                                         </span>
                                     </div>
                                 </div>
@@ -307,9 +308,9 @@ export default function TechnicanDashboard() {
                         </Link>
                     )) : (
                         <div className="flex flex-col items-center justify-center p-12 text-center text-slate-500 h-full">
-                             <Briefcase className="h-10 w-10 text-slate-300 dark:text-slate-600 mb-3" />
-                             <p className="text-sm font-medium">You're all caught up!</p>
-                             <p className="text-xs mt-1 max-w-[200px]">There are no new job requests assigned to you right now.</p>
+                            <Briefcase className="h-10 w-10 text-slate-300 dark:text-slate-600 mb-3" />
+                            <p className="text-sm font-medium">You're all caught up!</p>
+                            <p className="text-xs mt-1 max-w-[200px]">There are no new job requests assigned to you right now.</p>
                         </div>
                     )}
                 </CardContent>

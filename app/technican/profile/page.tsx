@@ -97,7 +97,7 @@ export default function ProfilePage() {
                         <Button
                             variant="outline"
                             size="sm"
-                            className="gap-2 rounded-xl hover:bg-[#236b9d] hover-text-white ">
+                            className="gap-2 rounded-xl hover:bg-[#236b9d] hover:text-white ">
 
                             <Edit className="h-4 w-4" /> Edit Profile
                         </Button>
@@ -155,7 +155,7 @@ export default function ProfilePage() {
             {/* Profile Card */}
             <Card className="rounded-2xl border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 {/* Sky blue banner */}
-                <div className="h-28 bg-gradient-to-r from-[#2baba8] to-[#123854]" />
+                <div className="h-28 bg-gradient-to-r from-[#1e5b87] to-[#1e5b97]" />
 
                 <CardContent className="px-6 pb-6 -mt-12">
                     {/* Avatar */}
@@ -194,9 +194,9 @@ export default function ProfilePage() {
 
                     {/* Contact info */}
                     <div className="flex flex-wrap gap-4 mt-5 text-sm text-slate-600 dark:text-slate-400">
-                        <span className="flex items-center gap-1.5"><Phone className="h-4 w-4 text-[#236b9d]" /> {user.phoneNumber || "-"}</span>
-                        <span className="flex items-center gap-1.5"><Mail className="h-4 w-4 text-[#236b9d]" /> {user.email}</span>
-                        <span className="flex items-center gap-1.5"><MapPin className="h-4 w-4 text-[#236b9d]" /> {user.address || "-"}</span>
+                        <span className="flex items-center gap-1.5"><Phone className="h-4 w-4 text-green-500" /> {user.phoneNumber || "-"}</span>
+                        <span className="flex items-center gap-1.5"><Mail className="h-4 w-4 text-blue-500" /> {user.email}</span>
+                        <span className="flex items-center gap-1.5"><MapPin className="h-4 w-4 text-rose-500" /> {user.address || "-"}</span>
                     </div>
 
                     <Separator className="my-5" />

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Bell } from 'lucide-react';
+import { Bell, Calendar, Star, MessageSquare, UserPlus, Wrench } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -53,13 +53,34 @@ function NotificationItem({
         }
     };
 
+    const getIcon = () => {
+        switch (notification.type) {
+            case 'NEW_BOOKING':
+            case 'BOOKING_CREATED':
+                return <Calendar className="h-4 w-4 text-sky-500" />;
+            case 'BOOKING_UPDATE':
+                return <Calendar className="h-4 w-4 text-blue-500" />;
+            case 'NEW_REVIEW':
+                return <Star className="h-4 w-4 text-yellow-500" />;
+            case 'USER_INQUIRY':
+                return <MessageSquare className="h-4 w-4 text-purple-500" />;
+            case 'NEW_USER':
+                return <UserPlus className="h-4 w-4 text-emerald-500" />;
+            case 'NEW_TECHNICIAN':
+                return <Wrench className="h-4 w-4 text-orange-500" />;
+            default:
+                return <Bell className="h-4 w-4 text-slate-500" />;
+        }
+    };
+
     return (
         <button
             onClick={handleClick}
             className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${!isRead ? 'bg-sky-50/60 dark:bg-sky-900/10' : ''}`}
         >
-            {/* Unread dot */}
-            <span className={`mt-1.5 h-2 w-2 rounded-full flex-shrink-0 transition-colors ${!isRead ? 'bg-sky-500' : 'bg-transparent'}`} />
+            <div className="mt-1 flex-shrink-0 bg-white dark:bg-slate-800 p-1.5 rounded-full shadow-sm border border-slate-100 dark:border-slate-700">
+                {getIcon()}
+            </div>
             <div className="flex-1 min-w-0">
                 <p className={`text-sm leading-snug ${!isRead ? 'font-semibold text-slate-800 dark:text-slate-100' : 'font-medium text-slate-600 dark:text-slate-400'}`}>
                     {notification.message}
@@ -68,6 +89,9 @@ function NotificationItem({
                     {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
                 </p>
             </div>
+            {!isRead && (
+                <span className="mt-2 h-2 w-2 rounded-full flex-shrink-0 bg-sky-500" />
+            )}
         </button>
     );
 }
