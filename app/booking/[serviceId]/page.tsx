@@ -11,6 +11,7 @@ import { toast } from "sonner"
 import { useProfile } from "@/src/hooks/useAuth"
 import { useGetPublicServices } from "@/src/hooks/useServices"
 import axiosInstance from "@/src/lib/axios"
+import { useCart } from "@/src/lib/cartContext"
 
 import { NavbarPage } from "@/app/component/Navbar"
 import { Button } from "@/components/ui/button"
@@ -40,8 +41,12 @@ export default function BookingWizardPage() {
 
     const { data: userProfile, isLoading: isAuthLoading } = useProfile()
     const { data: services = [], isLoading: isServicesLoading } = useGetPublicServices()
+    const { items, removeItem } = useCart()
 
     const service = services.find((s: any) => s.id === serviceId)
+
+    const cartItem = items.find((i) => i.serviceId === serviceId)
+    const quantity = cartItem ? cartItem.quantity : 1
 
     // Form State
     const [step, setStep] = useState(1)
@@ -123,6 +128,7 @@ export default function BookingWizardPage() {
                         amount: data.total_amount,
                         khaltiStatus: data.khaltiStatus || "Completed",
                     })
+                    if (cartItem) removeItem(cartItem.id) // Clear from cart
                     toast.success("Payment verified successfully! Your booking is confirmed.")
                 } else {
                     setPaymentError("Payment verification returned unexpected status.")
@@ -174,7 +180,7 @@ export default function BookingWizardPage() {
     }
 
     // Calculate display price
-    const servicePriceNPR = service.price ? Number(service.price) : 0
+    const servicePriceNPR = service.price ? Number(service.price) * quantity : 0
     const displayPrice = servicePriceNPR > 0 ? `NPR ${servicePriceNPR.toLocaleString()}` : "Free"
 
     const handleNextStep = () => {
@@ -206,6 +212,8 @@ export default function BookingWizardPage() {
                 scheduledDate: dateObj.toISOString(),
                 description: finalDescription,
                 address: contactAddress,
+                // optionally pass quantity if backend handles it
+                quantity: quantity
             }
 
             const response = await axiosInstance.post("/bookings", payload)
@@ -273,6 +281,7 @@ export default function BookingWizardPage() {
                     transactionId: null,
                     amount: servicePriceNPR
                 });
+                if (cartItem) removeItem(cartItem.id) // Clear from cart
                 setStep(4);
                 setIsSubmitting(false);
             } catch (error: any) {
@@ -285,6 +294,7 @@ export default function BookingWizardPage() {
             const booking = await processBackendBooking();
             if (booking) {
                 setBookingResult(booking);
+                if (cartItem) removeItem(cartItem.id) // Clear from cart
                 setStep(4);
                 setIsSubmitting(false);
             }

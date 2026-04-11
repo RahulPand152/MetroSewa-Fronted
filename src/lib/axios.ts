@@ -19,9 +19,16 @@ axiosInstance.interceptors.request.use((config) => {
         config.headers.Authorization = `Bearer ${token}`;
     }
     // When sending FormData, let the browser set Content-Type automatically
-    // (it includes the correct multipart boundary). Manually setting it breaks uploads.
+    // (it includes the correct multipart/form-data boundary).
+    // Manually setting it breaks uploads because the boundary is missing.
+    // Axios v1.x uses an AxiosHeaders object – use its .delete() if available,
+    // otherwise fall back to the plain property delete.
     if (config.data instanceof FormData) {
-        delete config.headers['Content-Type'];
+        if (typeof (config.headers as any).delete === 'function') {
+            (config.headers as any).delete('Content-Type');
+        } else {
+            delete (config.headers as any)['Content-Type'];
+        }
     }
     return config;
 });

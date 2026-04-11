@@ -16,11 +16,6 @@ import {
   Star,
   ArrowLeft,
   ShoppingCart,
-  Calendar,
-  Clock,
-  FileText,
-  CreditCard,
-  CheckCircle,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { NavbarPage } from "@/app/component/Navbar";
@@ -29,41 +24,12 @@ import { Reviews } from "@/app/component/Reviews";
 import { useGetPublicServices } from "@/src/hooks/useServices";
 import { useProfile } from "@/src/hooks/useAuth";
 import { Loader2 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
 import { AuthDialog } from "@/components/AuthDialog";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { Calendar as CalendarUI } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Input } from "@/components/ui/input";
-import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { useCart } from "@/src/lib/cartContext";
+import { toast } from "sonner";
 
-const timeSlots = [
-  "8:00 AM",
-  "9:00 AM",
-  "10:00 AM",
-  "11:00 AM",
-  "12:00 PM",
-  "1:00 PM",
-  "2:00 PM",
-  "3:00 PM",
-  "4:00 PM",
-  "5:00 PM",
-  "6:00 PM",
-];
 
 export default function ServiceDetails() {
   const router = useRouter();
@@ -75,18 +41,37 @@ export default function ServiceDetails() {
   const service = services.find((item: any) => item.id === id);
 
   const { data: userProfile } = useProfile();
+  const { addItem, isInCart } = useCart();
   const isEligibleToBook =
-    userProfile?.role !== "ADMIN" && userProfile?.role !== "TECHNICIAN";
+    userProfile?.data?.role !== "ADMIN" && userProfile?.data?.role !== "TECHNICIAN";
   const [showAuthDialog, setShowAuthDialog] = React.useState(false);
   const [lightboxOpen, setLightboxOpen] = React.useState(false);
   const [activeIndex, setActiveIndex] = React.useState(0);
 
   const handleBookNow = () => {
-    if (!userProfile) {
+    if (!userProfile?.data) {
       setShowAuthDialog(true);
       return;
     }
     router.push(`/booking/${service.id}`);
+  };
+
+  const handleAddToCart = () => {
+    if (!userProfile?.data) {
+      setShowAuthDialog(true);
+      return;
+    }
+    
+    addItem({
+      serviceId: service.id,
+      serviceName: service.name,
+      serviceImage: service.images?.[0]?.url || "",
+      price: service.price ? Number(service.price) : 0,
+      category: service.categoryId,
+      selectedAttributes: {},
+      quantity: 1,
+    });
+    toast.success(`"${service.name}" added to your Cart!`);
   };
 
   if (isLoading) {
@@ -301,20 +286,30 @@ export default function ServiceDetails() {
                   </div>
                 </div>
 
-                {isEligibleToBook ? (
-                  <Button
-                    size="lg"
-                    className="w-full rounded-full h-10 text-lg font-medium shadow-lg hover:shadow-xl transition-all bg-[#236b9d] hover:bg-[#1a5a8c]"
-                    onClick={handleBookNow}
-                  >
-                    Book Now
-                  </Button>
+                {isEligibleToBook && (
+                  <div className="space-y-3">
+                    {/* Add to Cart */}
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className={`w-full rounded-full h-10 font-medium transition-all border-2 ${service && isInCart(service.id)
+                          ? "border-emerald-500 text-emerald-600 bg-emerald-50 hover:bg-emerald-100"
+                          : "border-[#236b9d] text-[#236b9d] hover:bg-[#236b9d] hover:text-white"
+                        }`}
+                      onClick={handleAddToCart}
+                    >
+                      <ShoppingCart className="w-4 h-4 mr-2" />
+                      {service && isInCart(service.id) ? "✓ Added" : "Add Book"}
+                    </Button>
 
-                ) : (
-                  <div className="w-full p-3 bg-red-50 text-red-600 rounded-xl text-center font-medium text-sm border border-red-100">
-                    For security reasons,{" "}
-                    {userProfile?.role === "ADMIN" ? "Admins" : "Technicians"}{" "}
-                    cannot book services.
+                    {/* Book Now */}
+                    <Button
+                      size="lg"
+                      className="w-full rounded-full h-10 text-lg font-medium shadow-lg hover:shadow-xl transition-all bg-[#236b9d] hover:bg-[#1a5a8c]"
+                      onClick={handleBookNow}
+                    >
+                      Book Now
+                    </Button>
                   </div>
                 )}
 
@@ -334,6 +329,7 @@ export default function ServiceDetails() {
                 All our experts are background checked and trained.
               </p>
             </div>
+
           </div>
         </div>
       </div>
