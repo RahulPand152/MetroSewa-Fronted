@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 import ConditionalFooter from "./component/ConditionalFooter";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -102,6 +103,14 @@ export default function RootLayout({
           {children}
           <ConditionalFooter />
         </Providers>
+        {/* Chatbot Script */}
+        <Script
+          src="https://intellidocs.tech/embed.js"
+          data-chatbot-id="cmnubxxo2000tnz01nzqj0d1a"
+          data-api-key="ocr_f6bff41b9a4631be97bd8f1dbcf4870b557664d2d8eeac7c1244f633c67be0a5"
+          id="ocr-chatbot"
+          strategy="lazyOnload"
+        />
       </body>
 
     </html>
