@@ -78,7 +78,8 @@ interface Technician {
         avatar: string | null;
         address: string | null;
     };
-    specializations: { id: string; name: string }[];
+    skills: string | null;
+    expertise: string | null;
 }
 
 const avatarColors = [
@@ -193,8 +194,8 @@ function TechnicianProfilePopup({
                     />
                     <InfoRow
                         icon={<Wrench className="h-4 w-4 text-slate-400" />}
-                        label="Specializations"
-                        value={technician.specializations?.map(s => s.name).join(", ") || "-"}
+                        label="Expertise"
+                        value={technician.skills || technician.expertise?.replace(/_/g, " ") || "-"}
                     />
                     <InfoRow
                         icon={<Calendar className="h-4 w-4 text-slate-400" />}
@@ -426,7 +427,7 @@ export default function TechnicianManagement() {
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-2">
                                                     <Wrench className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                                                    <span className="truncate max-w-[150px]">{tech.specializations?.map(s => s.name).join(", ") || "-"}</span>
+                                                    <span className="truncate max-w-[150px]">{tech.skills || tech.expertise?.replace(/_/g, " ") || "-"}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4"><StatusBadge isApproved={tech.isApproved} isAvailable={tech.isAvailable} /></td>
