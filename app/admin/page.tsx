@@ -76,7 +76,7 @@ export default function AdminDashboard() {
         {
             title: "Total Revenue",
             value: `Rs. ${dashboardStats.totalRevenue?.toLocaleString() || 0}`,
-            description: "Total gross volume",
+            description: "Total booked amount",
             icon: DollarSign,
         },
         {
@@ -125,6 +125,7 @@ export default function AdminDashboard() {
                 displayName: item.category,
                 visitors: Math.max(item.count || 0, 1), // Minimum of 1 so it always visually renders
                 actualCount: item.count || 0,
+                services: item.services || [], // Add the list of services directly from backend if available
                 fill: `var(--color-${safeKey})`
             }
         })
@@ -225,7 +226,29 @@ export default function AdminDashboard() {
                             <PieChart>
                                 <ChartTooltip
                                     cursor={false}
-                                    content={<ChartTooltipContent hideLabel />}
+                                    content={({ active, payload }) => {
+                                        if (active && payload && payload.length) {
+                                            const data = payload[0].payload;
+                                            return (
+                                                <div className="rounded-lg border bg-white p-3 shadow-md dark:bg-slate-950 sm:min-w-[12rem]">
+                                                    <p className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1">
+                                                        {data.displayName}
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                                                        Total Services: <span className="font-semibold text-slate-900 dark:text-white">{data.actualCount}</span>
+                                                    </p>
+                                                    {data.services && data.services.length > 0 && (
+                                                        <div className="mt-2 flex flex-wrap gap-1">
+                                                            {data.services.map((name: string, idx: number) => (
+                                                                <Badge key={idx} variant="outline" className="text-[10px] py-0">{name}</Badge>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        }
+                                        return null;
+                                    }}
                                 />
                                 <Pie
                                     data={serviceData}
@@ -245,20 +268,7 @@ export default function AdminDashboard() {
                                                         textAnchor="middle"
                                                         dominantBaseline="middle"
                                                     >
-                                                        <tspan
-                                                            x={viewBox.cx}
-                                                            y={viewBox.cy}
-                                                            className="fill-foreground text-3xl font-bold"
-                                                        >
-                                                            {totalVisitors.toLocaleString()}
-                                                        </tspan>
-                                                        <tspan
-                                                            x={viewBox.cx}
-                                                            y={(viewBox.cy || 0) + 24}
-                                                            className="fill-muted-foreground"
-                                                        >
-                                                            Services
-                                                        </tspan>
+                                                        
                                                     </text>
                                                 )
                                             }

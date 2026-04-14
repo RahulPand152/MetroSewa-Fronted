@@ -204,7 +204,7 @@ export default function BookingManagement() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
                 <Card className="rounded-2xl border-slate-200">
                     <CardContent className="p-4 flex items-center gap-4 hover:bg-slate-50 transition-colors">
                         <div className="bg-blue-100 p-3 rounded-xl text-blue-600"><Calendar className="h-5 w-5" /></div>
@@ -215,6 +215,18 @@ export default function BookingManagement() {
                     <CardContent className="p-4 flex items-center gap-4 hover:bg-slate-50 transition-colors">
                         <div className="bg-amber-100 p-3 rounded-xl text-amber-600"><Clock className="h-5 w-5" /></div>
                         <div><p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Pending</p><p className="text-2xl font-bold text-slate-900">{bookings.filter((b: any) => b.status === "PENDING").length}</p></div>
+                    </CardContent>
+                </Card>
+                <Card className="rounded-2xl border-slate-200">
+                    <CardContent className="p-4 flex items-center gap-4 hover:bg-slate-50 transition-colors">
+                        <div className="bg-indigo-100 p-3 rounded-xl text-indigo-600"><UserPlus className="h-5 w-5" /></div>
+                        <div><p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Assigned</p><p className="text-2xl font-bold text-slate-900">{bookings.filter((b: any) => b.status === "ASSIGNED").length}</p></div>
+                    </CardContent>
+                </Card>
+                <Card className="rounded-2xl border-slate-200">
+                    <CardContent className="p-4 flex items-center gap-4 hover:bg-slate-50 transition-colors">
+                        <div className="bg-purple-100 p-3 rounded-xl text-purple-600"><Clock3 className="h-5 w-5" /></div>
+                        <div><p className="text-xs font-semibold uppercase tracking-wider text-slate-500">In Progress</p><p className="text-2xl font-bold text-slate-900">{bookings.filter((b: any) => b.status === "IN_PROGRESS").length}</p></div>
                     </CardContent>
                 </Card>
                 <Card className="rounded-2xl border-slate-200">

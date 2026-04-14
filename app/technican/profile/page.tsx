@@ -76,8 +76,9 @@ export default function ProfilePage() {
     const techStats = user.technician || {};
     const ratingNode = typeof techStats.rating === 'number' ? techStats.rating.toFixed(1) : "New";
 
-    // In a real app we would get these from the technician profile extension
-    const specializations = ["Plumbing", "Electrical"];
+    // Retrieve expertise from the user's technician profile
+    const techSkillsStr = techStats.skills || techStats.expertise || techStats.specialization;
+    const specializations = techSkillsStr ? techSkillsStr.split(",").map((s: string) => s.trim().replace(/_/g, " ")) : ["New"];
     const profileStats = [
         { icon: Briefcase, label: "Experience", value: techStats.experience ? `${techStats.experience} Yrs` : "New", iconClass: "text-sky-500" },
         { icon: Star, label: "Avg Rating", value: ratingNode, iconClass: "text-amber-500" },
@@ -214,13 +215,13 @@ export default function ProfilePage() {
                 </CardContent>
             </Card>
 
-            {/* Specializations */}
+            {/* Expertise */}
             <Card className="rounded-2xl border-slate-200 dark:border-slate-800 shadow-sm">
                 <CardHeader className="pb-3">
-                    <CardTitle className="text-base text-slate-800 dark:text-slate-200">Specializations</CardTitle>
+                    <CardTitle className="text-base text-slate-800 dark:text-slate-200">Your Expertise</CardTitle>
                 </CardHeader>
                 <CardContent className="flex flex-wrap gap-2 pt-0">
-                    {specializations.map((tag) => (
+                    {specializations.map((tag: string) => (
                         <Badge
                             key={tag}
                             variant="secondary"
