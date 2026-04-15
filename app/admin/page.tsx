@@ -55,11 +55,11 @@ export default function AdminDashboard() {
 
                 setDashboardStats(statsRes.data?.data || statsRes.data)
                 setAnalytics(analyticsRes.data?.data || analyticsRes.data)
-                
+
                 // Get all users and limit to 5 on frontend
                 const allUsers = usersRes.data?.data || usersRes.data || []
                 setRecentUsers(allUsers.slice(0, 5))
-                
+
                 // Bookings are already limited by backend query parameter
                 setRecentBookings(bookingsRes.data?.data || bookingsRes.data || [])
 
@@ -75,7 +75,7 @@ export default function AdminDashboard() {
     const statsData = dashboardStats ? [
         {
             title: "Total Revenue",
-            value: `Rs. ${dashboardStats.totalRevenue?.toLocaleString() || 0}`,
+            value: `Rs. ${dashboardStats.totalRevenue?.toLocaleString()}`,
             description: "Total booked amount",
             icon: DollarSign,
         },
@@ -102,11 +102,11 @@ export default function AdminDashboard() {
     // Map analytics data into charts
     const chartData = React.useMemo(() => {
         if (!analytics) return []
-        
+
         const revMonths = Object.keys(analytics.revenueByMonth || {})
         const userMonths = Object.keys(analytics.usersByMonth || {})
         const allMonths = Array.from(new Set([...revMonths, ...userMonths]))
-        
+
         return allMonths.map(month => ({
             month,
             revenue: analytics.revenueByMonth?.[month] || 0,
@@ -116,7 +116,7 @@ export default function AdminDashboard() {
 
     const serviceData = React.useMemo(() => {
         if (!analytics?.servicesByCategory) return []
-        
+
         return analytics.servicesByCategory.map((item: any, i: number) => {
             // Transform category into a valid CSS variable key (e.g. "Air Conditioning" -> "airconditioning")
             const safeKey = item.category.replace(/[^a-zA-Z0-9]/g, "").toLowerCase() || `category${i}`
@@ -268,7 +268,7 @@ export default function AdminDashboard() {
                                                         textAnchor="middle"
                                                         dominantBaseline="middle"
                                                     >
-                                                        
+
                                                     </text>
                                                 )
                                             }
@@ -294,31 +294,31 @@ export default function AdminDashboard() {
                         <CardDescription>Latest 5 service bookings</CardDescription>
                     </CardHeader>
                     <CardContent>
-                         <div className="space-y-6">
-                             {recentBookings.length > 0 ? recentBookings.map((b) => (
-                                  <div key={b.id} className="flex items-center justify-between">
-                                      <div className="flex items-center gap-4">
-                                          <Avatar className="h-10 w-10 border border-slate-100 shadow-sm">
-                                             <AvatarFallback className="bg-sky-50 text-sky-600 font-semibold">
+                        <div className="space-y-6">
+                            {recentBookings.length > 0 ? recentBookings.map((b) => (
+                                <div key={b.id} className="flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <Avatar className="h-10 w-10 border border-slate-100 shadow-sm">
+                                            <AvatarFallback className="bg-sky-50 text-sky-600 font-semibold">
                                                 {b.user?.firstName?.charAt(0) || "U"}
-                                             </AvatarFallback>
-                                          </Avatar>
-                                          <div>
-                                              <p className="text-sm font-semibold text-slate-800">{b.user?.firstName} {b.user?.lastName}</p>
-                                              <p className="text-xs text-muted-foreground mt-0.5">{b.service?.name || "Unknown Service"}</p>
-                                          </div>
-                                      </div>
-                                      <div className="text-right">
-                                          <Badge variant={b.status === "COMPLETED" ? "default" : "secondary"} className="shadow-sm">
-                                              {b.status}
-                                          </Badge>
-                                          <p className="text-xs text-muted-foreground mt-1.5 font-medium">Rs. {b.amount || b.service?.price || 0}</p>
-                                      </div>
-                                  </div>
-                             )) : (
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <div>
+                                            <p className="text-sm font-semibold text-slate-800">{b.user?.firstName} {b.user?.lastName}</p>
+                                            <p className="text-xs text-muted-foreground mt-0.5">{b.service?.name || "Unknown Service"}</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <Badge variant={b.status === "COMPLETED" ? "default" : "secondary"} className="shadow-sm">
+                                            {b.status}
+                                        </Badge>
+                                        <p className="text-xs text-muted-foreground mt-1.5 font-medium">Rs. {b.amount || b.service?.price || 0}</p>
+                                    </div>
+                                </div>
+                            )) : (
                                 <div className="text-sm text-slate-500 py-4 text-center">No recent bookings</div>
-                             )}
-                         </div>
+                            )}
+                        </div>
                     </CardContent>
                 </Card>
 
@@ -329,30 +329,30 @@ export default function AdminDashboard() {
                         <CardDescription>Latest 5 registered customers</CardDescription>
                     </CardHeader>
                     <CardContent>
-                         <div className="space-y-6">
-                             {recentUsers.length > 0 ? recentUsers.map((u) => (
-                                  <div key={u.id} className="flex items-center justify-between">
-                                      <div className="flex items-center gap-4">
-                                          <Avatar className="h-10 w-10 border border-slate-100 shadow-sm">
-                                             <AvatarImage src={u.avatar} />
-                                             <AvatarFallback className="bg-emerald-50 text-emerald-600 font-semibold">
+                        <div className="space-y-6">
+                            {recentUsers.length > 0 ? recentUsers.map((u) => (
+                                <div key={u.id} className="flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <Avatar className="h-10 w-10 border border-slate-100 shadow-sm">
+                                            <AvatarImage src={u.avatar} />
+                                            <AvatarFallback className="bg-emerald-50 text-emerald-600 font-semibold">
                                                 {u.firstName?.charAt(0) || "U"}
-                                             </AvatarFallback>
-                                          </Avatar>
-                                          <div>
-                                              <p className="text-sm font-semibold text-slate-800">{u.firstName} {u.lastName}</p>
-                                              <p className="text-xs text-muted-foreground mt-0.5">{u.email}</p>
-                                          </div>
-                                      </div>
-                                      <div className="text-right">
-                                          <p className="text-sm font-bold text-slate-700">{u._count?.bookings || 0} <span className="font-normal text-xs text-slate-500">Bookings</span></p>
-                                          <p className="text-xs text-muted-foreground mt-1.5">{new Date(u.createdAt).toLocaleDateString()}</p>
-                                      </div>
-                                  </div>
-                             )) : (
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <div>
+                                            <p className="text-sm font-semibold text-slate-800">{u.firstName} {u.lastName}</p>
+                                            <p className="text-xs text-muted-foreground mt-0.5">{u.email}</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-sm font-bold text-slate-700">{u._count?.bookings || 0} <span className="font-normal text-xs text-slate-500">Bookings</span></p>
+                                        <p className="text-xs text-muted-foreground mt-1.5">{new Date(u.createdAt).toLocaleDateString()}</p>
+                                    </div>
+                                </div>
+                            )) : (
                                 <div className="text-sm text-slate-500 py-4 text-center">No recent users</div>
-                             )}
-                         </div>
+                            )}
+                        </div>
                     </CardContent>
                 </Card>
             </div>
