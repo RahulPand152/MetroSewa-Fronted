@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Toaster } from 'sonner';
 import { CartProvider } from '@/src/lib/cartContext';
+import { ConvexClientProvider } from './providers/ConvexClientProvider';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
     const [queryClient] = useState(() => new QueryClient({
@@ -25,9 +26,11 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <CartProvider>
-                {children}
-            </CartProvider>
+            <ConvexClientProvider>
+                <CartProvider>
+                    {children}
+                </CartProvider>
+            </ConvexClientProvider>
             <Toaster position="top-right" richColors />
         </QueryClientProvider>
     );

@@ -11,6 +11,9 @@ import {
 import { format } from "date-fns";
 import { formatBookingDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { useProfile } from "@/src/hooks/useAuth";
+import ChatBox from "@/components/chat/ChatBox";
+import { ChatOpenButton } from "@/components/chat/ChatOpenButton";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -60,6 +63,8 @@ export default function JobDetailPage() {
     const { mutate: completeJob, isPending: isCompleting } = useCompleteJob();
 
     const [actionDialog, setActionDialog] = useState<"accept" | "complete" | null>(null);
+    const [isChatOpen, setIsChatOpen] = useState(false);
+    const { data: profileData } = useProfile();
 
     if (isLoading) {
         return (
@@ -96,11 +101,65 @@ export default function JobDetailPage() {
     };
 
     return (
-        <div className="flex flex-col gap-6 max-w-4xl mx-auto pb-10">
+        <div className="flex flex-col gap-6 max-w-4xl mx-auto pb-10 relative">
             {/* Nav */}
-            <Button variant="ghost" size="sm" className="self-start gap-2 -ml-2 text-slate-500 hover:text-slate-800" onClick={() => router.back()}>
-                <ArrowLeft className="h-4 w-4" /> Back to My Jobs
-            </Button>
+            <div className="flex justify-between items-center w-full">
+                <Button variant="ghost" size="sm" className="self-start gap-2 -ml-2 text-slate-500 hover:text-slate-800" onClick={() => router.back()}>
+                    <ArrowLeft className="h-4 w-4" /> Back to My Jobs
+                </Button>
+                {profileData?.data &&
+                    ["ASSIGNED", "IN_PROGRESS", "COMPLETED"].includes(status) &&
+                    (() => {
+                        const customerUserId = job.user?.id || job.customer?.id || job.userId;
+                        if (!customerUserId) return null;
+                        const conversationId = [profileData.data.id, customerUserId].sort().join("_");
+                        
+                        return (
+                            <ChatOpenButton
+                                conversationId={conversationId}
+                                bookingId={id}
+                                currentUserId={profileData.data.id}
+                                onClick={() => setIsChatOpen(true)}
+                                isChatOpen={isChatOpen}
+                            />
+                        );
+                    })()}
+            </div>
+
+            {isChatOpen &&
+                (() => {
+                    const customerUserId = job.user?.id || job.customer?.id || job.userId;
+                    if (!customerUserId) return null;
+                    const conversationId = [profileData.data.id, customerUserId].sort().join("_");
+                    
+                    return (
+                        <div className="fixed inset-0 z-50 flex sm:items-end sm:justify-end bg-white dark:bg-slate-900 sm:bg-black/40 sm:pr-6 sm:pb-6">
+                            <div className="w-full h-full sm:w-[400px] sm:h-[500px] bg-white dark:bg-slate-900 sm:rounded-2xl shadow-2xl flex flex-col border-0 sm:border border-slate-200 dark:border-slate-700 overflow-hidden animate-in slide-in-from-bottom-5 relative">
+                                
+                                {/* Close Button Absolute */}
+                                <button 
+                                    onClick={() => setIsChatOpen(false)}
+                                    className="absolute top-4 right-4 z-10 w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-colors"
+                                >
+                                    ✕
+                                </button>
+
+                                {/* ChatBox */}
+                                <div className="flex-1 overflow-hidden">
+                                    <ChatBox
+                                        embedded
+                                        conversationId={conversationId}
+                                        bookingId={id}
+                                        currentUserId={profileData.data.id}
+                                        currentUserName={`${profileData.data.firstName} ${profileData.data.lastName}`}
+                                        currentUserRole="TECHNICIAN"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })()
+            }
 
             {/* Header */}
             <div className="relative overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 
@@ -291,7 +350,6 @@ flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                             </div>
                         )}
                     </div>
-
                 </div>
             </div>
 
@@ -325,6 +383,8 @@ flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+
+
         </div>
     );
 }
