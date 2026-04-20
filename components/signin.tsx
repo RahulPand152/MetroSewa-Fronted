@@ -76,7 +76,7 @@ export default function Signin() {
       {/* Back button */}
       <Link
         href="/"
-        className="absolute top-4 left-4 lg:top-8 lg:left-8 flex items-center text-gray-800 hover:text-black hover:bg-gray-300 p-2  transition-colors z-20"
+        className="absolute top-4 rounded-full left-4 lg:top-8 lg:left-8 flex items-center text-gray-800 hover:text-black hover:bg-gray-300 p-2 transition-colors z-20"
       >
         <ChevronLeft className="w-6 h-6" />
       </Link>
@@ -208,15 +208,15 @@ export default function Signin() {
 
         {/* Right Section - Visual (50%) */}
         <div className="hidden lg:block lg:w-1/2 relative overflow-hidden">
-                <Image
-                  src="/metrosewabrnd.png"
-                  alt="Create account workspace"
-                  fill
-                  sizes="40vw"
-                  className="object-cover object-top"
-                  priority
-                />
-              </div>
+          <Image
+            src="/metrosewabrnd.png"
+            alt="Create account workspace"
+            fill
+            sizes="40vw"
+            className="object-cover object-top"
+            priority
+          />
+        </div>
       </div>
     </div>
   );
