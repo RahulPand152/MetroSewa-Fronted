@@ -1,0 +1,23 @@
+[
+  {
+    "firstName": "Pujjan",
+    "lastName": "Thapa",
+    "reviewDescription": "The electrician arrived right on time and fixed our wiring issue cleanly. Booking was simple and the follow-up call made us feel genuinely cared for.",
+    "rating": 3.5,
+    "image": ""
+  },
+  {
+    "firstName": "Aashma",
+    "lastName": "Dhungana",
+    "reviewDescription": "I booked the Mehendi service and was very satisfied. The artist was skilled, professional, and the design came out beautiful and neat. Great experience overall",
+    "rating": 5,
+    "image": ""
+  },
+  {
+    "firstName": "Rahul",
+    "lastName": "Pandit",
+    "reviewDescription": "Metro Sewa helped me with urgent plumbing work in the evening. The technician explained everything clearly and solved it without extra hassle.",
+    "rating": 4,
+    "image": "/Rahul Pandit.png"
+  }
+]

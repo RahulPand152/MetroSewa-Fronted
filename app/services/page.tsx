@@ -51,7 +51,7 @@ function ServicesContent() {
 
   const handleOpenCart = (svc: any) => {
     if (!userProfile?.data) { router.push("/signin"); return; }
-    
+
     addItem({
       serviceId: svc.id,
       serviceName: svc.name,
@@ -136,8 +136,8 @@ function ServicesContent() {
                       key={cat.id}
                       onClick={() => setSelectedCategory(isActive ? "all" : cat.id)}
                       className={`group relative rounded-xl overflow-hidden border transition-all duration-300 cursor-pointer text-left ${isActive
-                          ? "border-sky-500 ring-2 ring-sky-200"
-                          : "border-slate-200 hover:border-sky-300 hover:shadow-sm"
+                        ? "border-sky-500 ring-2 ring-sky-200"
+                        : "border-slate-200 hover:border-sky-300 hover:shadow-sm"
                         }`}
                     >
                       <div className="relative h-24 w-full overflow-hidden flex items-center justify-center bg-slate-100">
@@ -276,8 +276,8 @@ function ServicesContent() {
                                 <button
                                   onClick={() => handleOpenCart(service)}
                                   className={`flex-1 rounded-lg px-3 py-2 text-xs font-semibold transition-all flex items-center justify-center gap-1 ${inCart
-                                      ? "bg-emerald-500 text-white"
-                                      : "bg-[#236b9d] hover:bg-[#1a5177] text-white"
+                                    ? "bg-emerald-500 text-white"
+                                    : "bg-[#236b9d] hover:bg-[#1a5177] text-white"
                                     }`}
                                 >
                                   <ShoppingCart className="w-3.5 h-3.5" />
@@ -292,7 +292,7 @@ function ServicesContent() {
                                 className="w-full mt-2 text-xs h-8 border-[#236b9d] text-[#236b9d] hover:bg-[#236b9d] hover:text-white transition-all"
                                 onClick={() => handleBookRoute(service.id)}
                               >
-                                Book Now Directly
+                                Book Now
                               </Button>
                             </>
                           )}
