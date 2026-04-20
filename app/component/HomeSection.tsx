@@ -92,7 +92,7 @@ const HomeSection = () => {
               {/* Input field */}
               <div
                 className="flex flex-1 items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 sm:px-4 
-                focus-within:ring-2 focus-within:ring-gray-200 focus-within:ring-offset-0 transition relative z-20"
+                focus-within:ring-2 focus-within:ring-[#236b9d] focus-within:ring-offset-0 transition relative z-20"
               >
                 <Search className="h-5 w-5 text-slate-400" />
                 <input
@@ -130,9 +130,9 @@ const HomeSection = () => {
                     {/* Categories matched */}
                     {filteredCategories.length > 0 && (
                       <div className="mb-2">
-                        <div className="px-4 py-1 text-xs font-bold uppercase tracking-wider text-slate-400">
+                        {/* <div className="px-4 py-1 text-xs font-bold uppercase tracking-wider text-slate-400">
                           Categories
-                        </div>
+                        </div> */}
                         <ul className="text-left">
                           {filteredCategories.map((c: any) => (
                             <li
@@ -175,13 +175,13 @@ const HomeSection = () => {
                                 <span className="text-sm font-semibold text-slate-700">
                                   {s.name}
                                 </span>
-                                <span className="text-xs text-slate-400 truncate max-w-[200px] sm:max-w-xs">
+                                {/* <span className="text-xs text-slate-400 truncate max-w-[200px] sm:max-w-xs">
                                   {s.description || "Top service"}
-                                </span>
+                                </span> */}
                               </div>
-                              <div className="text-xs font-bold text-sky-500 bg-sky-50 px-2 py-0.5 rounded ml-2">
+                              {/* <div className="text-xs font-bold text-sky-500 bg-sky-50 px-2 py-0.5 rounded ml-2">
                                 Book
-                              </div>
+                              </div> */}
                             </li>
                           ))}
                         </ul>
