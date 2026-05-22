@@ -120,6 +120,7 @@ export default function ServiceDetails() {
     "Professional Service",
     "Verified Technician",
     "Satisfaction Guaranteed",
+    "24/7 Customer Support",
   ];
 
   const nextLightboxImage = () => setActiveIndex((prev) => (prev + 1) % images.length);
