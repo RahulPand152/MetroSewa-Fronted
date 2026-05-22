@@ -10,7 +10,11 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+import { useGetPublicCategories } from "@/src/hooks/useServices";
+
 const Footer = () => {
+    const { data: categories = [] } = useGetPublicCategories();
+
     return (
         <footer className="bg-[#020817] text-slate-300 px-6">
             <div className="max-w-7xl mx-auto py-16">
@@ -37,19 +41,19 @@ const Footer = () => {
                         <div className="flex gap-3 pt-2">
                             <Link
                                 href="#"
-                                className="p-2 rounded-lg bg-slate-800 hover:bg-blue-600 transition"
+                                className="p-2 rounded-lg bg-slate-800 hover:bg-[#1e5b87] transition"
                             >
                                 <Facebook size={18} />
                             </Link>
                             <Link
                                 href="#"
-                                className="p-2 rounded-lg bg-slate-800 hover:bg-blue-600 transition"
+                                className="p-2 rounded-lg bg-slate-800 hover:bg-[#1e5b87] transition"
                             >
                                 <Instagram size={18} />
                             </Link>
                             <Link
                                 href="#"
-                                className="p-2 rounded-lg bg-slate-800 hover:bg-blue-600 transition"
+                                className="p-2 rounded-lg bg-slate-800 hover:bg-[#1e5b87] transition"
                             >
                                 <Linkedin size={18} />
                             </Link>
@@ -62,10 +66,19 @@ const Footer = () => {
                             Services
                         </h4>
                         <ul className="space-y-3 text-sm text-slate-400">
-                            <li><Link href="#" className="hover:text-white transition">Plumbing Repair</Link></li>
-                            <li><Link href="#" className="hover:text-white transition">Electrical Work</Link></li>
-                            <li><Link href="#" className="hover:text-white transition">Computer & CCTV</Link></li>
-                            <li><Link href="#" className="hover:text-white transition">Appliance Repair</Link></li>
+                            {categories.length > 0 ? (
+                                categories.slice(0, 4).map((cat: any) => (
+                                    <li key={cat.id}>
+                                        <Link href={`/service/${cat.id}`} className="hover:text-white transition capitalize">
+                                            {cat.name}
+                                        </Link>
+                                    </li>
+                                ))
+                            ) : (
+                                <>
+                                    <li><Link href="/services" className="hover:text-white transition">Loading Services...</Link></li>
+                                </>
+                            )}
                         </ul>
                     </div>
 
@@ -93,7 +106,7 @@ const Footer = () => {
                                     <MapPin size={16} className="text-gray-200" />
                                 </div>
                                 <span>
-                                    123 Service Lane, Tech City, <br /> Kathmandu, Nepal
+                                    PatanDhoka, <br /> Lalitpur, Nepal
                                 </span>
                             </div>
 
@@ -101,14 +114,14 @@ const Footer = () => {
                                 <div className="bg-slate-800 p-2 rounded-lg">
                                     <Phone size={16} className="text-gray-200" />
                                 </div>
-                                <span>+977 9800000000</span>
+                                <span>+977 9826871444</span>
                             </div>
 
                             <div className="flex items-center gap-3">
                                 <div className="bg-slate-800 p-2 rounded-lg">
                                     <Mail size={16} className="text-gray-200" />
                                 </div>
-                                <span>hello@metrosewa.com</span>
+                                <span>info@metrosewa.com</span>
                             </div>
                         </div>
                     </div>
