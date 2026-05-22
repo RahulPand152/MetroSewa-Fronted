@@ -106,7 +106,7 @@ export const ServicePage = () => {
                           {svc.name}
                         </h3>
                         <p
-                          className="mt-2 text-sm leading-relaxed text-slate-500 line-clamp-2"
+                          className="mt-2 text-sm leading-relaxed text-slate-500 line-clamp-3"
                           dangerouslySetInnerHTML={{ __html: svc.description ?? "" }}
                         />
                         {svc.price != null && (
