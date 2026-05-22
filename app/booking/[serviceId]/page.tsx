@@ -311,7 +311,7 @@ export default function BookingWizardPage() {
             <div className="max-w-4xl mx-auto px-4 py-8 mt-10">
                 {/* Header & Stepper */}
                 <div className="mb-10">
-                    <button onClick={() => router.back()} className="flex items-center gap-2 text-sm text-slate-500 hover:text-[#236b9d] transition mb-6">
+                    <button onClick={() => router.back()} className="flex items-center gap-2 text-sm text-slate-500 hover:text-primary transition mb-6">
                         <ArrowLeft className="w-4 h-4" /> Back to service
                     </button>
                     <h1 className="text-3xl font-bold text-slate-900">Book {service.name}</h1>
@@ -321,7 +321,7 @@ export default function BookingWizardPage() {
                 <div className="relative mb-12">
                     <div className="absolute top-5 left-[12.5%] right-[12.5%] h-1 bg-slate-200 -translate-y-1/2 rounded-full overflow-hidden z-0">
                         <div
-                            className="h-full bg-[#2baba8] transition-all duration-500 ease-in-out"
+                            className="h-full bg-accent transition-all duration-500 ease-in-out"
                             style={{ width: `${((step - 1) / (STEPS.length - 1)) * 100}%` }}
                         />
                     </div>
@@ -333,8 +333,8 @@ export default function BookingWizardPage() {
                                 <div key={idx} className="flex flex-col items-center">
                                     <div className={cn(
                                         "w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-sm transition-all duration-300",
-                                        isCurrent ? "bg-[#2baba8] text-white ring-4 ring-[#2baba8]/20" :
-                                            isCompleted ? "bg-[#2baba8] text-white" : "bg-white text-slate-400 border border-slate-200"
+                                        isCurrent ? "bg-accent text-white ring-4 ring-accent/20" :
+                                            isCompleted ? "bg-accent text-white" : "bg-white text-slate-400 border border-slate-200"
                                     )}>
                                         {isCompleted ? <Check className="w-5 h-5" /> : idx + 1}
                                     </div>
@@ -512,7 +512,7 @@ export default function BookingWizardPage() {
                                                                             const val = (i + 1).toString().padStart(2, "0");
                                                                             const isSelected = currentH === val;
                                                                             return (
-                                                                                <div key={`h-${val}`} onClick={() => setTimePart('h', val)} className={cn("px-3 py-3 text-center rounded-xl cursor-pointer transition-all duration-200", isSelected ? "bg-[#2baba8] text-white font-bold shadow-md scale-105" : "hover:bg-slate-100 text-slate-600 font-medium")}>{val}</div>
+                                                                                <div key={`h-${val}`} onClick={() => setTimePart('h', val)} className={cn("px-3 py-3 text-center rounded-xl cursor-pointer transition-all duration-200", isSelected ? "bg-accent text-white font-bold shadow-md scale-105" : "hover:bg-slate-100 text-slate-600 font-medium")}>{val}</div>
                                                                             )
                                                                         })}
                                                                     </div>
@@ -522,7 +522,7 @@ export default function BookingWizardPage() {
                                                                             const val = (i).toString().padStart(2, "0");
                                                                             const isSelected = currentM === val;
                                                                             return (
-                                                                                <div key={`m-${val}`} onClick={() => setTimePart('m', val)} className={cn("px-3 py-3 text-center rounded-xl cursor-pointer transition-all duration-200", isSelected ? "bg-[#2baba8] text-white font-bold shadow-md scale-105" : "hover:bg-slate-100 text-slate-600 font-medium")}>{val}</div>
+                                                                                <div key={`m-${val}`} onClick={() => setTimePart('m', val)} className={cn("px-3 py-3 text-center rounded-xl cursor-pointer transition-all duration-200", isSelected ? "bg-accent text-white font-bold shadow-md scale-105" : "hover:bg-slate-100 text-slate-600 font-medium")}>{val}</div>
                                                                             )
                                                                         })}
                                                                     </div>
@@ -531,7 +531,7 @@ export default function BookingWizardPage() {
                                                                         {["AM", "PM"].map((val) => {
                                                                             const isSelected = currentAmPm === val;
                                                                             return (
-                                                                                <div key={`ampm-${val}`} onClick={() => setTimePart('ampm', val)} className={cn("px-3 py-3 text-center rounded-xl cursor-pointer transition-all duration-200", isSelected ? "bg-[#2baba8] text-white font-bold shadow-md scale-105" : "hover:bg-slate-100 text-slate-600 font-medium")}>{val}</div>
+                                                                                <div key={`ampm-${val}`} onClick={() => setTimePart('ampm', val)} className={cn("px-3 py-3 text-center rounded-xl cursor-pointer transition-all duration-200", isSelected ? "bg-accent text-white font-bold shadow-md scale-105" : "hover:bg-slate-100 text-slate-600 font-medium")}>{val}</div>
                                                                             )
                                                                         })}
                                                                     </div>
@@ -850,7 +850,7 @@ export default function BookingWizardPage() {
 
                             {step < 3 ? (
                                 <Button
-                                    className="bg-[#236b9d] hover:bg-[#1a5177] text-white px-8 rounded-full shadow-sm"
+                                    className="bg-primary hover:bg-primary-active text-white px-8 rounded-full shadow-sm"
                                     onClick={handleNextStep}
                                     disabled={step === 1 && !isStep1Valid}
                                 >

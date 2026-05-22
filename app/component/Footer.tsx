@@ -16,7 +16,7 @@ const Footer = () => {
     const { data: categories = [] } = useGetPublicCategories();
 
     return (
-        <footer className="bg-[#020817] text-slate-300 px-6">
+        <footer className="bg-background-dark text-slate-300 px-6">
             <div className="max-w-7xl mx-auto py-16">
 
                 {/* Top Grid */}
@@ -41,19 +41,19 @@ const Footer = () => {
                         <div className="flex gap-3 pt-2">
                             <Link
                                 href="#"
-                                className="p-2 rounded-lg bg-slate-800 hover:bg-[#1e5b87] transition"
+                                className="p-2 rounded-lg bg-slate-800 hover:bg-primary-hover transition"
                             >
                                 <Facebook size={18} />
                             </Link>
                             <Link
                                 href="#"
-                                className="p-2 rounded-lg bg-slate-800 hover:bg-[#1e5b87] transition"
+                                className="p-2 rounded-lg bg-slate-800 hover:bg-primary-hover transition"
                             >
                                 <Instagram size={18} />
                             </Link>
                             <Link
                                 href="#"
-                                className="p-2 rounded-lg bg-slate-800 hover:bg-[#1e5b87] transition"
+                                className="p-2 rounded-lg bg-slate-800 hover:bg-primary-hover transition"
                             >
                                 <Linkedin size={18} />
                             </Link>

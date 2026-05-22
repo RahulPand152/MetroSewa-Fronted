@@ -105,7 +105,7 @@ function InfoRow({
       <div
         className={`w-8 h-8 rounded-lg ${bg || "bg-slate-100 dark:bg-slate-800"} flex items-center justify-center shrink-0 mt-0.5`}
       >
-        <Icon className={`h-4 w-4 ${iconColor || "text-[#0077b6]"}`} />
+        <Icon className={`h-4 w-4 ${iconColor || "text-info"}`} />
       </div>
       <div>
         <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
@@ -136,7 +136,7 @@ export default function BookingDetailPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-24">
-        <Loader2 className="h-8 w-8 animate-spin text-[#0077b6]" />
+        <Loader2 className="h-8 w-8 animate-spin text-info" />
       </div>
     );
   }
@@ -398,17 +398,17 @@ export default function BookingDetailPage() {
             <h2 className="text-sm font-bold uppercase tracking-wide text-slate-500 mb-4">
               Assigned Technician
             </h2>
-            <div className="flex flex-col gap-4 border-l-4 border-[#0077b6] pl-4">
+            <div className="flex flex-col gap-4 border-l-4 border-info pl-4">
               <div className="flex items-center gap-4">
                 {techAvatar ? (
                   <img
                     src={techAvatar}
                     alt={techName}
-                    className="w-14 h-14 rounded-full object-cover ring-2 ring-[#0077b6]/20"
+                    className="w-14 h-14 rounded-full object-cover ring-2 ring-info/20"
                   />
                 ) : (
-                  <div className="w-14 h-14 rounded-full bg-[#0077b6]/10 flex items-center justify-center ring-2 ring-[#0077b6]/20">
-                    <UserCheck className="h-6 w-6 text-[#0077b6]" />
+                  <div className="w-14 h-14 rounded-full bg-info/10 flex items-center justify-center ring-2 ring-info/20">
+                    <UserCheck className="h-6 w-6 text-info" />
                   </div>
                 )}
                 <div>
@@ -418,7 +418,7 @@ export default function BookingDetailPage() {
                   {techPhone ? (
                     <a
                       href={`tel:${techPhone}`}
-                      className="text-sm font-medium text-slate-500 hover:text-[#0077b6] flex items-center gap-1.5 mt-1 transition-colors"
+                      className="text-sm font-medium text-slate-500 hover:text-info flex items-center gap-1.5 mt-1 transition-colors"
                     >
                       <Phone className="h-3.5 w-3.5" />
                       {techPhone}

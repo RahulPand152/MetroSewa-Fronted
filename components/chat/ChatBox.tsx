@@ -111,7 +111,7 @@ export default function ChatBox({
             <button
                 onClick={() => setIsOpen(true)}
                 className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5
-                    bg-gradient-to-r from-[#0077b6] to-[#023e8a] text-white
+                    bg-gradient-to-r from-info to-primary-active text-white
                     px-5 py-3.5 rounded-full shadow-xl
                     hover:shadow-2xl hover:scale-105 active:scale-95
                     transition-all duration-300 group"
@@ -139,7 +139,7 @@ export default function ChatBox({
         }>
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-3.5
-                bg-gradient-to-r from-[#0077b6] to-[#023e8a] text-white shrink-0"
+                bg-gradient-to-r from-info to-primary-active text-white shrink-0"
             >
                 <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center">
@@ -169,12 +169,12 @@ export default function ChatBox({
             >
                 {messages === undefined ? (
                     <div className="flex items-center justify-center h-full">
-                        <Loader2 className="h-6 w-6 animate-spin text-[#0077b6]" />
+                        <Loader2 className="h-6 w-6 animate-spin text-info" />
                     </div>
                 ) : messages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full gap-3 text-center">
-                        <div className="w-16 h-16 rounded-full bg-[#0077b6]/10 flex items-center justify-center">
-                            <MessageCircle className="h-7 w-7 text-[#0077b6]" />
+                        <div className="w-16 h-16 rounded-full bg-info/10 flex items-center justify-center">
+                            <MessageCircle className="h-7 w-7 text-info" />
                         </div>
                         <p className="text-sm font-medium text-slate-500">No messages yet</p>
                         <p className="text-xs text-slate-400 max-w-[200px]">
@@ -192,12 +192,12 @@ export default function ChatBox({
                                 <div
                                     className={`max-w-[75%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed shadow-sm
                                         ${isMe
-                                            ? "bg-[#0077b6] text-white rounded-br-md"
+                                            ? "bg-info text-white rounded-br-md"
                                             : "bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-100 dark:border-slate-700 rounded-bl-md"
                                         }`}
                                 >
                                     {!isMe && (
-                                        <p className={`text-[10px] font-bold mb-1 ${isMe ? "text-white/60" : "text-[#0077b6]"}`}>
+                                        <p className={`text-[10px] font-bold mb-1 ${isMe ? "text-white/60" : "text-info"}`}>
                                             {msg.senderName}
                                         </p>
                                     )}
@@ -236,7 +236,7 @@ export default function ChatBox({
                         <img 
                             src={selectedFilePreview} 
                             alt="Preview" 
-                            className="h-20 w-auto rounded-lg object-cover ring-2 ring-[#0077b6]/30 shadow-sm"
+                            className="h-20 w-auto rounded-lg object-cover ring-2 ring-info/30 shadow-sm"
                         />
                         <button 
                             onClick={clearFile}
@@ -259,7 +259,7 @@ export default function ChatBox({
                         disabled={isSending}
                         className="w-10 h-10 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800
                             dark:text-slate-400 flex items-center justify-center shrink-0
-                            transition-all hover:text-[#0077b6] disabled:opacity-40"
+                            transition-all hover:text-info disabled:opacity-40"
                     >
                         <ImageIcon className="h-5 w-5" />
                     </button>
@@ -273,16 +273,16 @@ export default function ChatBox({
                             bg-slate-50 dark:bg-slate-800 px-3.5 py-2.5 text-sm
                             text-slate-800 dark:text-slate-200
                             placeholder:text-slate-400
-                            focus:outline-none focus:ring-2 focus:ring-[#0077b6]/30 focus:border-[#0077b6]
+                            focus:outline-none focus:ring-2 focus:ring-info/30 focus:border-info
                             transition-all max-h-24 overflow-y-auto"
                         style={{ minHeight: "40px" }}
                     />
                     <button
                         onClick={handleSend}
                         disabled={(!input.trim() && !selectedFile) || isSending}
-                        className="w-10 h-10 rounded-xl bg-[#0077b6] text-white
+                        className="w-10 h-10 rounded-xl bg-info text-white
                             flex items-center justify-center shrink-0
-                            hover:bg-[#023e8a] disabled:opacity-40 disabled:cursor-not-allowed
+                            hover:bg-primary-active disabled:opacity-40 disabled:cursor-not-allowed
                             transition-all active:scale-90 shadow-md"
                     >
                         {isSending ? (

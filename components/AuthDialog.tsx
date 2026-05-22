@@ -70,8 +70,8 @@ export function AuthDialog({ open, onOpenChange, onSuccess }: AuthDialogProps) {
                   />
                 </div>
                 <div className="font-bold tracking-tight flex items-center text-sm sm:text-base md:text-2xl">
-                  <span className="text-[#236b9d]">Metro</span>
-                  <span className="text-[#2baba8] ml-0.5">Sewa</span>
+                  <span className="text-primary">Metro</span>
+                  <span className="text-accent ml-0.5">Sewa</span>
                 </div>
               </div>
             </div>
@@ -120,7 +120,7 @@ export function AuthDialog({ open, onOpenChange, onSuccess }: AuthDialogProps) {
             </div>
             <Button
               type="submit"
-              className="w-full h-12 rounded-sm text-[16px] font-semibold tracking-wide bg-[#236b9d] hover:bg-[#1e5b87] text-white shadow-sm hover:shadow-md transition-all"
+              className="w-full h-12 rounded-sm text-[16px] font-semibold tracking-wide bg-primary hover:bg-primary-hover text-white shadow-sm hover:shadow-md transition-all"
               disabled={isLoggingIn}
             >
               {isLoggingIn ? (
@@ -140,7 +140,7 @@ export function AuthDialog({ open, onOpenChange, onSuccess }: AuthDialogProps) {
               <Link
                 href="/signup"
                 onClick={() => onOpenChange(false)}
-                className="text-[#236b9d] font-semibold hover:underline transition-all"
+                className="text-primary font-semibold hover:underline transition-all"
               >
                 Sign up
               </Link>

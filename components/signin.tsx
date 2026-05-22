@@ -85,7 +85,7 @@ export default function Signin() {
           <div className="w-full max-w-md mx-auto relative lg:mt-8">
             {/* Header */}
             <div className="flex flex-col space-y-3 mb-10 text-center lg:text-left">
-              <h2 className="text-[2.5rem] font-bold tracking-tight text-[#1e5b87] leading-tight">
+              <h2 className="text-[2.5rem] font-bold tracking-tight text-primary-hover leading-tight">
                 Welcome Back{" "}
                 <span className="inline-block origin-bottom-right hover:animate-wave">
                   👋
@@ -119,7 +119,7 @@ export default function Signin() {
                                 id={`${id}-email`}
                                 type="email"
                                 placeholder="Enter your email"
-                                className={`w-full pl-12 pr-3 py-3 h-auto rounded border bg-[#F4F5F7] ${form.formState.errors.email ? "border-red-300 focus-visible:ring-red-500 focus-visible:border-red-500" : "border-gray-300 focus-visible:border-gray-400"} focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 text-black text-sm transition-all`}
+                                className={`w-full pl-12 pr-3 py-3 h-auto rounded border bg-background-secondary ${form.formState.errors.email ? "border-red-300 focus-visible:ring-red-500 focus-visible:border-red-500" : "border-gray-300 focus-visible:border-gray-400"} focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 text-black text-sm transition-all`}
                                 {...field}
                               />
                             </div>
@@ -144,7 +144,7 @@ export default function Signin() {
                                 id={`${id}-password`}
                                 type={showPassword ? "text" : "password"}
                                 placeholder="Enter your password"
-                                className={`w-full pl-12 pr-12 py-3 h-auto rounded border bg-[#F4F5F7] ${form.formState.errors.password ? "border-red-300 focus-visible:ring-red-500 focus-visible:border-red-500" : "border-gray-300 focus-visible:border-gray-400"} focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 text-black text-sm transition-all`}
+                                className={`w-full pl-12 pr-12 py-3 h-auto rounded border bg-background-secondary ${form.formState.errors.password ? "border-red-300 focus-visible:ring-red-500 focus-visible:border-red-500" : "border-gray-300 focus-visible:border-gray-400"} focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 text-black text-sm transition-all`}
                                 {...field}
                               />
                               <button
@@ -177,7 +177,7 @@ export default function Signin() {
                   <div className="flex items-center justify-end pt-1 mb-8">
                     <Link
                       href="/forget-password"
-                      className="text-[14px] font-semibold text-[#1e5b87] hover:text-[#164263] transition-colors"
+                      className="text-[14px] font-semibold text-primary-hover hover:text-primary-active transition-colors"
                     >
                       Forgot Password?
                     </Link>
@@ -185,7 +185,7 @@ export default function Signin() {
 
                   <Button
                     type="submit"
-                    className="w-full h-14 rounded-sm text-[16px] font-semibold tracking-wide bg-[#236b9d] hover:bg-[#1e5b87] text-white shadow-sm hover:shadow-md transition-all"
+                    className="w-full h-14 rounded-sm text-[16px] font-semibold tracking-wide bg-primary hover:bg-primary-hover text-white shadow-sm hover:shadow-md transition-all"
                     disabled={isPending}
                   >
                     {isPending ? "Logging In..." : "Log In"}
@@ -197,7 +197,7 @@ export default function Signin() {
                 Don't have an account?{" "}
                 <Link
                   href="/signup"
-                  className="text-[#1e5b87] hover:text-[#164263] font-bold transition-colors"
+                  className="text-primary-hover hover:text-primary-active font-bold transition-colors"
                 >
                   Sign Up
                 </Link>

@@ -271,7 +271,7 @@ function BatchCheckoutContent() {
 
             <div className="max-w-4xl mx-auto px-4 py-8 mt-10">
                 <div className="mb-10">
-                    <button onClick={() => router.push("/cart")} className="flex items-center gap-2 text-sm text-slate-500 hover:text-[#236b9d] transition mb-6">
+                    <button onClick={() => router.push("/cart")} className="flex items-center gap-2 text-sm text-slate-500 hover:text-primary transition mb-6">
                         <ArrowLeft className="w-4 h-4" /> Back to Cart
                     </button>
                     <h1 className="text-3xl font-bold text-slate-900">Checkout Cart</h1>
@@ -281,7 +281,7 @@ function BatchCheckoutContent() {
                 <div className="relative mb-12">
                     <div className="absolute top-5 left-[12.5%] right-[12.5%] h-1 bg-slate-200 -translate-y-1/2 rounded-full overflow-hidden z-0">
                         <div
-                            className="h-full bg-[#2baba8] transition-all duration-500 ease-in-out"
+                            className="h-full bg-accent transition-all duration-500 ease-in-out"
                             style={{ width: `${((step - 1) / (STEPS.length - 1)) * 100}%` }}
                         />
                     </div>
@@ -293,8 +293,8 @@ function BatchCheckoutContent() {
                                 <div key={idx} className="flex flex-col items-center">
                                     <div className={cn(
                                         "w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-sm transition-all duration-300",
-                                        isCurrent ? "bg-[#2baba8] text-white ring-4 ring-[#2baba8]/20" :
-                                            isCompleted ? "bg-[#2baba8] text-white" : "bg-white text-slate-400 border border-slate-200"
+                                        isCurrent ? "bg-accent text-white ring-4 ring-accent/20" :
+                                            isCompleted ? "bg-accent text-white" : "bg-white text-slate-400 border border-slate-200"
                                     )}>
                                         {isCompleted ? <Check className="w-5 h-5" /> : idx + 1}
                                     </div>
@@ -406,20 +406,20 @@ function BatchCheckoutContent() {
                                                                         {Array.from({ length: 12 }).map((_, i) => {
                                                                             const val = (i + 1).toString().padStart(2, "0");
                                                                             const isSelected = currentH === val;
-                                                                            return (<div key={`h-${val}`} onClick={() => setTimePart('h', val)} className={cn("px-3 py-3 text-center rounded-xl cursor-pointer", isSelected ? "bg-[#2baba8] text-white font-bold shadow-md scale-105" : "hover:bg-slate-100 text-slate-600 font-medium")}>{val}</div>)
+                                                                            return (<div key={`h-${val}`} onClick={() => setTimePart('h', val)} className={cn("px-3 py-3 text-center rounded-xl cursor-pointer", isSelected ? "bg-accent text-white font-bold shadow-md scale-105" : "hover:bg-slate-100 text-slate-600 font-medium")}>{val}</div>)
                                                                         })}
                                                                     </div>
                                                                     <div className="w-16 overflow-y-auto hide-scroll flex flex-col gap-1.5 px-1">
                                                                         {Array.from({ length: 60 }).map((_, i) => {
                                                                             const val = (i).toString().padStart(2, "0");
                                                                             const isSelected = currentM === val;
-                                                                            return (<div key={`m-${val}`} onClick={() => setTimePart('m', val)} className={cn("px-3 py-3 text-center rounded-xl cursor-pointer", isSelected ? "bg-[#2baba8] text-white font-bold shadow-md scale-105" : "hover:bg-slate-100 text-slate-600 font-medium")}>{val}</div>)
+                                                                            return (<div key={`m-${val}`} onClick={() => setTimePart('m', val)} className={cn("px-3 py-3 text-center rounded-xl cursor-pointer", isSelected ? "bg-accent text-white font-bold shadow-md scale-105" : "hover:bg-slate-100 text-slate-600 font-medium")}>{val}</div>)
                                                                         })}
                                                                     </div>
                                                                     <div className="w-16 overflow-y-auto hide-scroll flex flex-col gap-1.5 pl-2">
                                                                         {["AM", "PM"].map((val) => {
                                                                             const isSelected = currentAmPm === val;
-                                                                            return (<div key={`ampm-${val}`} onClick={() => setTimePart('ampm', val)} className={cn("px-3 py-3 text-center rounded-xl cursor-pointer", isSelected ? "bg-[#2baba8] text-white font-bold shadow-md scale-105" : "hover:bg-slate-100 text-slate-600 font-medium")}>{val}</div>)
+                                                                            return (<div key={`ampm-${val}`} onClick={() => setTimePart('ampm', val)} className={cn("px-3 py-3 text-center rounded-xl cursor-pointer", isSelected ? "bg-accent text-white font-bold shadow-md scale-105" : "hover:bg-slate-100 text-slate-600 font-medium")}>{val}</div>)
                                                                         })}
                                                                     </div>
                                                                 </div>
@@ -581,7 +581,7 @@ function BatchCheckoutContent() {
                                         <h2 className="text-3xl font-bold text-slate-900 mb-4">Batch Checkout Confirmed!</h2>
                                         <p className="text-lg text-slate-600 max-w-md mx-auto">All of your selected services have been successfully booked. Our technicians have been notified.</p>
                                         <div className="flex mt-8 gap-4 justify-center">
-                                            <Button onClick={() => router.push("/user/my-bookings")} className="bg-[#2baba8] hover:bg-[#238b89]">View My Bookings</Button>
+                                            <Button onClick={() => router.push("/user/my-bookings")} className="bg-accent hover:bg-accent-hover">View My Bookings</Button>
                                         </div>
                                     </div>
                                 )}
@@ -594,7 +594,7 @@ function BatchCheckoutContent() {
                             <Button variant="ghost" className="text-slate-500 hover:text-slate-800 font-medium" onClick={() => (step === 1 ? router.push("/cart") : setStep(s => s - 1))} disabled={isSubmitting}>
                                 {step === 1 ? "Cancel" : "Back"}
                             </Button>
-                            <Button className="bg-[#2baba8] hover:bg-[#238b89] text-white px-8 rounded-full shadow-md hover:shadow-lg transition-all font-semibold" onClick={step < 3 ? handleNextStep : handleConfirmBooking} disabled={isSubmitting}>
+                            <Button className="bg-accent hover:bg-accent-hover text-white px-8 rounded-full shadow-md hover:shadow-lg transition-all font-semibold" onClick={step < 3 ? handleNextStep : handleConfirmBooking} disabled={isSubmitting}>
                                 {isSubmitting ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing...</> : step === 3 ? "Confirm & Pay" : "Continue"}
                             </Button>
                         </div>

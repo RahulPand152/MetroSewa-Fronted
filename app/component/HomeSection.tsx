@@ -92,7 +92,7 @@ const HomeSection = () => {
               {/* Input field */}
               <div
                 className="flex flex-1 items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 sm:px-4 
-                focus-within:ring-2 focus-within:ring-[#236b9d] focus-within:ring-offset-0 transition relative z-20"
+                focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-0 transition relative z-20"
               >
                 <Search className="h-5 w-5 text-slate-400" />
                 <input
@@ -112,7 +112,7 @@ const HomeSection = () => {
               {/* Search button */}
               <Button
                 type="submit"
-                className="w-full rounded-lg bg-[#236b9d] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#1a5a8c] sm:w-auto sm:py-3 sm:text-base z-20"
+                className="w-full rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-active sm:w-auto sm:py-3 sm:text-base z-20"
               >
                 Search
               </Button>

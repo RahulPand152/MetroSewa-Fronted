@@ -71,7 +71,7 @@ function CartItemCard({
 
           {/* Price + Qty */}
           <div className="flex items-center justify-between mt-auto pt-1">
-            <p className="text-[#236b9d] font-bold text-sm sm:text-base">
+            <p className="text-primary font-bold text-sm sm:text-base">
               NPR {(item.price * item.quantity).toLocaleString()}
               {item.quantity > 1 && (
                 <span className="text-xs font-normal text-slate-400 ml-1">
@@ -83,7 +83,7 @@ function CartItemCard({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => onUpdateQty(Math.max(1, item.quantity - 1))}
-                className="w-7 h-7 rounded-full border border-slate-200 flex items-center justify-center hover:border-[#236b9d] transition text-slate-600"
+                className="w-7 h-7 rounded-full border border-slate-200 flex items-center justify-center hover:border-primary transition text-slate-600"
               >
                 <Minus className="w-3 h-3" />
               </button>
@@ -92,7 +92,7 @@ function CartItemCard({
               </span>
               <button
                 onClick={() => onUpdateQty(Math.min(10, item.quantity + 1))}
-                className="w-7 h-7 rounded-full border border-slate-200 flex items-center justify-center hover:border-[#236b9d] transition text-slate-600"
+                className="w-7 h-7 rounded-full border border-slate-200 flex items-center justify-center hover:border-primary transition text-slate-600"
               >
                 <Plus className="w-3 h-3" />
               </button>
@@ -122,7 +122,7 @@ export default function CartPage() {
       <div className="min-h-screen bg-slate-50">
         <NavbarPage />
         <div className="flex items-center justify-center h-[70vh]">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#236b9d]" />
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
         </div>
       </div>
     );
@@ -148,15 +148,15 @@ export default function CartPage() {
           <div>
             <button
               onClick={() => router.back()}
-              className="flex items-center gap-2 text-sm text-slate-500 hover:text-[#236b9d] transition mb-3"
+              className="flex items-center gap-2 text-sm text-slate-500 hover:text-primary transition mb-3"
             >
               <ArrowLeft className="w-4 h-4" /> Back
             </button>
             <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
-              <ShoppingCart className="w-8 h-8 text-[#236b9d]" />
+              <ShoppingCart className="w-8 h-8 text-primary" />
               My Booking Cart
               {totalItems > 0 && (
-                <Badge className="bg-[#236b9d] text-white text-base px-3 py-1 rounded-full">
+                <Badge className="bg-primary text-white text-base px-3 py-1 rounded-full">
                   {totalItems}
                 </Badge>
               )}
@@ -190,7 +190,7 @@ export default function CartPage() {
             </p>
             <Button
               onClick={() => router.push("/services")}
-              className="bg-[#236b9d] hover:bg-[#1a5177] rounded-full px-8 h-11"
+              className="bg-primary hover:bg-primary-active rounded-full px-8 h-11"
             >
               Explore Services
             </Button>
@@ -218,7 +218,7 @@ export default function CartPage() {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="rounded-full px-5 text-xs border-[#236b9d] text-[#236b9d] hover:bg-[#236b9d] hover:text-white transition-all"
+                      className="rounded-full px-5 text-xs border-primary text-primary hover:bg-primary hover:text-white transition-all"
                       onClick={() => handleProceedBooking(item)}
                       disabled={proceedingId === item.id}
                     >
@@ -263,13 +263,13 @@ export default function CartPage() {
 
                   <div className="flex justify-between items-center">
                     <span className="text-slate-600 font-medium">Total</span>
-                    <span className="text-2xl font-bold text-[#236b9d]">
+                    <span className="text-2xl font-bold text-primary">
                       NPR {totalPrice.toLocaleString()}
                     </span>
                   </div>
 
                   <Button
-                    className="w-full rounded-full h-12 bg-[#236b9d] hover:bg-[#1a5177] text-base font-semibold shadow-md hover:shadow-lg transition-all"
+                    className="w-full rounded-full h-12 bg-primary hover:bg-primary-active text-base font-semibold shadow-md hover:shadow-lg transition-all"
                     onClick={handleBookAll}
                   >
                     Proceed to Book <ArrowRight className="w-5 h-5 ml-2" />

@@ -36,7 +36,7 @@ export function Reviews({ serviceId }: ReviewsSectionProps) {
             {/* Write a Review */}
             {eligibilityLoading && isAuthenticated ? (
                 <div className="flex justify-center py-6">
-                    <Loader2 className="w-5 h-5 animate-spin text-[#236b9d]" />
+                    <Loader2 className="w-5 h-5 animate-spin text-primary" />
                 </div>
             ) : (
                 <ReviewForm

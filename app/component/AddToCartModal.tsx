@@ -113,7 +113,7 @@ export function AddToCartModal({ open, onOpenChange, service, onSuccess }: Props
         </DialogHeader>
 
         {/* ── Hero top bar ─────────────────────────────────── */}
-        <div className="relative bg-gradient-to-br from-[#236b9d] to-[#1a5175] p-6 text-white">
+        <div className="relative bg-gradient-to-br from-primary to-primary-active p-6 text-white">
           <button
             onClick={() => onOpenChange(false)}
             className="absolute top-4 right-4 p-1.5 rounded-full bg-white/20 hover:bg-white/30 transition"
@@ -147,19 +147,19 @@ export function AddToCartModal({ open, onOpenChange, service, onSuccess }: Props
           {/* Quantity */}
           <div>
             <p className="text-sm font-bold text-slate-700 uppercase tracking-wider mb-3 flex items-center gap-2">
-              <SlidersHorizontal className="w-4 h-4 text-[#236b9d]" /> Quantity
+              <SlidersHorizontal className="w-4 h-4 text-primary" /> Quantity
             </p>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                className="w-9 h-9 rounded-full border-2 border-slate-200 flex items-center justify-center hover:border-[#236b9d] transition text-slate-600"
+                className="w-9 h-9 rounded-full border-2 border-slate-200 flex items-center justify-center hover:border-primary transition text-slate-600"
               >
                 <Minus className="w-4 h-4" />
               </button>
               <span className="w-10 text-center font-bold text-lg text-slate-800">{quantity}</span>
               <button
                 onClick={() => setQuantity(q => Math.min(10, q + 1))}
-                className="w-9 h-9 rounded-full border-2 border-slate-200 flex items-center justify-center hover:border-[#236b9d] transition text-slate-600"
+                className="w-9 h-9 rounded-full border-2 border-slate-200 flex items-center justify-center hover:border-primary transition text-slate-600"
               >
                 <Plus className="w-4 h-4" />
               </button>
@@ -174,7 +174,7 @@ export function AddToCartModal({ open, onOpenChange, service, onSuccess }: Props
           {/* Color / Theme */}
           <div>
             <p className="text-sm font-bold text-slate-700 uppercase tracking-wider mb-3 flex items-center gap-2">
-              <Palette className="w-4 h-4 text-[#236b9d]" /> Colour Preference
+              <Palette className="w-4 h-4 text-primary" /> Colour Preference
             </p>
             <div className="flex flex-wrap gap-2.5">
               {COLOR_OPTIONS.map((c) => (
@@ -185,7 +185,7 @@ export function AddToCartModal({ open, onOpenChange, service, onSuccess }: Props
                   className={cn(
                     "relative w-9 h-9 rounded-full border-2 transition-all duration-200 focus:outline-none",
                     selectedColor === c.value
-                      ? "border-[#236b9d] ring-2 ring-[#236b9d]/30 scale-110"
+                      ? "border-primary ring-2 ring-primary/30 scale-110"
                       : "border-slate-200 hover:scale-105"
                   )}
                   style={{ backgroundColor: c.hex }}
@@ -209,7 +209,7 @@ export function AddToCartModal({ open, onOpenChange, service, onSuccess }: Props
           {/* Attributes */}
           <div>
             <p className="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4 flex items-center gap-2">
-              <Zap className="w-4 h-4 text-[#236b9d]" /> Service Options
+              <Zap className="w-4 h-4 text-primary" /> Service Options
             </p>
             <div className="space-y-5">
               {Object.entries(ATTRIBUTE_PRESETS).map(([attrKey, options]) => (
@@ -223,8 +223,8 @@ export function AddToCartModal({ open, onOpenChange, service, onSuccess }: Props
                         className={cn(
                           "px-3 py-1.5 rounded-xl text-xs font-medium border transition-all duration-200",
                           attributes[attrKey] === opt
-                            ? "bg-[#236b9d] text-white border-[#236b9d] shadow-sm"
-                            : "bg-white text-slate-600 border-slate-200 hover:border-[#236b9d] hover:text-[#236b9d]"
+                            ? "bg-primary text-white border-primary shadow-sm"
+                            : "bg-white text-slate-600 border-slate-200 hover:border-primary hover:text-primary"
                         )}
                       >
                         {opt}
@@ -259,7 +259,7 @@ export function AddToCartModal({ open, onOpenChange, service, onSuccess }: Props
                 "flex-1 rounded-full h-12 text-base font-semibold transition-all duration-300",
                 added
                   ? "bg-emerald-500 hover:bg-emerald-500"
-                  : "bg-[#236b9d] hover:bg-[#1a5177]"
+                  : "bg-primary hover:bg-primary-active"
               )}
               onClick={handleAddToCart}
               disabled={added}

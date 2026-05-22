@@ -45,11 +45,11 @@ function InfoRow({ label, value, icon: Icon, isBold = false, iconColor }: { labe
     return (
         <div className="flex items-start gap-4 p-4 rounded-xl border border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/40">
             <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-700 shadow-sm flex items-center justify-center shrink-0">
-                <Icon className={`h-5 w-5 ${iconColor || "text-[#236b9d]"}`} />
+                <Icon className={`h-5 w-5 ${iconColor || "text-primary"}`} />
             </div>
             <div className="flex flex-col gap-0.5">
                 <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">{label}</p>
-                <p className={`text-sm ${isBold ? 'font-bold text-[#236b9d]' : 'font-medium text-slate-800 dark:text-slate-200'}`}>{value}</p>
+                <p className={`text-sm ${isBold ? 'font-bold text-primary' : 'font-medium text-slate-800 dark:text-slate-200'}`}>{value}</p>
             </div>
         </div>
     );
@@ -69,7 +69,7 @@ export default function JobDetailPage() {
     if (isLoading) {
         return (
             <div className="flex items-center justify-center py-32 flex-col gap-4">
-                <Loader2 className="h-10 w-10 animate-spin text-[#236b9d]" />
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
                 <p className="text-slate-500 font-medium">Loading job details...</p>
             </div>
         );
@@ -167,7 +167,7 @@ bg-white/80 dark:bg-slate-900/60 backdrop-blur shadow-lg p-6 md:p-8
 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
 
                 {/* Background Accent */}
-                <div className="absolute top-0 right-0 w-72 h-72 bg-gradient-to-bl from-[#236b9d]/10 to-transparent rounded-bl-[120px] -z-0" />
+                <div className="absolute top-0 right-0 w-72 h-72 bg-gradient-to-bl from-primary/10 to-transparent rounded-bl-[120px] -z-0" />
 
                 {/* LEFT CONTENT */}
                 <div className="z-10 space-y-2 max-w-xl">
@@ -200,7 +200,7 @@ flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                     {status === "ASSIGNED" && (
                         <Button
                             className="w-full sm:w-auto h-11 px-5 text-sm sm:text-base font-semibold 
-        bg-gradient-to-r from-[#236b9d] to-[#1a5279] text-white 
+        bg-gradient-to-r from-primary to-primary-active text-white 
         shadow-md hover:shadow-lg transition-all duration-300"
                             onClick={() => setActionDialog("accept")}
                         >
@@ -318,7 +318,7 @@ flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                         <h2 className="text-lg font-semibold text-slate-800 dark:text-white mb-6">Status Timeline</h2>
                         {!isCancelled ? (
                             <div className="relative">
-                                <div className="absolute left-5 top-2 bottom-5 w-0.5 bg-gradient-to-b from-[#236b9d] to-transparent" />
+                                <div className="absolute left-5 top-2 bottom-5 w-0.5 bg-gradient-to-b from-primary to-transparent" />
                                 <div className="space-y-8">
                                     {TIMELINE_STEPS.map((step, i) => {
                                         const isDone = i <= currentStepIdx;
@@ -371,7 +371,7 @@ flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                         <AlertDialogCancel disabled={isPendingAct}>Cancel</AlertDialogCancel>
                         <AlertDialogAction
                             disabled={isPendingAct}
-                            className={actionDialog === "accept" ? "bg-[#236b9d] hover:bg-[#1a5279]" : "bg-emerald-600 hover:bg-emerald-700"}
+                            className={actionDialog === "accept" ? "bg-primary hover:bg-primary-active" : "bg-emerald-600 hover:bg-emerald-700"}
                             onClick={(e) => {
                                 e.preventDefault(); // Prevent default dialog close to show loading
                                 handleAction();

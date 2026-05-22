@@ -78,8 +78,8 @@ export default function BookServicePage() {
                                     key={cat.id}
                                     onClick={() => setSelectedCategory(isActive ? "all" : cat.id)}
                                     className={`group relative rounded-xl overflow-hidden border transition-all duration-300 cursor-pointer text-left flex flex-col ${isActive
-                                        ? "border-[#236b9d] ring-2 ring-[#236b9d]/30 dark:ring-[#236b9d]/50"
-                                        : "border-slate-200 dark:border-slate-800 hover:border-[#236b9d]/50 hover:shadow-md"
+                                        ? "border-primary ring-2 ring-primary/30 dark:ring-primary/50"
+                                        : "border-slate-200 dark:border-slate-800 hover:border-primary/50 hover:shadow-md"
                                         }`}
                                 >
                                     <div className="relative h-32 w-full overflow-hidden flex items-center justify-center bg-slate-100">
@@ -91,7 +91,7 @@ export default function BookServicePage() {
                                         <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition duration-300" />
                                     </div>
                                     <div className="p-3 bg-white dark:bg-slate-900 w-full mt-auto">
-                                        <p className={`text-sm font-semibold text-center truncate ${isActive ? "text-[#236b9d]" : "text-slate-700 dark:text-slate-200"}`}>
+                                        <p className={`text-sm font-semibold text-center truncate ${isActive ? "text-primary" : "text-slate-700 dark:text-slate-200"}`}>
                                             {cat.name}
                                         </p>
                                     </div>
@@ -164,7 +164,7 @@ export default function BookServicePage() {
                                     <div className="p-4 flex flex-col flex-1 gap-2">
                                         <div>
                                             <Link href={`/service/${service.categoryId ?? 'all'}/${service.id}`}>
-                                                <h3 className="text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-100 leading-tight hover:text-[#236b9d] cursor-pointer transition-colors">
+                                                <h3 className="text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-100 leading-tight hover:text-primary cursor-pointer transition-colors">
                                                     {service.name}
                                                 </h3>
                                             </Link>
@@ -189,7 +189,7 @@ export default function BookServicePage() {
                                                 {service.price != null ? `Rs. ${service.price}` : "--"}
                                             </span>
                                             <Link href={`/booking/${service.id}`} className="ml-auto">
-                                                <Button size="sm" className="bg-[#1e5b87] hover:bg-[#1e5b87] text-white text-xs h-8 px-4">
+                                                <Button size="sm" className="bg-primary-hover hover:bg-primary-hover text-white text-xs h-8 px-4">
                                                     Book Now
                                                 </Button>
                                             </Link>

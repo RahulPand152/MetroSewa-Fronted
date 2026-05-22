@@ -48,7 +48,7 @@ function BarTooltip({ active, payload, label }: any) {
     return (
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 px-3 py-2 z-50">
             <p className="text-xs font-semibold text-slate-600 dark:text-slate-400">{label}</p>
-            <p className="text-sm font-bold text-[#236b9d]">{payload[0].value} jobs</p>
+            <p className="text-sm font-bold text-primary">{payload[0].value} jobs</p>
         </div>
     );
 }
@@ -126,7 +126,7 @@ export default function TechnicanDashboard() {
         return (
             <div className="flex flex-1 items-center justify-center p-8 min-h-[500px]">
                 <div className="flex flex-col items-center gap-2">
-                    <Loader2 className="h-8 w-8 animate-spin text-[#236b9d]" />
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
                     <p className="text-sm text-slate-500">Loading your board...</p>
                 </div>
             </div>
@@ -144,7 +144,7 @@ export default function TechnicanDashboard() {
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                     <Button variant="outline" size="sm" className="flex items-center gap-1.5 rounded-xl border-slate-200 dark:border-slate-700 pointer-events-none">
-                        <Calendar className="h-4 w-4 text-[#236b9d]" />
+                        <Calendar className="h-4 w-4 text-primary" />
                         {dateFilter}
                     </Button>
                 </div>
@@ -180,7 +180,7 @@ export default function TechnicanDashboard() {
                         </CardTitle>
                         <Badge
                             variant="secondary"
-                            className="bg-[#236b9d] text-white border-0 flex items-center gap-1.5"
+                            className="bg-primary text-white border-0 flex items-center gap-1.5"
                         >
                             <TrendingUp className="h-3 w-3" /> Job Progress
                         </Badge>
@@ -264,7 +264,7 @@ export default function TechnicanDashboard() {
                             New Job Requests
                         </CardTitle>
                         {newJobsData.length > 0 && (
-                            <Badge className="bg-[#236b9d] hover:bg-[#236b8d] text-white text-xs px-2 py-0.5">
+                            <Badge className="bg-primary hover:bg-primary-active text-white text-xs px-2 py-0.5">
                                 {newJobsData.length}
                             </Badge>
                         )}
@@ -278,12 +278,12 @@ export default function TechnicanDashboard() {
 
                 <CardContent className="p-0 divide-y divide-slate-100 dark:divide-slate-800 flex-1">
                     {newJobsData.length > 0 ? newJobsData.map((job) => (
-                        <Link key={job.id} href={`/technican/my-jobs/${job.id}`} className="block hover:bg-sky-50/50 dark:hover:bg-[#236b9d]/5 transition-colors group">
+                        <Link key={job.id} href={`/technican/my-jobs/${job.id}`} className="block hover:bg-sky-50/50 dark:hover:bg-primary/5 transition-colors group">
                             <div className="flex flex-col sm:flex-row sm:items-center gap-4 px-6 py-4">
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 flex-wrap">
-                                        <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 group-hover:text-[#236b9d] transition-colors">{job.service?.name || "Job Request"}</p>
-                                        <Badge variant="secondary" className="text-xs bg-[#236b9d] text-white dark:text-sky-400 border-0">
+                                        <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 group-hover:text-primary transition-colors">{job.service?.name || "Job Request"}</p>
+                                        <Badge variant="secondary" className="text-xs bg-primary text-white dark:text-sky-400 border-0">
                                             New
                                         </Badge>
                                     </div>
@@ -300,7 +300,7 @@ export default function TechnicanDashboard() {
                                 </div>
                                 <div className="flex items-center gap-3 flex-shrink-0 mt-3 sm:mt-0">
                                     <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Rs. {job.totalAmount || job.service?.price || 0}</span>
-                                    <Button size="sm" className="bg-[#236b9d] hover:bg-[#1a5177] text-white rounded-xl shadow-sm text-xs px-4 pointer-events-none">
+                                    <Button size="sm" className="bg-primary hover:bg-primary-active text-white rounded-xl shadow-sm text-xs px-4 pointer-events-none">
                                         View Details
                                     </Button>
                                 </div>

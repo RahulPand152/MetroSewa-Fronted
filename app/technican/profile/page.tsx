@@ -98,7 +98,7 @@ export default function ProfilePage() {
                         <Button
                             variant="outline"
                             size="sm"
-                            className="gap-2 rounded-xl hover:bg-[#236b9d] hover:text-white ">
+                            className="gap-2 rounded-xl hover:bg-primary hover:text-white ">
 
                             <Edit className="h-4 w-4" /> Edit Profile
                         </Button>
@@ -156,7 +156,7 @@ export default function ProfilePage() {
             {/* Profile Card */}
             <Card className="rounded-2xl border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 {/* Sky blue banner */}
-                <div className="h-28 bg-gradient-to-r from-[#1e5b87] to-[#1e5b97]" />
+                <div className="h-28 bg-gradient-to-r from-primary-hover to-primary-active" />
 
                 <CardContent className="px-6 pb-6 -mt-12">
                     {/* Avatar */}

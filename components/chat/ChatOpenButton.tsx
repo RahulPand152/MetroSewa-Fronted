@@ -59,7 +59,7 @@ export function ChatOpenButton({
         setReadCount(otherMessages.length);
         onClick();
       }}
-      className="relative flex items-center justify-center gap-2 px-4 py-2 bg-[#0077b6] hover:bg-[#023e8a] text-white rounded-lg text-sm font-medium transition-colors"
+      className="relative flex items-center justify-center gap-2 px-4 py-2 bg-info hover:bg-primary-active text-white rounded-lg text-sm font-medium transition-colors"
     >
       <span>MetroSewa Chat</span>
       {unreadCount > 0 && (!isChatOpen) && (

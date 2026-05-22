@@ -86,8 +86,8 @@ export default function SidebarTechnican() {
                         />
                     </div>
                     <div className="font-bold text-xl tracking-tight flex items-center">
-                        <span className="text-[#236b9d]">Metro</span>
-                        <span className="text-[#2baba8] ml-0.5"> Sewa</span>
+                        <span className="text-primary">Metro</span>
+                        <span className="text-accent ml-0.5"> Sewa</span>
                     </div>
                 </div>
             </SidebarHeader>
