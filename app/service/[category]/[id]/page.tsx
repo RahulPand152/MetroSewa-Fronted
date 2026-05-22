@@ -275,7 +275,7 @@ export default function ServiceDetails() {
                     <p className="text-sm text-gray-500 uppercase tracking-wider font-medium">
                       Starting from
                     </p>
-                    <p className="text-4xl font-bold text-gray-900">{price}</p>
+                    <p className="text-4xl font-bold text-accent">{price}</p>
                   </div>
 
                   <div className="space-y-4">

@@ -110,7 +110,7 @@ export const ServicePage = () => {
                           dangerouslySetInnerHTML={{ __html: svc.description ?? "" }}
                         />
                         {svc.price != null && (
-                          <p className="mt-2 text-sm font-semibold text-primary">
+                          <p className="mt-2 text-sm font-semibold text-accent">
                             Rs. {svc.price}
                           </p>
                         )}

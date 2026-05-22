@@ -262,7 +262,7 @@ function ServicesContent() {
                         {/* Price + Action buttons */}
                         <div className="mt-auto pt-3">
                           <div className="flex items-center justify-between mb-3">
-                            <span className="text-sm font-bold text-slate-800">
+                            <span className="text-sm font-bold text-accent">
                               {service.price != null ? `Rs. ${service.price}` : "--"}
                             </span>
                           </div>
