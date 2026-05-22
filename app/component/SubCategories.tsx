@@ -86,7 +86,7 @@ export const SubCategories = ({ data, category }: { data: SubCategoryProps[], ca
                         {/* Button */}
                         <button 
                             onClick={(e) => handleBookNow(e, service.id)}
-                            className="w-full rounded-xl bg-[#236b9d] px-4 py-2 text-sm font-semibold text-white transition-all duration-300 hover:bg-[#1a4f75] hover:shadow-lg mt-3"
+                            className="w-full rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white transition-all duration-300 hover:bg-primary-active hover:shadow-lg mt-3"
                         >
                             {service.buttonText}
                         </button>

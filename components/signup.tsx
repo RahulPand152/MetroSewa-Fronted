@@ -186,12 +186,12 @@ export default function SignupForm() {
           <div className="flex flex-col justify-center py-10 w-full lg:w-[50%] h-full overflow-y-auto px-6 lg:px-20 relative z-10 bg-white [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             <div className="w-full max-w-md mx-auto relative lg:mt-8">
               <div className="flex flex-col space-y-3 mb-10 text-center lg:text-left">
-                <h2 className="text-[2.5rem] font-bold tracking-tight text-[#1e5b87] leading-tight">
+                <h2 className="text-[2.5rem] font-bold tracking-tight text-primary-hover leading-tight">
                   Verify Account
                 </h2>
                 <p className="text-[15px] font-medium text-slate-500 leading-relaxed">
                   Enter the 6-digit code sent to <br />
-                  <strong className="text-[#1e5b87] block mt-1">
+                  <strong className="text-primary-hover block mt-1">
                     {registeredEmail}
                   </strong>
                 </p>
@@ -212,9 +212,9 @@ export default function SignupForm() {
                         onChange={(e) => handleOtpChange(e.target.value, i)}
                         onKeyDown={(e) => handleOtpKeyDown(e, i)}
                         onPaste={handleOtpPaste}
-                        className={`w-12 h-14 text-center text-2xl font-bold rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#236b9d] transition-all shadow-sm ${
+                        className={`w-12 h-14 text-center text-2xl font-bold rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary transition-all shadow-sm ${
                           otpError ? "border-red-500" : "border-slate-200"
-                        } bg-[#F4F5F7]`}
+                        } bg-background-secondary`}
                       />
                       {i === 2 && (
                         <span className="mx-1 text-xl text-slate-300">-</span>
@@ -226,7 +226,7 @@ export default function SignupForm() {
                 <Button
                   onClick={handleVerifyOtp}
                   disabled={isVerifying}
-                  className="w-full h-14 rounded-xl text-[16px] font-semibold tracking-wide bg-[#236b9d] hover:bg-[#1e5b87] text-white shadow-sm hover:shadow-md transition-all mt-4"
+                  className="w-full h-14 rounded-xl text-[16px] font-semibold tracking-wide bg-primary hover:bg-primary-hover text-white shadow-sm hover:shadow-md transition-all mt-4"
                 >
                   {isVerifying ? (
                     <>
@@ -246,7 +246,7 @@ export default function SignupForm() {
                       setOtp(Array(OTP_LENGTH).fill(""));
                       setOtpError("");
                     }}
-                    className="text-[#1e5b87] hover:text-[#164263] font-bold transition-colors"
+                    className="text-primary-hover hover:text-primary-active font-bold transition-colors"
                   >
                     Go back
                   </button>
@@ -283,7 +283,7 @@ export default function SignupForm() {
         <div className="flex flex-col py-10 w-full lg:w-[50%] h-full overflow-y-auto px-6 lg:px-20 relative z-10 bg-white [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <div className="w-full max-w-md mx-auto relative pb-12 lg:mt-8">
             <div className="flex flex-col space-y-3 mb-10 text-center lg:text-left">
-              <h2 className="text-[2.5rem] font-bold tracking-tight text-[#1e5b87] leading-tight">
+              <h2 className="text-[2.5rem] font-bold tracking-tight text-primary-hover leading-tight">
                 Create Account
               </h2>
               <p className="text-[15px] font-medium text-slate-500 leading-relaxed">
@@ -313,7 +313,7 @@ export default function SignupForm() {
                               />
                               <Input
                                 placeholder="First name"
-                                className={`w-full pl-12 pr-3 py-3 h-auto rounded border bg-[#F4F5F7] ${form.formState.errors.firstName ? "border-red-300 focus-visible:ring-red-500 focus-visible:border-red-500" : "border-gray-300 focus-visible:border-gray-400"} focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 text-black text-sm transition-all`}
+                                className={`w-full pl-12 pr-3 py-3 h-auto rounded border bg-background-secondary ${form.formState.errors.firstName ? "border-red-300 focus-visible:ring-red-500 focus-visible:border-red-500" : "border-gray-300 focus-visible:border-gray-400"} focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 text-black text-sm transition-all`}
                                 {...field}
                               />
                             </div>
@@ -335,7 +335,7 @@ export default function SignupForm() {
                               />
                               <Input
                                 placeholder="Last name"
-                                className={`w-full pl-12 pr-3 py-3 h-auto rounded border bg-[#F4F5F7] ${form.formState.errors.lastName ? "border-red-300 focus-visible:ring-red-500 focus-visible:border-red-500" : "border-gray-300 focus-visible:border-gray-400"} focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 text-black text-sm transition-all`}
+                                className={`w-full pl-12 pr-3 py-3 h-auto rounded border bg-background-secondary ${form.formState.errors.lastName ? "border-red-300 focus-visible:ring-red-500 focus-visible:border-red-500" : "border-gray-300 focus-visible:border-gray-400"} focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 text-black text-sm transition-all`}
                                 {...field}
                               />
                             </div>
@@ -360,7 +360,7 @@ export default function SignupForm() {
                             <Input
                               type="email"
                               placeholder="Enter your email"
-                              className={`w-full pl-12 pr-3 py-3 h-auto rounded border bg-[#F4F5F7] ${form.formState.errors.email ? "border-red-300 focus-visible:ring-red-500 focus-visible:border-red-500" : "border-gray-300 focus-visible:border-gray-400"} focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 text-black text-sm transition-all`}
+                              className={`w-full pl-12 pr-3 py-3 h-auto rounded border bg-background-secondary ${form.formState.errors.email ? "border-red-300 focus-visible:ring-red-500 focus-visible:border-red-500" : "border-gray-300 focus-visible:border-gray-400"} focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 text-black text-sm transition-all`}
                               {...field}
                             />
                           </div>
@@ -384,7 +384,7 @@ export default function SignupForm() {
                             <Input
                               type="tel"
                               placeholder="Enter your phone number"
-                              className={`w-full pl-12 pr-3 py-3 h-auto rounded border bg-[#F4F5F7] ${form.formState.errors.phone ? "border-red-300 focus-visible:ring-red-500 focus-visible:border-red-500" : "border-gray-300 focus-visible:border-gray-400"} focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 text-black text-sm transition-all`}
+                              className={`w-full pl-12 pr-3 py-3 h-auto rounded border bg-background-secondary ${form.formState.errors.phone ? "border-red-300 focus-visible:ring-red-500 focus-visible:border-red-500" : "border-gray-300 focus-visible:border-gray-400"} focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 text-black text-sm transition-all`}
                               {...field}
                             />
                           </div>
@@ -408,7 +408,7 @@ export default function SignupForm() {
                             <Input
                               type={showPassword ? "text" : "password"}
                               placeholder="Create a password"
-                              className={`w-full pl-12 pr-12 py-3 h-auto rounded border bg-[#F4F5F7] ${form.formState.errors.password ? "border-red-300 focus-visible:ring-red-500 focus-visible:border-red-500" : "border-gray-300 focus-visible:border-gray-400"} focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 text-black text-sm transition-all`}
+                              className={`w-full pl-12 pr-12 py-3 h-auto rounded border bg-background-secondary ${form.formState.errors.password ? "border-red-300 focus-visible:ring-red-500 focus-visible:border-red-500" : "border-gray-300 focus-visible:border-gray-400"} focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 text-black text-sm transition-all`}
                               {...field}
                             />
                             <button
@@ -443,7 +443,7 @@ export default function SignupForm() {
                             <Input
                               type={showConfirmPassword ? "text" : "password"}
                               placeholder="Confirm your password"
-                              className={`w-full pl-12 pr-12 py-3 h-auto rounded border bg-[#F4F5F7] ${form.formState.errors.confirmPassword ? "border-red-300 focus-visible:ring-red-500 focus-visible:border-red-500" : "border-gray-300 focus-visible:border-gray-400"} focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 text-black text-sm transition-all`}
+                              className={`w-full pl-12 pr-12 py-3 h-auto rounded border bg-background-secondary ${form.formState.errors.confirmPassword ? "border-red-300 focus-visible:ring-red-500 focus-visible:border-red-500" : "border-gray-300 focus-visible:border-gray-400"} focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 text-black text-sm transition-all`}
                               {...field}
                             />
                             <button
@@ -475,7 +475,7 @@ export default function SignupForm() {
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
-                            className="data-[state=checked]:bg-[#1e5b87] data-[state=checked]:text-white rounded h-4 w-4 border-slate-300"
+                            className="data-[state=checked]:bg-primary-hover data-[state=checked]:text-white rounded h-4 w-4 border-slate-300"
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
@@ -483,14 +483,14 @@ export default function SignupForm() {
                             I agree to the{" "}
                             <Link
                               href="#"
-                              className="text-[#1e5b87] hover:underline"
+                              className="text-primary-hover hover:underline"
                             >
                               Terms
                             </Link>{" "}
                             and{" "}
                             <Link
                               href="#"
-                              className="text-[#1e5b87] hover:underline"
+                              className="text-primary-hover hover:underline"
                             >
                               Conditions
                             </Link>
@@ -503,7 +503,7 @@ export default function SignupForm() {
 
                   <Button
                     type="submit"
-                    className="w-full h-14 rounded-sm text-[16px] font-semibold tracking-wide bg-[#236b9d] hover:bg-[#1e5b87] text-white shadow-sm hover:shadow-md transition-all mt-4"
+                    className="w-full h-14 rounded-sm text-[16px] font-semibold tracking-wide bg-primary hover:bg-primary-hover text-white shadow-sm hover:shadow-md transition-all mt-4"
                     disabled={isRegistering}
                   >
                     {isRegistering ? (
@@ -522,7 +522,7 @@ export default function SignupForm() {
                 Already have an account?{" "}
                 <Link
                   href="/signin"
-                  className="text-[#1e5b87] hover:text-[#164263] font-bold transition-colors"
+                  className="text-primary-hover hover:text-primary-active font-bold transition-colors"
                 >
                   Log In
                 </Link>

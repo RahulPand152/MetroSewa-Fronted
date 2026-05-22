@@ -127,7 +127,7 @@ export default function ServiceDetails() {
   const prevLightboxImage = () => setActiveIndex((prev) => (prev - 1 + images.length) % images.length);
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa]">
+    <div className="min-h-screen bg-background-secondary">
       <NavbarPage />
 
       <AuthDialog
@@ -229,7 +229,7 @@ export default function ServiceDetails() {
                       key={index}
                       className="flex items-center gap-3 p-4 rounded-xl bg-gray-50 border border-gray-100"
                     >
-                      <div className="relative flex items-center justify-center h-6 w-6 rounded-full bg-[#236b9d]">
+                      <div className="relative flex items-center justify-center h-6 w-6 rounded-full bg-primary">
                         <svg
                           className="h-3 w-3 text-white"
                           fill="none"
@@ -305,7 +305,7 @@ export default function ServiceDetails() {
                         variant="outline"
                         className={`w-full rounded-full h-10 font-medium transition-all border-2 ${service && isInCart(service.id)
                           ? "border-emerald-500 text-emerald-600 bg-emerald-50 hover:bg-emerald-100"
-                          : "border-[#236b9d] text-[#236b9d] hover:bg-[#236b9d] hover:text-white"
+                          : "border-primary text-primary hover:bg-primary hover:text-white"
                           }`}
                         onClick={handleAddToCart}
                       >
@@ -316,7 +316,7 @@ export default function ServiceDetails() {
                       {/* Book Now */}
                       <Button
                         size="lg"
-                        className="w-full rounded-full h-10 text-lg font-medium shadow-lg hover:shadow-xl transition-all bg-[#236b9d] hover:bg-[#1a5a8c]"
+                        className="w-full rounded-full h-10 text-lg font-medium shadow-lg hover:shadow-xl transition-all bg-primary hover:bg-primary-active"
                         onClick={handleBookNow}
                       >
                         Book Now
@@ -333,7 +333,7 @@ export default function ServiceDetails() {
                 <div className="h-10 w-10 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-2">
                   <BadgeCheck className="text-green-500 w-5 h-5" />
                 </div>
-                <h4 className="font-semibold text-[#236b9d]">
+                <h4 className="font-semibold text-primary">
                   Verified Professionals
                 </h4>
                 <p className="text-sm text-blue-700/80">

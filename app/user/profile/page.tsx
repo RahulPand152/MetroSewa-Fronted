@@ -95,7 +95,7 @@ export default function UserProfilePage() {
 
             <Card className="border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 {/* Sky banner */}
-                <div className="h-28 bg-gradient-to-r from-[#1e5b87] to-[#1e5b97]" />
+                <div className="h-28 bg-gradient-to-r from-primary-hover to-primary-active" />
 
                 <CardContent className="px-6 pb-6 -mt-12">
                     {/* Avatar & Action */}
@@ -105,7 +105,7 @@ export default function UserProfilePage() {
                                 {user.avatar && (
                                     <AvatarImage src={user.avatar} alt={name} className="object-cover" />
                                 )}
-                                <AvatarFallback className="bg-[#1e5b87] text-white text-2xl font-bold">{initials}</AvatarFallback>
+                                <AvatarFallback className="bg-primary-hover text-white text-2xl font-bold">{initials}</AvatarFallback>
                             </Avatar>
                             {isUploading && (
                                 <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center">
@@ -124,7 +124,7 @@ export default function UserProfilePage() {
                             <DialogTrigger asChild>
                                 <Button
                                     variant="outline"
-                                    className="gap-2 border-[#1e5b87]  hover:bg-[#1e5b87] hover:text-white"
+                                    className="gap-2 border-primary-hover  hover:bg-primary-hover hover:text-white"
                                 >
                                     <Edit className="h-4 w-4" /> Edit Profile
                                 </Button>
@@ -156,7 +156,7 @@ export default function UserProfilePage() {
                                         </div>
                                     </div>
                                     <DialogFooter>
-                                        <Button type="submit" disabled={isUpdating} className="bg-[#1e5b87] hover:bg-[#1e5b87] text-white w-full sm:w-auto">
+                                        <Button type="submit" disabled={isUpdating} className="bg-primary-hover hover:bg-primary-hover text-white w-full sm:w-auto">
                                             {isUpdating ? "Saving..." : "Save changes"}
                                         </Button>
                                     </DialogFooter>
@@ -169,7 +169,7 @@ export default function UserProfilePage() {
                         <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{name}</h2>
                         <div className="flex items-center gap-2 mt-1">
                             {user.isEmailVerified && (
-                                <Badge className="bg-[#1e5b87]/10 text-[#1e5b87] hover:bg-[#1e5b87]/20 border-0">Verified User</Badge>
+                                <Badge className="bg-primary-hover/10 text-primary-hover hover:bg-primary-hover/20 border-0">Verified User</Badge>
                             )}
                             <Badge variant="outline" className="border-slate-200 dark:border-slate-700 text-slate-500">Joined {joinedDate}</Badge>
                         </div>
@@ -215,7 +215,7 @@ export default function UserProfilePage() {
                     <DialogTrigger asChild>
                         <Card className="border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:shadow-md cursor-pointer">
                             <CardHeader className="p-4 flex flex-row items-center gap-4 space-y-0">
-                                <div className="h-10 w-10 rounded-lg bg-[#1e5b87]/10 flex items-center justify-center shrink-0">
+                                <div className="h-10 w-10 rounded-lg bg-primary-hover/10 flex items-center justify-center shrink-0">
                                     <Key className="h-5 w-5 text-amber-500" />
                                 </div>
                                 <div>
@@ -262,7 +262,7 @@ export default function UserProfilePage() {
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button type="button" className="bg-[#1e5b87] hover:bg-[#1e5b87] text-white w-full sm:w-auto">
+                            <Button type="button" className="bg-primary-hover hover:bg-primary-hover text-white w-full sm:w-auto">
                                 Update Password
                             </Button>
                         </DialogFooter>

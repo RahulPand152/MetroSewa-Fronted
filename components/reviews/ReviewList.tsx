@@ -38,7 +38,7 @@ export function ReviewList({ reviews, isLoading, isAuthenticated }: ReviewListPr
     if (isLoading) {
         return (
             <div className="flex justify-center items-center py-10">
-                <Loader2 className="w-6 h-6 animate-spin text-[#236b9d]" />
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
             </div>
         );
     }
@@ -96,7 +96,7 @@ export function ReviewList({ reviews, isLoading, isAuthenticated }: ReviewListPr
                             setSort(e.target.value as SortOption);
                             setVisibleCount(REVIEWS_PER_PAGE);
                         }}
-                        className="text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-[#236b9d] text-gray-600 font-medium"
+                        className="text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-primary text-gray-600 font-medium"
                     >
                         <option value="newest">Newest First</option>
                         <option value="oldest">Oldest First</option>
@@ -118,7 +118,7 @@ export function ReviewList({ reviews, isLoading, isAuthenticated }: ReviewListPr
                 <div className="flex justify-center pt-2">
                     <button
                         onClick={() => setVisibleCount((c) => c + REVIEWS_PER_PAGE)}
-                        className="flex items-center gap-2 text-sm text-[#236b9d] font-medium border border-[#236b9d]/30 bg-[#236b9d]/5 hover:bg-[#236b9d]/10 rounded-full px-6 py-2 transition-all"
+                        className="flex items-center gap-2 text-sm text-primary font-medium border border-primary/30 bg-primary/5 hover:bg-primary/10 rounded-full px-6 py-2 transition-all"
                     >
                         <ChevronDown className="w-4 h-4" />
                         Load More Reviews

@@ -194,7 +194,7 @@ export default function NotificationBell({ role }: { role: 'user' | 'technician'
                         <Bell className="h-4 w-4 text-slate-500" />
                         <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">Notifications</span>
                         {unreadCount > 0 && (
-                            <span className="text-xs font-bold bg-sky-100 text-[#236b9d] px-1.5 py-0.5 rounded-full">
+                            <span className="text-xs font-bold bg-sky-100 text-primary px-1.5 py-0.5 rounded-full">
                                 {unreadCount} new
                             </span>
                         )}

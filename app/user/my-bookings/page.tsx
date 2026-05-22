@@ -166,7 +166,7 @@ export default function MyBookingsPage() {
                                     className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-4 hover:bg-slate-50/50 dark:hover:bg-slate-900/5 transition-colors group"
                                 >
                                     <div className="flex items-center gap-4 flex-1 min-w-0">
-                                        <div className="h-10 w-10 rounded-full bg-[#0077b6]/10 flex items-center justify-center text-[#0077b6] font-bold text-xs shrink-0">
+                                        <div className="h-10 w-10 rounded-full bg-info/10 flex items-center justify-center text-info font-bold text-xs shrink-0">
                                             {b.id.substring(0, 3).toUpperCase()}
                                         </div>
                                         <div className="min-w-0">
@@ -224,7 +224,7 @@ export default function MyBookingsPage() {
                                                 </Button>
                                             )}
                                             <Link href={`/user/my-bookings/${b.id}`}>
-                                                <Button size="sm" variant="outline" className="text-xs gap-1 hover:bg-[#236b9d] hover:text-white">
+                                                <Button size="sm" variant="outline" className="text-xs gap-1 hover:bg-primary hover:text-white">
                                                     Details
                                                     <ChevronRight className="h-3.5 w-3.5" />
                                                 </Button>

@@ -277,7 +277,7 @@ function ServicesContent() {
                                   onClick={() => handleOpenCart(service)}
                                   className={`flex-1 rounded-lg px-3 py-2 text-xs font-semibold transition-all flex items-center justify-center gap-1 ${inCart
                                     ? "bg-emerald-500 text-white"
-                                    : "bg-[#236b9d] hover:bg-[#1a5177] text-white"
+                                    : "bg-primary hover:bg-primary-active text-white"
                                     }`}
                                 >
                                   <ShoppingCart className="w-3.5 h-3.5" />
@@ -289,7 +289,7 @@ function ServicesContent() {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="w-full mt-2 text-xs h-8 border-[#236b9d] text-[#236b9d] hover:bg-[#236b9d] hover:text-white transition-all"
+                                className="w-full mt-2 text-xs h-8 border-primary text-primary hover:bg-primary hover:text-white transition-all"
                                 onClick={() => handleBookRoute(service.id)}
                               >
                                 Book Now

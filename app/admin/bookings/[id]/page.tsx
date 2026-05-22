@@ -27,7 +27,7 @@ function InfoRow({ label, value, icon: Icon }: { label: string; value: string; i
     return (
         <div className="flex items-start gap-3">
             <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center shrink-0 mt-0.5">
-                <Icon className="h-4 w-4 text-[#236b9d]" />
+                <Icon className="h-4 w-4 text-primary" />
             </div>
             <div>
                 <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">{label}</p>
@@ -53,7 +53,7 @@ export default function AdminBookingDetailPage() {
     if (isBookingLoading || isTechsLoading) {
         return (
             <div className="flex items-center justify-center h-[60vh]">
-                <Loader2 className="h-10 w-10 animate-spin text-[#236b9d]" />
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
             </div>
         );
     }
@@ -146,10 +146,10 @@ export default function AdminBookingDetailPage() {
                 <div className="flex flex-col gap-6">
 
                     {/* Assign Technician Card */}
-                    <Card className="rounded-xl border-slate-200 shadow-sm border-t-4 border-t-[#236b9d]">
+                    <Card className="rounded-xl border-slate-200 shadow-sm border-t-4 border-t-primary">
                         <CardHeader>
                             <CardTitle className="text-lg flex items-center gap-2">
-                                <Wrench className="h-5 w-5 text-[#236b9d]" /> Technician Assignment
+                                <Wrench className="h-5 w-5 text-primary" /> Technician Assignment
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="flex flex-col gap-4">
@@ -185,7 +185,7 @@ export default function AdminBookingDetailPage() {
                                     </SelectContent>
                                 </Select>
                                 <Button
-                                    className="w-full bg-[#236b9d] hover:bg-[#1a5177]"
+                                    className="w-full bg-primary hover:bg-primary-active"
                                     onClick={handleAssign}
                                     disabled={isAssigning || !selectedTech}
                                 >

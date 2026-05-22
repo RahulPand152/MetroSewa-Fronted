@@ -30,7 +30,7 @@ export const ClientReview = () => {
     <section className="w-full bg-slate-50 py-14 sm:py-12 ">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8 sm:mb-10">
-          <p className="text-xl sm:text-xl md:text-2xl lg:text-3xl font-bold tracking-tight text-center text-[#236b9d]"> Our Client Reviews</p>
+          <p className="text-xl sm:text-xl md:text-2xl lg:text-3xl font-bold tracking-tight text-center text-primary"> Our Client Reviews</p>
 
         </div>
 
@@ -52,7 +52,7 @@ export const ClientReview = () => {
                       className="h-12 w-12 rounded-full object-cover ring-2 ring-slate-100"
                     />
                   ) : (
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#236b9d] text-sm font-bold text-white ring-2 ring-slate-100">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-sm font-bold text-white ring-2 ring-slate-100">
                       {getInitials(review.firstName, review.lastName)}
                     </div>
                   )}

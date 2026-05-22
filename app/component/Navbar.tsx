@@ -75,7 +75,7 @@ export const NavbarPage = () => {
             >
               <ShoppingCart className="h-5 w-5 text-slate-600" />
               {totalItems > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-[#236b9d] text-[10px] font-bold text-white flex items-center justify-center leading-none ring-2 ring-white">
+                <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-primary text-[10px] font-bold text-white flex items-center justify-center leading-none ring-2 ring-white">
                   {totalItems > 9 ? "9+" : totalItems}
                 </span>
               )}
@@ -119,7 +119,7 @@ export const NavbarPage = () => {
                       <ShoppingCart className="mr-2 h-4 w-4" />
                       <span>My Cart</span>
                       {totalItems > 0 && (
-                        <span className="ml-auto bg-[#236b9d] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                        <span className="ml-auto bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
                           {totalItems}
                         </span>
                       )}
@@ -149,18 +149,18 @@ export const NavbarPage = () => {
       <>
         <Link
           href="/signin"
-          className="text-sm font-semibold text-[#236b9d] bg-white border border-[#236b9d] hover:bg-[#236b9d] hover:text-white h-9 px-4 flex items-center justify-center rounded-sm transition-colors"
+          className="text-sm font-semibold text-primary bg-white border border-primary hover:bg-primary hover:text-white h-9 px-4 flex items-center justify-center rounded-sm transition-colors"
         >
           Sign In
         </Link>
         <Link
           href="/signup"
-          className="text-sm font-semibold text-white bg-[#236b9d] hover:bg-[#1a5175] h-9 px-4 flex items-center justify-center rounded-sm shadow-sm transition-colors"
+          className="text-sm font-semibold text-white bg-primary hover:bg-primary-active h-9 px-4 flex items-center justify-center rounded-sm shadow-sm transition-colors"
         >
           Sign Up
         </Link>
         <Link href="/technician-register" className="flex">
-          <Button className="rounded-sm h-9 px-4 text-sm shadow-sm bg-[#2baba8] text-white font-semibold hover:bg-[#208f8c] transition-colors flex items-center justify-center border-none">
+          <Button className="rounded-sm h-9 px-4 text-sm shadow-sm bg-accent text-white font-semibold hover:bg-accent-hover transition-colors flex items-center justify-center border-none">
             Become a Technician
           </Button>
         </Link>
@@ -187,20 +187,20 @@ export const NavbarPage = () => {
             />
           </div>
           <div className="font-bold tracking-tight flex items-center text-sm sm:text-base md:text-xl">
-            <span className="text-[#236b9d]">Metro</span>
-            <span className="text-[#2baba8] ml-0.5">Sewa</span>
+            <span className="text-primary">Metro</span>
+            <span className="text-accent ml-0.5">Sewa</span>
           </div>
         </div>
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8 font-medium">
-          <Link href="/" className="font-semibold text-sm text-slate-800 hover:text-[#236b9d] transition-colors">
+          <Link href="/" className="font-semibold text-sm text-slate-800 hover:text-primary transition-colors">
             Home
           </Link>
-          <Link href="/services" className="font-semibold text-sm text-slate-800 hover:text-[#236b9d] transition-colors">
+          <Link href="/services" className="font-semibold text-sm text-slate-800 hover:text-primary transition-colors">
             Services
           </Link>
-          <Link href="/contact" className="font-semibold text-sm text-slate-800 hover:text-[#236b9d] transition-colors">
+          <Link href="/contact" className="font-semibold text-sm text-slate-800 hover:text-primary transition-colors">
             Contacts
           </Link>
         </nav>
@@ -222,7 +222,7 @@ export const NavbarPage = () => {
             >
               <ShoppingCart className="h-5 w-5 text-slate-600" />
               {totalItems > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-[#236b9d] text-[10px] font-bold text-white flex items-center justify-center leading-none ring-2 ring-white">
+                <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-primary text-[10px] font-bold text-white flex items-center justify-center leading-none ring-2 ring-white">
                   {totalItems > 9 ? "9+" : totalItems}
                 </span>
               )}
@@ -246,8 +246,8 @@ export const NavbarPage = () => {
               <div className="px-6 pb-4 pt-2 border-b border-slate-100 flex items-center">
                 <Image alt="MetroSewa logo" className="object-contain" src="/metrosewalogo.png" width={55} height={38} />
                 <div className="font-bold text-xl tracking-tight flex items-center ml-2">
-                  <span className="text-[#236b9d]">Metro</span>
-                  <span className="text-[#2baba8] ml-0.5"> Sewa</span>
+                  <span className="text-primary">Metro</span>
+                  <span className="text-accent ml-0.5"> Sewa</span>
                 </div>
               </div>
 
@@ -303,14 +303,14 @@ export const NavbarPage = () => {
                           <div className="relative flex-shrink-0">
                             <ShoppingCart className="h-5 w-5 stroke-[1.5]" />
                             {totalItems > 0 && (
-                              <span className="absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full bg-[#236b9d] text-[9px] font-bold text-white flex items-center justify-center">
+                              <span className="absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full bg-primary text-[9px] font-bold text-white flex items-center justify-center">
                                 {totalItems > 9 ? "9+" : totalItems}
                               </span>
                             )}
                           </div>
                           My Cart
                           {totalItems > 0 && (
-                            <span className="ml-auto bg-[#236b9d] text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                            <span className="ml-auto bg-primary text-white text-xs font-bold px-2 py-0.5 rounded-full">
                               {totalItems}
                             </span>
                           )}

@@ -21,13 +21,13 @@ export const Categories = () => {
                 <div className="flex items-center justify-between">
                     <div className="text-xl sm:text-xl md:text-2xl lg:text-3xl font-bold tracking-tight text-center">
                         <span className="text-gray-900">Service</span>{" "}
-                        <span className="text-[#236b9d]">
+                        <span className="text-primary">
                             Categories
                         </span>
                     </div>
                     <Link
                         href="/services"
-                        className="ml-4 text-sm font-medium border border-gray-300 hover:bg-[#236b9d] hover:text-white hover:border-[#236b9d] whitespace-nowrap px-3 py-1.5 rounded-md transition-all duration-200"
+                        className="ml-4 text-sm font-medium border border-gray-300 hover:bg-primary hover:text-white hover:border-primary whitespace-nowrap px-3 py-1.5 rounded-md transition-all duration-200"
                     >
                         View All →
                     </Link>

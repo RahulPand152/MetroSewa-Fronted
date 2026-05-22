@@ -110,7 +110,7 @@ export default function HelpSupportPage() {
                             <Accordion type="single" collapsible className="w-full">
                                 {faqs.map((faq, i) => (
                                     <AccordionItem value={`item-${i}`} key={i} className="px-6 border-b border-slate-100 dark:border-slate-800 last:border-0">
-                                        <AccordionTrigger className="text-sm font-medium hover:no-underline hover:text-[#2baba8] dark:hover:text-[#2baba8] py-4 text-left">
+                                        <AccordionTrigger className="text-sm font-medium hover:no-underline hover:text-accent dark:hover:text-accent py-4 text-left">
                                             {faq.question}
                                         </AccordionTrigger>
                                         <AccordionContent className="text-sm text-slate-600 dark:text-slate-400 pb-4 leading-relaxed">
@@ -166,7 +166,7 @@ export default function HelpSupportPage() {
                                 <Button
                                     type="submit"
                                     disabled={isPending}
-                                    className="bg-[#236b9d] hover:bg-[#1a5175] text-white self-start px-8"
+                                    className="bg-primary hover:bg-primary-active text-white self-start px-8"
                                 >
                                     {isPending ? (
                                         <>

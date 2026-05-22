@@ -169,8 +169,8 @@ export default function AdminReviewsPage() {
                             key={r}
                             onClick={() => setFilterRating(r)}
                             className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-all ${filterRating === r
-                                    ? "bg-[#236b9d] text-white border-[#236b9d]"
-                                    : "bg-white text-gray-500 border-gray-200 hover:border-[#236b9d] hover:text-[#236b9d]"
+                                    ? "bg-primary text-white border-primary"
+                                    : "bg-white text-gray-500 border-gray-200 hover:border-primary hover:text-primary"
                                 }`}
                         >
                             {r === "all" ? "All Ratings" : `${r} ⭐`}
@@ -182,7 +182,7 @@ export default function AdminReviewsPage() {
             {/* Reviews Table / Cards */}
             {isLoading ? (
                 <div className="flex justify-center items-center py-20">
-                    <Loader2 className="h-8 w-8 animate-spin text-[#236b9d]" />
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
             ) : filtered.length === 0 ? (
                 <div className="text-center py-16 bg-white rounded-xl border border-dashed border-gray-200">
@@ -234,7 +234,7 @@ export default function AdminReviewsPage() {
                                         </Badge>
                                         <StarRating rating={review.rating} size={13} />
                                         <span className="text-xs text-gray-400">for</span>
-                                        <span className="text-xs font-semibold text-[#236b9d] truncate max-w-[160px]">
+                                        <span className="text-xs font-semibold text-primary truncate max-w-[160px]">
                                             {serviceName}
                                         </span>
                                     </div>

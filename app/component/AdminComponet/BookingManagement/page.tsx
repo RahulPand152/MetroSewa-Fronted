@@ -188,7 +188,7 @@ export default function BookingManagement() {
     if (isLoading) {
         return (
             <div className="flex flex-1 flex-col items-center justify-center h-[60vh]">
-                <Loader2 className="h-10 w-10 animate-spin text-[#236b9d]" />
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
                 <p className="mt-4 text-slate-500 font-medium">Loading bookings...</p>
             </div>
         );

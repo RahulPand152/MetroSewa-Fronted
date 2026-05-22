@@ -68,7 +68,7 @@ export default function UserDashboard() {
                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Here is what&apos;s happening with your services today.</p>
                 </div>
                 <Link href="/user/book-service">
-                    <Button className="bg-[#1e5b87] hover:bg-[#1e5b87] text-white shadow-sm gap-2">
+                    <Button className="bg-primary-hover hover:bg-primary-hover text-white shadow-sm gap-2">
                         Book a New Service <ArrowRight className="h-4 w-4" />
                     </Button>
                 </Link>
