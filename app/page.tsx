@@ -2,6 +2,7 @@ import HomeSection from "./component/HomeSection";
 import { NavbarPage } from "./component/Navbar";
 import { Categories } from "./component/Categories";
 import { ServicePage } from "./component/Service";
+import { WhyMetroSewa } from "./component/WhyMetroSewa";
 import { ClientReview } from "./component/ClientReview";
 
 const Home = () => {
@@ -11,6 +12,7 @@ const Home = () => {
       <HomeSection />
       <Categories />
       <ServicePage />
+      <WhyMetroSewa />
       <ClientReview />
     </>
   );

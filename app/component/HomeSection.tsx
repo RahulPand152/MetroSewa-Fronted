@@ -78,10 +78,19 @@ const HomeSection = () => {
             Expert Home Services <br /> at Your Doorstep
           </h1>
 
-          <p className="text-sm text-white/85 sm:text-base md:text-lg">
-            Fix. Clean. Repair. Relax.
-            Metro Sewa Has Your Back.
-          </p>
+          <div className="flex flex-wrap gap-2">
+            {["Fix", "Clean", "Repair", "Relax"].map((word, i) => (
+              <span
+                key={word}
+                className={`px-4 py-1.5 rounded-md text-sm sm:text-base font-semibold border ${i % 3 === 0
+                    ? "bg-primary text-white border-primary"
+                    : "bg-transparent text-white border-white/40"
+                  }`}
+              >
+                {word}
+              </span>
+            ))}
+          </div>
 
           {/* Search Form */}
           <div className="w-full max-w-3xl mx-auto relative" ref={dropdownRef}>
