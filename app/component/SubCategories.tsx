@@ -3,6 +3,9 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { useProfile } from '@/src/hooks/useAuth'
+import { AuthDialog } from '@/components/AuthDialog'
 
 interface SubCategoryProps {
     id: number;
@@ -16,9 +19,34 @@ interface SubCategoryProps {
 
 export const SubCategories = ({ data, category }: { data: SubCategoryProps[], category: string }) => {
     const router = useRouter();
+    const { data: userProfile } = useProfile();
+    const [authModalOpen, setAuthModalOpen] = useState(false);
+    const [pendingServiceId, setPendingServiceId] = useState<number | null>(null);
+
+    const handleBookNow = (e: React.MouseEvent, serviceId: number) => {
+        e.stopPropagation();
+        if (userProfile?.data) {
+            router.push(`/booking/${serviceId}`);
+        } else {
+            setPendingServiceId(serviceId);
+            setAuthModalOpen(true);
+        }
+    };
+
+    const handleAuthSuccess = () => {
+        if (pendingServiceId) {
+            router.push(`/booking/${pendingServiceId}`);
+        }
+    };
 
     return (
         <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-auto">
+            {/* Auth Dialog */}
+            <AuthDialog 
+                open={authModalOpen} 
+                onOpenChange={setAuthModalOpen} 
+                onSuccess={handleAuthSuccess} 
+            />
             {data.map((service) => (
                 <div 
                     key={service.id}
@@ -49,18 +77,16 @@ export const SubCategories = ({ data, category }: { data: SubCategoryProps[], ca
                             <h3 className="text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition tracking-tight">
                                 {service.name}
                             </h3>
-                            <p className="text-sm text-gray-500 mt-2 line-clamp-3">
-                                {service.description}
-                            </p>
+                            <p 
+                                className="text-sm text-gray-500 mt-2 line-clamp-3"
+                                dangerouslySetInnerHTML={{ __html: service.description || "" }}
+                            />
                         </Link>
 
                         {/* Button */}
                         <button 
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                router.push(`/booking/${service.id}`);
-                            }}
-                            className="w-full rounded-xl bg-[#020817] hover:bg-gray-400 hover:text-gray-200 px-4 py-2 text-sm font-semibold text-white transition-all duration-300 hover:bg-[#0b1224] hover:shadow-lg mt-3"
+                            onClick={(e) => handleBookNow(e, service.id)}
+                            className="w-full rounded-xl bg-[#236b9d] px-4 py-2 text-sm font-semibold text-white transition-all duration-300 hover:bg-[#1a4f75] hover:shadow-lg mt-3"
                         >
                             {service.buttonText}
                         </button>

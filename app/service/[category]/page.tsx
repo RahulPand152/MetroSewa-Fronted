@@ -71,9 +71,10 @@ const page = () => {
                     <h1 className="md:text-4xl text-2xl font-bold  text-slate-900 capitalize mb-4">
                         {categoryInfo?.name || "Category"} Services
                     </h1>
-                    <p className="md:text-lg text-base text-slate-600 max-w-2xl mx-auto">
-                        {categoryInfo?.description || `Explore our professional services.`}
-                    </p>
+                    <div 
+                        className="md:text-lg text-base text-slate-600 max-w-2xl mx-auto"
+                        dangerouslySetInnerHTML={{ __html: categoryInfo?.description || `Explore our professional services.` }}
+                    />
                 </div>
 
                 {mappedServices.length > 0 ? (

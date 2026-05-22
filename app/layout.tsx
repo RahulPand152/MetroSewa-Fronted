@@ -107,7 +107,7 @@ export default function RootLayout({
         <Script
           src="https://intellidocs.tech/embed.js"
           data-chatbot-id="cmnubxxo2000tnz01nzqj0d1a"
-          data-api-key="ocr_f6bff41b9a4631be97bd8f1dbcf4870b557664d2d8eeac7c1244f633c67be0a5"
+          data-api-key="ocr_fe1f78eb61e0fea8fcf535a16cc776e3d88d653b6c7e76f36cf4f9ad94d7379b"
           id="ocr-chatbot"
           strategy="lazyOnload"
         />
