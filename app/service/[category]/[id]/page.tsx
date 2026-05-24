@@ -110,7 +110,7 @@ export default function ServiceDetails() {
 
   const isPremium = service.isPremium || false;
   const price = service.price != null ? `NPR ${service.price}` : "Contact for Price";
-  const duration = service.duration || "Variable";
+  const duration = service.duration ? `${service.duration} ${service.durationUnit || 'Mins'}` : "";
 
   const reviewsCount = reviews?.length || 0;
   const rating = reviewsCount > 0 ? (reviews.reduce((acc: number, cur: any) => acc + cur.rating, 0) / reviewsCount).toFixed(1) : 0;

@@ -255,7 +255,7 @@ function ServicesContent() {
                             </span>
                           )}
                           {service.duration && (
-                            <span className="text-slate-400">{service.duration}</span>
+                            <span className="text-slate-400">{service.duration} {service.durationUnit || 'Mins'}</span>
                           )}
                         </div>
 
