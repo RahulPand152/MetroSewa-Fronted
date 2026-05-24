@@ -23,7 +23,7 @@ const STATUS_BADGE: Record<string, string> = {
     CANCELLED: "bg-rose-100 text-rose-700 border-rose-200",
 };
 
-function InfoRow({ label, value, icon: Icon }: { label: string; value: string; icon: any }) {
+function InfoRow({ label, value, icon: Icon }: { label: string; value: React.ReactNode; icon: any }) {
     return (
         <div className="flex items-start gap-3">
             <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center shrink-0 mt-0.5">
@@ -124,7 +124,7 @@ export default function AdminBookingDetailPage() {
                                 <InfoRow icon={MapPin} label="Service Address" value={booking.address || booking.user?.address || 'N/A'} />
                                 <InfoRow icon={Calendar} label="Scheduled Date" value={booking.scheduledDate ? formatBookingDate(d, "EEEE, MMMM d, yyyy") : 'N/A'} />
                                 <InfoRow icon={Clock} label="Scheduled Time" value={booking.scheduledDate ? format(d, "hh:mm a") : 'N/A'} />
-                                <InfoRow icon={Receipt} label="Service Price" value={`Rs. ${booking.service?.price || 0}`} />
+                                <InfoRow icon={Receipt} label="Service Price" value={`NPR ${booking.service?.price || 0}`} />
                             </div>
 
                             {booking.description && (

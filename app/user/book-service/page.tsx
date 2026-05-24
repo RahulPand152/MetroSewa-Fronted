@@ -186,7 +186,7 @@ export default function BookServicePage() {
 
                                         <div className="mt-auto pt-3 flex items-center justify-between gap-3">
                                             <span className="text-sm font-bold text-slate-800 dark:text-slate-100">
-                                                {service.price != null ? `Rs. ${service.price}` : "--"}
+                                                {service.price != null ? `NPR ${service.price}` : "--"}
                                             </span>
                                             <Link href={`/booking/${service.id}`} className="ml-auto">
                                                 <Button size="sm" className="bg-primary-hover hover:bg-primary-hover text-white text-xs h-8 px-4">

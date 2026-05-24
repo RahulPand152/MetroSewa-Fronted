@@ -95,7 +95,7 @@ function InfoRow({
   bg,
 }: {
   label: string;
-  value: string;
+  value: React.ReactNode;
   icon: any;
   iconColor?: string;
   bg?: string;
@@ -290,7 +290,7 @@ export default function BookingDetailPage() {
             iconColor="text-emerald-500"
             bg="bg-emerald-50 dark:bg-emerald-900/20"
             label="Service Price"
-            value={`NPR. ${booking.service?.price ?? "N/A"}`}
+            value={`NPR ${booking.service?.price ?? "N/A"}`}
           />
           <InfoRow
             icon={Receipt}

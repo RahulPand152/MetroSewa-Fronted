@@ -302,7 +302,7 @@ flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                         <div className="space-y-4">
                             <InfoRow icon={Calendar} label="Date" value={formatBookingDate(d, "EEEE, MMMM d, yyyy")} iconColor="text-blue-500" />
                             <InfoRow icon={Clock} label="Time" value={format(d, "hh:mm a")} iconColor="text-amber-500" />
-                            <InfoRow icon={Receipt} label="Service Pay Amount" value={`Rs. ${job.service?.price}`} iconColor="text-emerald-500" isBold />
+                            <InfoRow icon={Receipt} label="Service Pay Amount" value={`NPR ${job.service?.price}`} iconColor="text-emerald-500" isBold />
 
                             <div className="mt-2 p-4 rounded-xl border border-emerald-100 bg-emerald-50/50 flex flex-col gap-1">
                                 <span className="text-xs font-bold text-emerald-600 uppercase tracking-wide">Payment Status</span>

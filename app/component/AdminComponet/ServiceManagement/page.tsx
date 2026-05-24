@@ -133,7 +133,7 @@ function ServiceCard({ service, onEdit, onDelete, onToggle, isPending }: {
                     <div>
                         <p className="text-[10px] text-slate-400 font-medium">Starts from</p>
                         <p className={`text-base font-bold ${service.isActive ? "text-slate-900 dark:text-white" : "text-slate-400"}`}>
-                            {service.price != null ? `Rs. ${service.price.toLocaleString()}` : "—"}
+                            {service.price != null ? `NPR ${service.price.toLocaleString()}` : "—"}
                         </p>
                     </div>
                     <div className="flex gap-1">
@@ -298,9 +298,9 @@ function ServiceFormDialog({ open, onClose, editService, categories, onCreate, o
                     {/* Price + Duration */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Base Price (Rs.)</label>
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Base Price (NPR)</label>
                             <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">Rs.</span>
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">NPR</span>
                                 <Input type="number" placeholder="0" className="pl-10" value={price} onChange={e => setPrice(e.target.value)} />
                             </div>
                         </div>

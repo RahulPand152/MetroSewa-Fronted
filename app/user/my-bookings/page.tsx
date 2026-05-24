@@ -209,7 +209,7 @@ export default function MyBookingsPage() {
                                             {STATUS_LABELS[status] || status}
                                         </span>
                                         <span className="text-sm font-bold text-slate-700 dark:text-slate-300">
-                                            Rs. {b.service?.price ?? "—"}
+                                            NPR {b.service?.price ?? "—"}
                                         </span>
                                         <div className="flex items-center gap-1">
                                             {canCancel && (

@@ -772,7 +772,7 @@ export default function BookingWizardPage() {
                                         <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner ring-8 ring-emerald-50">
                                             <CheckCircle className="w-12 h-12 text-emerald-500" />
                                         </div>
-                                        <h2 className="md:text-3xl text-xl font-extrabold text-slate-900 mb-4">Booking Confirmed!</h2>
+                                        <h2 className="md:text-2xl text-xl font-extrabold text-slate-900 mb-4">Booking Confirmed!</h2>
                                         <p className="text-md md:text-lg text-slate-600 max-w-md mx-auto">
                                             Your service has been successfully booked and payment has been verified. Our technicians have been notified.
                                         </p>

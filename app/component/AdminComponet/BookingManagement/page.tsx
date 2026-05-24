@@ -333,7 +333,7 @@ export default function BookingManagement() {
                                                 {booking.paymentStatus}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 font-bold text-slate-700">Rs. {booking.amount}</td>
+                                        <td className="px-6 py-4 font-bold text-slate-700">NPR {booking.amount}</td>
                                         <td className="px-6 py-4 text-right">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
