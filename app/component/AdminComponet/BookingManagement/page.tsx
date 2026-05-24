@@ -226,7 +226,7 @@ export default function BookingManagement() {
                 <Card className="rounded-2xl border-slate-200">
                     <CardContent className="p-4 flex items-center gap-4 hover:bg-slate-50 transition-colors">
                         <div className="bg-purple-100 p-3 rounded-xl text-purple-600"><Clock3 className="h-5 w-5" /></div>
-                        <div><p className="text-xs font-semibold uppercase tracking-wider text-slate-500">In Progress</p><p className="text-2xl font-bold text-slate-900">{bookings.filter((b: any) => b.status === "IN_PROGRESS").length}</p></div>
+                        <div><p className="text-xs font-semibold uppercase tracking-wider text-slate-500"> Progress</p><p className="text-2xl font-bold text-slate-900">{bookings.filter((b: any) => b.status === "IN_PROGRESS").length}</p></div>
                     </CardContent>
                 </Card>
                 <Card className="rounded-2xl border-slate-200">

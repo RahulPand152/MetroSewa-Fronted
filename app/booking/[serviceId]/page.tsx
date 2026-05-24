@@ -772,15 +772,15 @@ export default function BookingWizardPage() {
                                         <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner ring-8 ring-emerald-50">
                                             <CheckCircle className="w-12 h-12 text-emerald-500" />
                                         </div>
-                                        <h2 className="text-4xl font-extrabold text-slate-900 mb-4">Booking Confirmed!</h2>
-                                        <p className="text-lg text-slate-600 max-w-md mx-auto">
+                                        <h2 className="md:text-3xl text-xl font-extrabold text-slate-900 mb-4">Booking Confirmed!</h2>
+                                        <p className="text-md md:text-lg text-slate-600 max-w-md mx-auto">
                                             Your service has been successfully booked and payment has been verified. Our technicians have been notified.
                                         </p>
 
                                         <div className="mt-8 max-w-sm mx-auto bg-slate-50 rounded-2xl border border-slate-200 p-6 shadow-sm">
                                             <p className="text-sm font-semibold uppercase tracking-widest text-slate-400 mb-2">Transaction / Booking ID</p>
                                             <p className="text-xl font-mono font-bold text-slate-800 tracking-wider">
-                                                {bookingResult?.id ? bookingResult.id.split("-")[0].toUpperCase() : "METRO-9AB2FDC"}
+                                                {bookingResult?.id ? bookingResult.id.replace(/-/g, "").substring(0, 8).toUpperCase() : "9AB2FDC0"}
                                             </p>
                                             <Separator className="my-4" />
                                             <div className="flex justify-between items-center text-sm">
@@ -789,7 +789,9 @@ export default function BookingWizardPage() {
                                             </div>
                                             <div className="flex justify-between items-center text-sm mt-2">
                                                 <span className="text-slate-500">Amount</span>
-                                                <span className="font-bold text-purple-700">{displayPrice}</span>
+                                                <span className="font-bold text-purple-700">
+                                                    {bookingResult?.amount ? `NPR ${bookingResult.amount.toLocaleString()}` : displayPrice}
+                                                </span>
                                             </div>
                                             <div className="flex justify-between items-center text-sm mt-2">
                                                 <span className="text-slate-500">Payment Status</span>
@@ -802,19 +804,22 @@ export default function BookingWizardPage() {
                                                     {bookingResult?.paymentStatus || "Paid"}
                                                 </span>
                                             </div>
-                                            {bookingResult?.transactionId && (
+                                            {/* {bookingResult?.transactionId && (
                                                 <div className="flex justify-between items-center text-sm mt-2">
                                                     <span className="text-slate-500">Transaction</span>
                                                     <span className="font-mono text-xs text-slate-600">
                                                         {bookingResult.transactionId.substring(0, 12)}...
                                                     </span>
                                                 </div>
-                                            )}
+                                            )} */}
                                         </div>
 
-                                        <div className="mt-10">
+                                        <div className="mt-10 flex gap-4 justify-center">
                                             <Button size="lg" className="bg-slate-900 hover:bg-slate-800 rounded-full px-8" onClick={() => router.push('/')}>
                                                 Back to Home
+                                            </Button>
+                                            <Button size="lg" onClick={() => router.push("/user/my-bookings")} className="bg-accent hover:bg-accent-hover text-white rounded-full px-8 shadow-md">
+                                                View Bookings
                                             </Button>
                                         </div>
                                     </div>
@@ -850,15 +855,15 @@ export default function BookingWizardPage() {
 
                             {step < 3 ? (
                                 <Button
-                                    className="bg-primary hover:bg-primary-active text-white px-8 rounded-full shadow-sm"
+                                    className="bg-accent hover:bg-accent-hover text-white px-8 rounded-full shadow-md hover:shadow-lg transition-all font-semibold disabled:opacity-70"
                                     onClick={handleNextStep}
                                     disabled={step === 1 && !isStep1Valid}
                                 >
-                                    Proceed <ArrowRight className="w-4 h-4 ml-2" />
+                                    Continue
                                 </Button>
                             ) : (
                                 <Button
-                                    className="bg-emerald-500 hover:bg-emerald-600 px-10 rounded-full shadow-sm text-lg font-bold disabled:opacity-70"
+                                    className="bg-accent hover:bg-accent-hover text-white px-8 rounded-full shadow-md hover:shadow-lg transition-all font-semibold disabled:opacity-70"
                                     onClick={handleConfirmBooking}
                                     disabled={isSubmitting}
                                 >
@@ -869,8 +874,7 @@ export default function BookingWizardPage() {
                                         </>
                                     ) : (
                                         <>
-                                            {paymentMethod === 'KHALTI' ? 'Pay & Book' : 'Confirm Booking'}
-                                            <ShieldCheck className="w-5 h-5 ml-2" />
+                                            Confirm Booking
                                         </>
                                     )}
                                 </Button>

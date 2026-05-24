@@ -115,13 +115,22 @@ function BatchCheckoutContent() {
                 const data = res.data?.data || res.data;
 
                 if (res.status === 200) {
+                    const savedAmount = localStorage.getItem("lastCheckoutAmount");
+                    const savedServices = localStorage.getItem("lastCheckoutServices");
+                    const amountToUse = totalAmount > 0 ? totalAmount : (savedAmount ? Number(savedAmount) : 0);
+                    const namesToUse = items.length > 0 ? items.map(i => i.serviceName).join(", ") : (savedServices || "Services");
+
                     setBookingResult({
                         id: transaction_id || pidx, // Using pidx as proxy for multi-id order
                         paymentStatus: "PAID",
                         transactionId: transaction_id || pidx,
                         khaltiStatus: "Completed",
+                        amount: amountToUse,
+                        serviceNames: namesToUse
                     })
                     clearCart()
+                    localStorage.removeItem("lastCheckoutAmount")
+                    localStorage.removeItem("lastCheckoutServices")
                     toast.success("Batch Payment verified successfully! Bookings confirmed.")
                 } else {
                     setPaymentError("Payment verification returned unexpected status.")
@@ -139,7 +148,7 @@ function BatchCheckoutContent() {
             setPaymentError(`Payment status: ${status}.`)
         }
         setIsVerifyingPayment(false)
-    }, [searchParams, isVerifyingPayment, bookingResult, clearCart])
+    }, [searchParams, isVerifyingPayment, bookingResult, clearCart, items, totalAmount])
 
     useEffect(() => {
         handleKhaltiCallback()
@@ -230,6 +239,10 @@ function BatchCheckoutContent() {
                     }
                 };
 
+                // Save cart details before redirecting
+                localStorage.setItem("lastCheckoutAmount", totalAmount.toString());
+                localStorage.setItem("lastCheckoutServices", items.map(i => i.serviceName).join(", "));
+
                 const res = await axiosInstance.post("/payment/initiate-batch", initiatePayload);
                 const data = res.data?.data;
 
@@ -251,7 +264,8 @@ function BatchCheckoutContent() {
                     id: bookingIds[0], // Display one as ref
                     paymentStatus: "Pending",
                     transactionId: "COD",
-                    amount: totalAmount
+                    amount: totalAmount,
+                    serviceNames: items.map(i => i.serviceName).join(", ")
                 });
                 clearCart() // empty cart after placing order
                 setStep(4);
@@ -274,7 +288,9 @@ function BatchCheckoutContent() {
                     <button onClick={() => router.push("/cart")} className="flex items-center gap-2 text-sm text-slate-500 hover:text-primary transition mb-6">
                         <ArrowLeft className="w-4 h-4" /> Back to Cart
                     </button>
-                    <h1 className="text-3xl font-bold text-slate-900">Checkout Cart</h1>
+                    <h1 className="text-3xl font-bold text-slate-900">
+                        Book {items.length > 0 ? items.map(i => i.serviceName).join(', ') : 'Services'}
+                    </h1>
                     <p className="text-slate-500 mt-2">Complete the checkout wizard to finalize all your selected services.</p>
                 </div>
 
@@ -577,11 +593,53 @@ function BatchCheckoutContent() {
 
                                 {!isVerifyingPayment && bookingResult && (
                                     <div>
-                                        <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner ring-8 ring-emerald-50"><CheckCircle className="w-12 h-12 text-emerald-500" /></div>
-                                        <h2 className="text-3xl font-bold text-slate-900 mb-4">Batch Checkout Confirmed!</h2>
-                                        <p className="text-lg text-slate-600 max-w-md mx-auto">All of your selected services have been successfully booked. Our technicians have been notified.</p>
-                                        <div className="flex mt-8 gap-4 justify-center">
-                                            <Button onClick={() => router.push("/user/my-bookings")} className="bg-accent hover:bg-accent-hover">View My Bookings</Button>
+                                        <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner ring-8 ring-emerald-50">
+                                            <CheckCircle className="w-12 h-12 text-emerald-500" />
+                                        </div>
+                                        <h2 className="md:text-2xl text-xl font-extrabold text-slate-900 mb-4">Booking Confirmed!</h2>
+                                        <p className="md:text-lg text-sm text-slate-600 max-w-md mx-auto">
+                                            All of your selected services have been successfully booked and payment has been verified. Our technicians have been notified.
+                                        </p>
+
+                                        <div className="mt-8 max-w-sm mx-auto bg-slate-50 rounded-2xl border border-slate-200 p-6 shadow-sm">
+                                            <p className="text-sm font-semibold uppercase tracking-widest text-slate-400 mb-2">Transaction / Booking ID</p>
+                                            <p className="text-xl font-mono font-bold text-slate-800 tracking-wider">
+                                                {bookingResult?.id ? bookingResult.id.replace(/-/g, "").substring(0, 8).toUpperCase() : "9AB2FDC0"}
+                                            </p>
+                                            <Separator className="my-4" />
+                                            <div className="flex justify-between items-center text-sm">
+                                                <span className="text-slate-500">Service</span>
+                                                <span className="font-bold text-slate-800 text-right max-w-[60%]">
+                                                    {bookingResult?.serviceNames || (items.length > 0 ? items.map(i => i.serviceName).join(", ") : "Services")}
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-sm mt-2">
+                                                <span className="text-slate-500">Amount</span>
+                                                <span className="font-bold text-purple-700">
+                                                    {bookingResult?.amount ? `NPR ${bookingResult.amount.toLocaleString()}` : displayPrice}
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-sm mt-2">
+                                                <span className="text-slate-500">Payment Status</span>
+                                                <span className={cn(
+                                                    "font-bold px-2 py-0.5 rounded text-xs uppercase",
+                                                    (bookingResult?.paymentStatus || "Paid").toString().toLowerCase().includes("pending")
+                                                        ? "text-red-600 bg-red-100"
+                                                        : "text-emerald-600 bg-emerald-100"
+                                                )}>
+                                                    {bookingResult?.paymentStatus || "Paid"}
+                                                </span>
+                                            </div>
+
+                                        </div>
+
+                                        <div className="mt-10 flex gap-4 justify-center">
+                                            <Button size="lg" className="bg-slate-900 hover:bg-slate-800 rounded-full px-8 text-white" onClick={() => router.push('/')}>
+                                                Back to Home
+                                            </Button>
+                                            <Button size="lg" onClick={() => router.push("/user/my-bookings")} className="bg-accent hover:bg-accent-hover text-white rounded-full px-8 shadow-md">
+                                                View Bookings
+                                            </Button>
                                         </div>
                                     </div>
                                 )}
@@ -594,8 +652,8 @@ function BatchCheckoutContent() {
                             <Button variant="ghost" className="text-slate-500 hover:text-slate-800 font-medium" onClick={() => (step === 1 ? router.push("/cart") : setStep(s => s - 1))} disabled={isSubmitting}>
                                 {step === 1 ? "Cancel" : "Back"}
                             </Button>
-                            <Button className="bg-accent hover:bg-accent-hover text-white px-8 rounded-full shadow-md hover:shadow-lg transition-all font-semibold" onClick={step < 3 ? handleNextStep : handleConfirmBooking} disabled={isSubmitting}>
-                                {isSubmitting ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing...</> : step === 3 ? "Confirm & Pay" : "Continue"}
+                            <Button className="bg-accent hover:bg-accent-hover text-white px-8 rounded-full shadow-md hover:shadow-lg transition-all font-semibold disabled:opacity-70" onClick={step < 3 ? handleNextStep : handleConfirmBooking} disabled={isSubmitting}>
+                                {isSubmitting ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing...</> : step === 3 ? "Confirm Booking" : "Continue"}
                             </Button>
                         </div>
                     )}
