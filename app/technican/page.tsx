@@ -299,7 +299,7 @@ export default function TechnicanDashboard() {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3 flex-shrink-0 mt-3 sm:mt-0">
-                                    <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Rs. {job.totalAmount || job.service?.price || 0}</span>
+                                    <span className="text-sm font-bold text-slate-700 dark:text-slate-300">NPR {job.totalAmount || job.service?.price || 0}</span>
                                     <Button size="sm" className="bg-primary hover:bg-primary-active text-white rounded-xl shadow-sm text-xs px-4 pointer-events-none">
                                         View Details
                                     </Button>

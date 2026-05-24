@@ -21,7 +21,7 @@ export const ServicePage = () => {
   const { data: userProfile } = useProfile();
   const router = useRouter();
   const { addItem, isInCart } = useCart();
-  
+
   const isEligibleToBook =
     userProfile?.data?.role !== "ADMIN" && userProfile?.data?.role !== "TECHNICIAN";
 
@@ -30,7 +30,7 @@ export const ServicePage = () => {
       router.push("/signin");
       return;
     }
-    
+
     addItem({
       serviceId: svc.id,
       serviceName: svc.name,
@@ -106,12 +106,12 @@ export const ServicePage = () => {
                           {svc.name}
                         </h3>
                         <p
-                          className="mt-2 text-sm leading-relaxed text-slate-500 line-clamp-2"
+                          className="mt-2 text-sm leading-relaxed text-slate-500 line-clamp-3"
                           dangerouslySetInnerHTML={{ __html: svc.description ?? "" }}
                         />
                         {svc.price != null && (
-                          <p className="mt-2 text-sm font-semibold text-primary">
-                            Rs. {svc.price}
+                          <p className="mt-2 text-sm font-semibold text-accent">
+                            NPR {svc.price}
                           </p>
                         )}
 
@@ -123,11 +123,10 @@ export const ServicePage = () => {
                             <button
                               onClick={() => handleAddToCart(svc)}
                               title={inCart ? "Already in cart" : "Add to cart"}
-                              className={`flex-1 rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-1 ${
-                                inCart
-                                  ? "bg-emerald-500 text-white cursor-default"
-                                  : "bg-primary hover:bg-primary-active text-white"
-                              }`}
+                              className={`flex-1 rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-1 ${inCart
+                                ? "bg-accent text-white cursor-default"
+                                : "bg-primary hover:bg-primary-active text-white"
+                                }`}
                             >
                               <ShoppingCart className="w-4 h-4" />
                               {inCart ? "Added" : "Add Book"}

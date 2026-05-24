@@ -255,15 +255,15 @@ function ServicesContent() {
                             </span>
                           )}
                           {service.duration && (
-                            <span className="text-slate-400">{service.duration}</span>
+                            <span className="text-slate-400">{service.duration} {service.durationUnit || 'Mins'}</span>
                           )}
                         </div>
 
                         {/* Price + Action buttons */}
                         <div className="mt-auto pt-3">
                           <div className="flex items-center justify-between mb-3">
-                            <span className="text-sm font-bold text-slate-800">
-                              {service.price != null ? `Rs. ${service.price}` : "--"}
+                            <span className="text-sm font-bold text-accent">
+                              {service.price != null ? `NPR ${service.price}` : "--"}
                             </span>
                           </div>
                           {/* Add Book + Book Now — hidden for Admin/Technician */}
@@ -276,7 +276,7 @@ function ServicesContent() {
                                 <button
                                   onClick={() => handleOpenCart(service)}
                                   className={`flex-1 rounded-lg px-3 py-2 text-xs font-semibold transition-all flex items-center justify-center gap-1 ${inCart
-                                    ? "bg-emerald-500 text-white"
+                                    ? "bg-accent text-white"
                                     : "bg-primary hover:bg-primary-active text-white"
                                     }`}
                                 >

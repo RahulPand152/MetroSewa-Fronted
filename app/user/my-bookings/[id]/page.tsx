@@ -95,7 +95,7 @@ function InfoRow({
   bg,
 }: {
   label: string;
-  value: string;
+  value: React.ReactNode;
   icon: any;
   iconColor?: string;
   bg?: string;
@@ -223,9 +223,9 @@ export default function BookingDetailPage() {
           return (
             <div className="fixed inset-0 z-50 flex sm:items-end sm:justify-end bg-white dark:bg-slate-900 sm:bg-black/40 sm:pr-6 sm:pb-6">
               <div className="w-full h-full sm:w-[400px] sm:h-[500px] bg-white dark:bg-slate-900 sm:rounded-2xl shadow-2xl flex flex-col border-0 sm:border border-slate-200 dark:border-slate-700 overflow-hidden animate-in slide-in-from-bottom-5 relative">
-                
+
                 {/* Close Button Absolute */}
-                <button 
+                <button
                   onClick={() => setIsChatOpen(false)}
                   className="absolute top-4 right-4 z-10 w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-colors"
                 >
@@ -252,8 +252,8 @@ export default function BookingDetailPage() {
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
-            {/* <p className="text-xs text-slate-400 font-medium mb-1">Booking ID</p> */}
-            {/* <p className="font-mono text-xs text-slate-500 dark:text-slate-400">{booking.id}</p> */}
+            <p className="text-xs text-slate-400 font-medium mb-1">Booking ID</p>
+            <p className="font-mono text-xs text-slate-500 dark:text-slate-400">{booking.id?.replace(/-/g, "").substring(0, 8).toUpperCase()}</p>
             <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 mt-2">
               {booking.service?.name}
             </h1>
@@ -290,7 +290,7 @@ export default function BookingDetailPage() {
             iconColor="text-emerald-500"
             bg="bg-emerald-50 dark:bg-emerald-900/20"
             label="Service Price"
-            value={`Rs. ${booking.service?.price ?? "N/A"}`}
+            value={`NPR ${booking.service?.price ?? "N/A"}`}
           />
           <InfoRow
             icon={Receipt}
@@ -342,11 +342,10 @@ export default function BookingDetailPage() {
                   >
                     <div
                       className={`absolute left-0 w-8 h-8 rounded-full flex items-center justify-center border-2 z-10 transition-all
-                                            ${
-                                              isDone
-                                                ? step.color
-                                                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-400"
-                                            } ${isCurrent ? `ring-4 ${step.ring}` : ""}`}
+                                            ${isDone
+                          ? step.color
+                          : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-400"
+                        } ${isCurrent ? `ring-4 ${step.ring}` : ""}`}
                     >
                       {isDone ? (
                         <CheckCircle2 className="h-4 w-4" />

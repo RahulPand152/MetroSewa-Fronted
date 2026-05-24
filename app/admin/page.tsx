@@ -75,7 +75,7 @@ export default function AdminDashboard() {
     const statsData = dashboardStats ? [
         {
             title: "Total Revenue",
-            value: `Rs. ${dashboardStats.totalRevenue?.toLocaleString()}`,
+            value: `NPR ${dashboardStats.totalRevenue?.toLocaleString()}`,
             description: "Total booked amount",
             icon: DollarSign,
         },
@@ -312,7 +312,7 @@ export default function AdminDashboard() {
                                         <Badge variant={b.status === "COMPLETED" ? "default" : "secondary"} className="shadow-sm">
                                             {b.status}
                                         </Badge>
-                                        <p className="text-xs text-muted-foreground mt-1.5 font-medium">Rs. {b.amount || b.service?.price || 0}</p>
+                                        <p className="text-xs text-muted-foreground mt-1.5 font-medium">NPR {b.amount || b.service?.price || 0}</p>
                                     </div>
                                 </div>
                             )) : (

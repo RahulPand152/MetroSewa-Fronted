@@ -109,8 +109,8 @@ export default function ServiceDetails() {
   if (images.length === 0) images.push("https://picsum.photos/800/600"); // placeholder if missing
 
   const isPremium = service.isPremium || false;
-  const price = service.price != null ? `Rs. ${service.price}` : "Contact for Price";
-  const duration = service.duration || "Variable";
+  const price = service.price != null ? `NPR ${service.price}` : "Contact for Price";
+  const duration = service.duration ? `${service.duration} ${service.durationUnit || 'Mins'}` : "";
 
   const reviewsCount = reviews?.length || 0;
   const rating = reviewsCount > 0 ? (reviews.reduce((acc: number, cur: any) => acc + cur.rating, 0) / reviewsCount).toFixed(1) : 0;
@@ -275,7 +275,7 @@ export default function ServiceDetails() {
                     <p className="text-sm text-gray-500 uppercase tracking-wider font-medium">
                       Starting from
                     </p>
-                    <p className="text-4xl font-bold text-gray-900">{price}</p>
+                    <p className="text-4xl font-bold text-accent">{price}</p>
                   </div>
 
                   <div className="space-y-4">
@@ -304,7 +304,7 @@ export default function ServiceDetails() {
                         size="lg"
                         variant="outline"
                         className={`w-full rounded-full h-10 font-medium transition-all border-2 ${service && isInCart(service.id)
-                          ? "border-emerald-500 text-emerald-600 bg-emerald-50 hover:bg-emerald-100"
+                          ? "border-accent text-emerald-600 bg-emerald-50 hover:bg-emerald-100"
                           : "border-primary text-primary hover:bg-primary hover:text-white"
                           }`}
                         onClick={handleAddToCart}

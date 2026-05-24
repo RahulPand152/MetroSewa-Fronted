@@ -128,7 +128,7 @@ export default function MyJobsPage() {
                                         <div className="flex items-center gap-4 flex-shrink-0 sm:justify-end border-t sm:border-0 pt-3 sm:pt-0 mt-2 sm:mt-0">
                                             <div className="flex flex-col sm:text-right">
                                                 <span className="text-xs text-slate-400 uppercase font-semibold">Service Pay</span>
-                                                <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Rs. {job.service?.price}</span>
+                                                <span className="text-sm font-bold text-slate-700 dark:text-slate-300">NPR {job.service?.price}</span>
                                             </div>
                                             <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
                                                 <ChevronRight className="h-4 w-4" />
