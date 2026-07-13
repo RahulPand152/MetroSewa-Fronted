@@ -19,6 +19,8 @@ export const useGetTechnicians = () => {
             const response = await axiosInstance.get('/admin/technicians');
             return response.data.data;
         },
+        refetchInterval: 15000,
+        refetchIntervalInBackground: true,
     });
 };
 
@@ -48,8 +50,36 @@ export const useDeleteUser = () => {
     });
 };
 
-export type AdminService = any;
-export type ServiceImage = any;
+export type ServiceImage = {
+    id?: string;
+    url: string;
+    publicId?: string;
+    isMain?: boolean;
+};
+
+export type AdminService = {
+    id?: string;
+    name: string;
+    description?: string | null;
+    price?: number | null;
+    duration?: number | null;
+    durationUnit?: string | null;
+    isActive: boolean;
+    images: ServiceImage[];
+    categoryId?: string | null;
+    subCategoryId?: string | null;
+    category?: {
+        id?: string;
+        name?: string;
+        icon?: string | null;
+    } | null;
+    subCategory?: {
+        id?: string;
+        name?: string;
+    } | null;
+    createdAt?: string;
+    updatedAt?: string;
+};
 
 export const useGetCategories = () => {
     return useQuery({
@@ -157,6 +187,8 @@ export const useGetBookings = () => {
             const response = await axiosInstance.get('/admin/bookings');
             return response.data.data;
         },
+        refetchInterval: 15000,
+        refetchIntervalInBackground: true,
     });
 };
 
@@ -167,14 +199,16 @@ export const useGetAdminBookingById = (bookingId: string) => {
             // Fetch all bookings and find the specific one by ID since
             // the backend might not have a dedicated GET /admin/bookings/:id endpoint
             const response = await axiosInstance.get('/admin/bookings');
-            const allBookings = response.data.data || [];
-            const booking = allBookings.find((b: any) => b.id === bookingId);
+            const allBookings = (response.data.data || []) as any[];
+            const booking = allBookings.find((b) => b.id === bookingId);
             if (!booking) {
                 throw new Error("Booking not found");
             }
             return booking;
         },
         enabled: !!bookingId,
+        refetchInterval: 15000,
+        refetchIntervalInBackground: true,
     });
 };
 
@@ -187,6 +221,7 @@ export const useUpdateBookingStatus = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin', 'bookings'] });
+            queryClient.invalidateQueries({ queryKey: ['admin', 'technicians'] });
             toast.success("Booking status updated successfully");
         },
     });
@@ -213,7 +248,7 @@ export const useAssignTechnician = () => {
     return useMutation({
         mutationFn: async ({ bookingId, technicianId }: { bookingId: string; technicianId: string }) => {
             // Note: Update to use standard path patterns, try /assign or similar if admin/assign-technician fails:
-            const response = await axiosInstance.post(`/admin/bookings/${bookingId}/assign`, { technicianId }).catch(async (err) => {
+            const response = await axiosInstance.post(`/admin/bookings/${bookingId}/assign`, { technicianId }).catch(async () => {
                  // Fallback to the original route if parameter-based path fails:
                  const res = await axiosInstance.post('/admin/assign-technician', { bookingId, technicianId });
                  return res;
@@ -222,6 +257,7 @@ export const useAssignTechnician = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin', 'bookings'] });
+            queryClient.invalidateQueries({ queryKey: ['admin', 'technicians'] });
             toast.success('Technician assigned successfully!');
         },
         onError: () => {

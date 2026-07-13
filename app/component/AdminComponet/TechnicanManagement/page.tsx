@@ -48,7 +48,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { useGetTechnicians, useApproveTechnician } from "@/src/hooks/useAdmin";
+import { useGetTechnicians, useApproveTechnician, useGetBookings } from "@/src/hooks/useAdmin";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 
@@ -146,14 +146,26 @@ function SortHeader({ label, field, sortField, sortDir, onSort }: { label: strin
 
 // ─── Profile Popup ────────────────────────────────────────────────────────────
 function TechnicianProfilePopup({
-    technician, open, onClose,
+    technician, open, onClose, allBookings = []
 }: {
     technician: Technician | null;
     open: boolean;
     onClose: () => void;
+    allBookings?: any[];
 }) {
     if (!technician) return null;
     const name = `${technician.user.firstName} ${technician.user.lastName}`;
+
+    const activeJobs = allBookings.filter(b => 
+        b.technicians?.some((t: any) => t.id === technician.id || t.userId === technician.user.id) &&
+        ["PENDING", "ASSIGNED", "IN_PROGRESS"].includes((b.status || "").toUpperCase())
+    ).length;
+
+    const completedJobs = allBookings.filter(b => 
+        b.technicians?.some((t: any) => t.id === technician.id || t.userId === technician.user.id) &&
+        (b.status || "").toUpperCase() === "COMPLETED"
+    ).length;
+
     return (
         <Dialog open={open} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
@@ -193,10 +205,22 @@ function TechnicianProfilePopup({
                         value={typeof technician.rating === 'number' ? `${technician.rating.toFixed(1)} Stars` : "New"}
                     />
                     <InfoRow
-                        icon={<Wrench className="h-4 w-4 text-slate-400" />}
+                        icon={<Briefcase className="h-4 w-4 text-slate-400" />}
                         label="Expertise"
                         value={technician.skills || technician.expertise?.replace(/_/g, " ") || "-"}
                     />
+                    <div className="grid grid-cols-2 gap-4">
+                        <InfoRow
+                            icon={<Briefcase className="h-4 w-4 text-slate-400" />}
+                            label="Active Jobs"
+                            value={activeJobs.toString()}
+                        />
+                        <InfoRow
+                            icon={<Briefcase className="h-4 w-4 text-slate-400" />}
+                            label="Completed Jobs"
+                            value={completedJobs.toString()}
+                        />
+                    </div>
                     <InfoRow
                         icon={<Calendar className="h-4 w-4 text-slate-400" />}
                         label="Joined Date"
@@ -279,6 +303,7 @@ function TechnicianActionMenu({
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function TechnicianManagement() {
     const { data: technicians = [], isLoading } = useGetTechnicians();
+    const { data: allBookings = [] } = useGetBookings();
 
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("All");
@@ -414,7 +439,11 @@ export default function TechnicianManagement() {
                                     </tr>
                                 ) : (
                                     paginated.map((tech: Technician) => (
-                                        <tr key={tech.id} className="border-b hover:bg-muted/50 transition-colors">
+                                        <tr 
+                                            key={tech.id} 
+                                            className="border-b hover:bg-muted/50 transition-colors cursor-pointer"
+                                            onClick={() => { setProfileTech(tech); setProfileOpen(true); }}
+                                        >
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-3">
                                                     <TechnicianAvatar technician={tech} />
@@ -440,7 +469,7 @@ export default function TechnicianManagement() {
                                             <td className="px-6 py-4">
                                                 {new Date(tech.createdAt).toLocaleDateString("en-NP")}
                                             </td>
-                                            <td className="px-6 py-4 text-right">
+                                            <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
                                                 <TechnicianActionMenu
                                                     technician={tech}
                                                     onView={() => { setProfileTech(tech); setProfileOpen(true); }}
@@ -486,6 +515,7 @@ export default function TechnicianManagement() {
                 technician={profileTech}
                 open={profileOpen}
                 onClose={() => setProfileOpen(false)}
+                allBookings={allBookings}
             />
         </div>
     );

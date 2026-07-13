@@ -6,6 +6,7 @@ import { formatBookingDate } from "@/lib/utils";
 import { useGetBookings, useUpdateBookingStatus, useGetTechnicians, useAssignTechnician } from "@/src/hooks/useAdmin";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import {
     Search,
@@ -39,14 +40,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
+
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -142,6 +136,7 @@ export default function BookingManagement() {
     const [sortField, setSortField] = useState<SortField>(null);
     const [sortDir, setSortDir] = useState<SortDir>("asc");
     const [page, setPage] = useState(1);
+    const router = useRouter();
 
 
 
@@ -185,6 +180,10 @@ export default function BookingManagement() {
         updateStatus({ id, status: backendStatus });
     };
 
+    const handleViewDetails = (booking: any) => {
+        router.push(`/admin/bookings/${booking.id}`);
+    };
+
     if (isLoading) {
         return (
             <div className="flex flex-1 flex-col items-center justify-center h-[60vh]">
@@ -195,8 +194,8 @@ export default function BookingManagement() {
     }
 
     return (
-        <div className="flex flex-1 flex-col gap-6 p-6 max-w-full">
-            <div className="flex justify-between items-center">
+        <div className="flex flex-col h-[calc(100vh-5rem)] gap-5 p-2 max-w-full">
+            <div className="flex justify-between items-center shrink-0">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Booking Management</h1>
                     <p className="text-sm text-slate-500 mt-1">Track and manage all service appointments.</p>
@@ -204,7 +203,7 @@ export default function BookingManagement() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 shrink-0">
                 <Card className="rounded-2xl border-slate-200">
                     <CardContent className="p-4 flex items-center gap-4 hover:bg-slate-50 transition-colors">
                         <div className="bg-blue-100 p-3 rounded-xl text-blue-600"><Calendar className="h-5 w-5" /></div>
@@ -235,16 +234,16 @@ export default function BookingManagement() {
                         <div><p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Completed</p><p className="text-2xl font-bold text-slate-900">{bookings.filter((b: any) => b.status === "COMPLETED").length}</p></div>
                     </CardContent>
                 </Card>
-                <Card className="rounded-2xl border-slate-200">
+                {/* <Card className="rounded-2xl border-slate-200">
                     <CardContent className="p-4 flex items-center gap-4 hover:bg-slate-50 transition-colors">
                         <div className="bg-rose-100 p-3 rounded-xl text-rose-600"><AlertCircle className="h-5 w-5" /></div>
                         <div><p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Cancelled</p><p className="text-2xl font-bold text-slate-900">{bookings.filter((b: any) => b.status === "CANCELLED").length}</p></div>
                     </CardContent>
-                </Card>
+                </Card> */}
             </div>
 
             {/* Filters */}
-            <div className="flex flex-col sm:flex-row items-center gap-3 bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
+            <div className="flex flex-col sm:flex-row items-center gap-3 bg-white p-3 rounded-2xl border border-slate-200 shadow-sm shrink-0">
                 <div className="relative flex-1 w-full max-w-sm">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                     <Input placeholder="Search bookings..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} className="pl-9 h-10 border-slate-200" />
@@ -262,12 +261,12 @@ export default function BookingManagement() {
             </div>
 
             {/* Table */}
-            <Card className="border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-                <CardContent className="p-0">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
-                            <thead>
-                                <tr className="border-b bg-slate-50/50">
+            <Card className="border-slate-200 rounded-2xl shadow-sm overflow-hidden flex-1 flex flex-col min-h-0">
+                <CardContent className="p-0 flex flex-col flex-1 min-h-0">
+                    <div className="overflow-auto flex-1">
+                        <table className="w-full min-w-[1000px] text-sm">
+                            <thead className="sticky top-0 z-10 shadow-sm bg-slate-50">
+                                <tr className="border-b">
                                     <th className="px-6 py-4 text-left font-semibold text-slate-500">Booking ID</th>
                                     <th className="px-6 py-4 text-left font-semibold text-slate-500">
                                         <SortHeader label="Customer" field="customerName" sortField={sortField} sortDir={sortDir} onSort={handleSort} />
@@ -293,7 +292,11 @@ export default function BookingManagement() {
                                         </td>
                                     </tr>
                                 ) : paginated.map((booking: any) => (
-                                    <tr key={booking.id} className="hover:bg-slate-50 transition-colors group">
+                                    <tr
+                                        key={booking.id}
+                                        className="hover:bg-slate-50 transition-colors group cursor-pointer"
+                                        onClick={() => router.push(`/admin/bookings/${booking.id}`)}
+                                    >
                                         <td className="px-6 py-4">
                                             <span className="font-mono text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded">
                                                 {String(booking.id || "").substring(0, 8).toUpperCase()}
@@ -334,7 +337,7 @@ export default function BookingManagement() {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 font-bold text-slate-700">NPR {booking.amount}</td>
-                                        <td className="px-6 py-4 text-right">
+                                        <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 group-hover:text-slate-700">
@@ -344,10 +347,11 @@ export default function BookingManagement() {
                                                 <DropdownMenuContent side="bottom" align="end" className="w-48">
                                                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                                     <DropdownMenuSeparator />
-                                                    <DropdownMenuItem asChild className="cursor-pointer">
-                                                        <Link href={`/admin/bookings/${booking.id}`}>
-                                                            <Eye className="mr-2 h-4 w-4 text-slate-500" /> View Details & Assign
-                                                        </Link>
+                                                    <DropdownMenuItem
+                                                        className="cursor-pointer"
+                                                        onClick={() => handleViewDetails(booking)}
+                                                    >
+                                                        <Eye className="mr-2 h-4 w-4 text-slate-500" /> View Details & Assign
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     <DropdownMenuLabel className="text-xs text-slate-400">Update Status</DropdownMenuLabel>

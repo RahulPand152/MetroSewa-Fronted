@@ -49,17 +49,45 @@ const HomeSection = () => {
     event.preventDefault();
 
     const trimmedTitle = title.trim();
-    const searchUrl = trimmedTitle
-      ? `/services?search=${encodeURIComponent(trimmedTitle)}`
-      : "/services";
+    if (!trimmedTitle) {
+      router.push("/services");
+      return;
+    }
 
-    router.push(searchUrl);
+    const normalizedTitle = trimmedTitle.toLowerCase();
+    const matchedService = filteredServices.find(
+      (service: any) => service.name?.toLowerCase() === normalizedTitle
+    );
+
+    if (matchedService) {
+      router.push(
+        `/service/${matchedService.categoryId ?? "all"}/${matchedService.id}`
+      );
+      return;
+    }
+
+    const matchedCategory = filteredCategories.find(
+      (category: any) => category.name?.toLowerCase() === normalizedTitle
+    );
+
+    if (matchedCategory) {
+      router.push(`/service/${matchedCategory.id}`);
+      return;
+    }
+
+    router.push(`/services?search=${encodeURIComponent(trimmedTitle)}`);
   };
 
-  const handleSelectOption = (text: string) => {
-    setTitle(text);
+  const handleSelectCategory = (category: any) => {
+    setTitle(category.name);
     setShowDropdown(false);
-    router.push(`/services?search=${encodeURIComponent(text)}`);
+    router.push(`/service/${category.id}`);
+  };
+
+  const handleSelectService = (service: any) => {
+    setTitle(service.name);
+    setShowDropdown(false);
+    router.push(`/service/${service.categoryId ?? "all"}/${service.id}`);
   };
 
   return (
@@ -128,7 +156,7 @@ const HomeSection = () => {
 
             {/* Search Dropdown */}
             {showDropdown && title.trim().length > 0 && (
-              <div className="absolute top-16 left-0 right-0 z-30 mt-1 bg-white rounded-xl shadow-2xl border border-slate-100 overflow-hidden max-h-[300px] overflow-y-auto">
+              <div className="absolute left-0 right-0 top-full z-30 mt-2 max-h-75 overflow-y-auto overflow-hidden rounded-xl border border-slate-100 bg-white shadow-2xl">
                 {!hasResults ? (
                   <div className="p-4 text-center text-sm text-slate-500">
                     No services or categories found for &quot;{title}&quot;.
@@ -145,7 +173,7 @@ const HomeSection = () => {
                           {filteredCategories.map((c: any) => (
                             <li
                               key={`cat-${c.id}`}
-                              onClick={() => handleSelectOption(c.name)}
+                              onClick={() => handleSelectCategory(c)}
                               className="px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 cursor-pointer"
                             >
                               <div className="font-semibold">{c.name}</div>
@@ -176,7 +204,7 @@ const HomeSection = () => {
                           {filteredServices.map((s: any) => (
                             <li
                               key={`srv-${s.id}`}
-                              onClick={() => handleSelectOption(s.name)}
+                              onClick={() => handleSelectService(s)}
                               className="px-4 py-2 flex items-center justify-between hover:bg-slate-50 cursor-pointer"
                             >
                               <div className="flex flex-col">
