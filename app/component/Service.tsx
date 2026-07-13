@@ -13,6 +13,7 @@ import { useProfile } from "@/src/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { Loader2, ShoppingCart, Eye } from "lucide-react";
 import { useState } from "react";
+import { AuthDialog } from "@/components/AuthDialog";
 import { useCart } from "@/src/lib/cartContext";
 import { toast } from "sonner";
 
@@ -21,13 +22,16 @@ export const ServicePage = () => {
   const { data: userProfile } = useProfile();
   const router = useRouter();
   const { addItem, isInCart } = useCart();
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const [pendingService, setPendingService] = useState<any>(null);
 
   const isEligibleToBook =
     userProfile?.data?.role !== "ADMIN" && userProfile?.data?.role !== "TECHNICIAN";
 
   const handleAddToCart = (svc: any) => {
     if (!userProfile?.data) {
-      router.push("/signin");
+      setPendingService(svc);
+      setAuthDialogOpen(true);
       return;
     }
 
@@ -43,8 +47,30 @@ export const ServicePage = () => {
     toast.success(`"${svc.name}" added to your Cart!`);
   };
 
+  const handleAuthSuccess = () => {
+    if (!pendingService) return;
+
+    addItem({
+      serviceId: pendingService.id,
+      serviceName: pendingService.name,
+      serviceImage: pendingService.images?.[0]?.url,
+      price: pendingService.price ? Number(pendingService.price) : 0,
+      category: pendingService.categoryId,
+      selectedAttributes: {},
+      quantity: 1,
+    });
+    toast.success(`"${pendingService.name}" added to your Cart!`);
+    setPendingService(null);
+  };
+
   return (
     <div className="w-full pb-10">
+      <AuthDialog
+        open={authDialogOpen}
+        onOpenChange={setAuthDialogOpen}
+        onSuccess={handleAuthSuccess}
+      />
+
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-8">
           <span className="text-xl sm:text-xl md:text-2xl lg:text-3xl font-bold tracking-tight text-primary">
