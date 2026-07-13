@@ -207,7 +207,7 @@ function ServiceFormDialog({ open, onClose, editService, categories, onCreate, o
 
     const removeExisting = (img: ServiceImage) => {
         setExistingImages(imgs => imgs.filter(i => i.id !== img.id));
-        setRemovedImageIds(ids => [...ids, img.id]);
+        setRemovedImageIds(ids => img.id ? [...ids, img.id] : ids);
     };
 
     const handleSave = () => {
@@ -222,7 +222,7 @@ function ServiceFormDialog({ open, onClose, editService, categories, onCreate, o
         fd.append("isActive", String(isActive));
         newFiles.forEach(f => fd.append("images", f));
         removedImageIds.forEach(id => fd.append("removeImageIds", id));
-        if (editService) onUpdate(editService.id, fd);
+        if (editService) onUpdate(editService.id ?? "", fd);
         else onCreate(fd);
     };
 
@@ -765,7 +765,7 @@ export default function ServiceManagement() {
                             key={s.id} service={s}
                             onEdit={() => { setEditService(s); setFormOpen(true); }}
                             onDelete={() => setDeleteTarget(s)}
-                            onToggle={() => toggleService.mutate(s.id)}
+                            onToggle={() => toggleService.mutate(s.id ?? "")}
                             isPending={toggleService.isPending && toggleService.variables === s.id}
                         />
                     ))}
@@ -828,7 +828,7 @@ export default function ServiceManagement() {
                 open={!!deleteTarget}
                 name={deleteTarget?.name ?? ""}
                 onClose={() => setDeleteTarget(null)}
-                onConfirm={() => { if (deleteTarget) { deleteService.mutate(deleteTarget.id); setDeleteTarget(null); } }}
+                onConfirm={() => { if (deleteTarget) { deleteService.mutate(deleteTarget.id ?? ""); setDeleteTarget(null); } }}
                 isPending={isDeletePending}
             />
         </div>

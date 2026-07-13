@@ -13,13 +13,21 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { MoreHorizontal, Search, Mail, Phone, MessageSquare } from "lucide-react";
+import { MoreHorizontal, Search, Mail, Phone, MessageSquare, CalendarDays, BadgeInfo, MessageCircle } from "lucide-react";
+import type { ContactMessage } from "@/src/hooks/useContact";
 
 const STATUS_COLORS: Record<string, string> = {
     PENDING: "bg-yellow-100 text-yellow-700 border-yellow-200",
@@ -31,6 +39,8 @@ export default function UserInquiriesPage() {
     const { data: contacts, isLoading, refetch } = useGetContacts();
     const { mutate: updateStatus } = useUpdateContactStatus();
     const [search, setSearch] = useState("");
+    const [selectedContact, setSelectedContact] = useState<ContactMessage | null>(null);
+    const [isDetailOpen, setIsDetailOpen] = useState(false);
 
     const filtered = contacts?.filter((c) => {
         const q = search.toLowerCase();
@@ -43,6 +53,11 @@ export default function UserInquiriesPage() {
 
     const handleStatusChange = (id: string, status: string) => {
         updateStatus({ id, status }, { onSuccess: () => refetch() });
+    };
+
+    const handleViewDetails = (contact: ContactMessage) => {
+        setSelectedContact(contact);
+        setIsDetailOpen(true);
     };
 
     return (
@@ -106,7 +121,11 @@ export default function UserInquiriesPage() {
                             </TableRow>
                         ) : (
                             filtered?.map((contact) => (
-                                <TableRow key={contact.id} className="hover:bg-slate-50/60 transition-colors">
+                                <TableRow 
+                                    key={contact.id} 
+                                    className="hover:bg-slate-50/60 transition-colors cursor-pointer"
+                                    onClick={() => handleViewDetails(contact)}
+                                >
                                     <TableCell className="font-medium text-slate-900">
                                         {contact.fullName}
                                     </TableCell>
@@ -145,7 +164,7 @@ export default function UserInquiriesPage() {
                                             year: "numeric",
                                         })}
                                     </TableCell>
-                                    <TableCell className="text-right">
+                                    <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -153,6 +172,25 @@ export default function UserInquiriesPage() {
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
+                                                <DropdownMenuItem
+                                                    onClick={() => handleViewDetails(contact)}
+                                                    className="cursor-pointer"
+                                                >
+                                                    <BadgeInfo className="mr-2 h-4 w-4" />
+                                                    View Details
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem disabled className="cursor-default text-slate-400">
+                                                    <MessageCircle className="mr-2 h-4 w-4" />
+                                                    Quick Message View
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem disabled className="cursor-default text-slate-400">
+                                                    <CalendarDays className="mr-2 h-4 w-4" />
+                                                    {new Date(contact.createdAt).toLocaleDateString("en-US", {
+                                                        month: "short",
+                                                        day: "numeric",
+                                                        year: "numeric",
+                                                    })}
+                                                </DropdownMenuItem>
                                                 <DropdownMenuItem
                                                     onClick={() => handleStatusChange(contact.id, "PENDING")}
                                                     disabled={contact.status === "PENDING"}
@@ -180,6 +218,70 @@ export default function UserInquiriesPage() {
                     </TableBody>
                 </Table>
             </div>
+
+            <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
+                <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>Inquiry Details</DialogTitle>
+                        <DialogDescription>
+                            Full details for the selected user inquiry.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    {selectedContact && (
+                        <div className="space-y-5 pt-2">
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Name</p>
+                                    <p className="mt-1 text-sm font-medium text-slate-900">{selectedContact.fullName}</p>
+                                </div>
+                                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Status</p>
+                                    <Badge
+                                        variant="outline"
+                                        className={`mt-1 text-xs font-semibold ${STATUS_COLORS[selectedContact.status] ?? STATUS_COLORS.PENDING}`}
+                                    >
+                                        {selectedContact.status}
+                                    </Badge>
+                                </div>
+                                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Email</p>
+                                    <p className="mt-1 text-sm font-medium text-slate-900">{selectedContact.email}</p>
+                                </div>
+                                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Phone</p>
+                                    <p className="mt-1 text-sm font-medium text-slate-900">{selectedContact.phone || "-"}</p>
+                                </div>
+                            </div>
+
+                            <div className="rounded-xl border border-slate-200 bg-white p-4">
+                                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Subject</p>
+                                <p className="mt-1 text-sm font-medium text-slate-900">{selectedContact.title}</p>
+                            </div>
+
+                            <div className="rounded-xl border border-slate-200 bg-white p-4">
+                                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Message</p>
+                                <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">
+                                    {selectedContact.message}
+                                </p>
+                            </div>
+
+                            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Created At</p>
+                                <p className="mt-1 text-sm font-medium text-slate-900">
+                                    {new Date(selectedContact.createdAt).toLocaleString("en-US", {
+                                        month: "short",
+                                        day: "numeric",
+                                        year: "numeric",
+                                        hour: "numeric",
+                                        minute: "2-digit",
+                                    })}
+                                </p>
+                            </div>
+                        </div>
+                    )}
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
