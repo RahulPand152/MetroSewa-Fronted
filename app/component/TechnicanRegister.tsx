@@ -65,7 +65,7 @@ const EXPERTISE_OPTIONS = [
   "Electrical",
   "Computer/CCTV",
   "Painting",
-  "Moving",
+  "Appliance Repair",
   "Cleaning",
   "AC Repair",
   "Beauty & Salon",
@@ -232,9 +232,8 @@ export default function TechnicianRegistrationForm() {
                       onChange={(e) => handleOtpChange(e.target.value, i)}
                       onKeyDown={(e) => handleOtpKeyDown(e, i)}
                       onPaste={handleOtpPaste}
-                      className={`w-12 h-14 text-center text-2xl font-bold rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary bg-background-secondary ${
-                        otpError ? "border-red-500" : "border-gray-200"
-                      }`}
+                      className={`w-12 h-14 text-center text-2xl font-bold rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary bg-background-secondary ${otpError ? "border-red-500" : "border-gray-200"
+                        }`}
                     />
                     {i === 2 && (
                       <span className="mx-1 text-xl text-slate-300">-</span>
@@ -469,14 +468,14 @@ export default function TechnicianRegistrationForm() {
                                         onCheckedChange={(checked) => {
                                           return checked
                                             ? field.onChange([
-                                                ...field.value,
-                                                item,
-                                              ])
+                                              ...field.value,
+                                              item,
+                                            ])
                                             : field.onChange(
-                                                field.value?.filter(
-                                                  (value) => value !== item,
-                                                ),
-                                              );
+                                              field.value?.filter(
+                                                (value) => value !== item,
+                                              ),
+                                            );
                                         }}
                                       />
                                     </FormControl>

@@ -24,8 +24,10 @@ import {
     ChevronsUpDown,
     Eye,
     UserPlus,
-    Loader2
+    Loader2,
+    Download
 } from "lucide-react";
+import { toast } from "sonner";
 import {
     Card,
     CardContent,
@@ -175,6 +177,41 @@ export default function BookingManagement() {
         }
     };
 
+    const handleExport = () => {
+        if (filtered.length === 0) {
+            toast.error("No bookings to export");
+            return;
+        }
+
+        const headers = ["Booking ID", "Customer Name", "Customer Phone", "Service", "Date", "Time", "Technician", "Status", "Payment Status", "Amount"];
+        const csvData = filtered.map((b: any) => {
+            const customerPhone = b.user?.phoneNumber || "";
+            return [
+                `"${String(b.id || "").substring(0, 8).toUpperCase()}"`,
+                `"${b.customerName}"`,
+                `"${customerPhone}"`,
+                `"${b.serviceName}"`,
+                `"${b.date}"`,
+                `"${b.time}"`,
+                `"${b.technicianName || "Unassigned"}"`,
+                `"${b.status}"`,
+                `"${b.paymentStatus}"`,
+                b.amount
+            ].join(",");
+        });
+
+        const csvContent = [headers.join(","), ...csvData].join("\n");
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `bookings_export_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        toast.success("Bookings exported successfully");
+    };
+
     const handleStatusChange = async (id: string, status: string) => {
         let backendStatus = status.toUpperCase().replace(' ', '_');
         updateStatus({ id, status: backendStatus });
@@ -248,7 +285,7 @@ export default function BookingManagement() {
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                     <Input placeholder="Search bookings..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} className="pl-9 h-10 border-slate-200" />
                 </div>
-                <div className="w-full sm:w-auto">
+                <div className="w-full sm:w-auto flex flex-col sm:flex-row items-center gap-2">
                     <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }} className="h-10 w-full sm:w-40 rounded-md border border-slate-200 bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
                         <option value="All">All Status</option>
                         <option value="PENDING">Pending</option>
@@ -257,6 +294,10 @@ export default function BookingManagement() {
                         <option value="COMPLETED">Completed</option>
                         <option value="CANCELLED">Cancelled</option>
                     </select>
+                    <Button variant="outline" size="sm" onClick={handleExport} className="h-10 w-full sm:w-auto gap-2">
+                        <Download className="h-4 w-4" />
+                        <span>Export</span>
+                    </Button>
                 </div>
             </div>
 
