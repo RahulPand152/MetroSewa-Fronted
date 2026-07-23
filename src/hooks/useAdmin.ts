@@ -184,7 +184,7 @@ export const useGetBookings = () => {
     return useQuery({
         queryKey: ['admin', 'bookings'],
         queryFn: async () => {
-            const response = await axiosInstance.get('/admin/bookings');
+            const response = await axiosInstance.get('/admin/bookings?limit=1000');
             return response.data.data;
         },
         refetchInterval: 15000,
@@ -196,15 +196,8 @@ export const useGetAdminBookingById = (bookingId: string) => {
     return useQuery({
         queryKey: ['admin', 'bookings', bookingId],
         queryFn: async () => {
-            // Fetch all bookings and find the specific one by ID since
-            // the backend might not have a dedicated GET /admin/bookings/:id endpoint
-            const response = await axiosInstance.get('/admin/bookings');
-            const allBookings = (response.data.data || []) as any[];
-            const booking = allBookings.find((b) => b.id === bookingId);
-            if (!booking) {
-                throw new Error("Booking not found");
-            }
-            return booking;
+            const response = await axiosInstance.get(`/admin/bookings/${bookingId}`);
+            return response.data.data;
         },
         enabled: !!bookingId,
         refetchInterval: 15000,
@@ -249,9 +242,9 @@ export const useAssignTechnician = () => {
         mutationFn: async ({ bookingId, technicianId }: { bookingId: string; technicianId: string }) => {
             // Note: Update to use standard path patterns, try /assign or similar if admin/assign-technician fails:
             const response = await axiosInstance.post(`/admin/bookings/${bookingId}/assign`, { technicianId }).catch(async () => {
-                 // Fallback to the original route if parameter-based path fails:
-                 const res = await axiosInstance.post('/admin/assign-technician', { bookingId, technicianId });
-                 return res;
+                // Fallback to the original route if parameter-based path fails:
+                const res = await axiosInstance.post('/admin/assign-technician', { bookingId, technicianId });
+                return res;
             });
             return response.data;
         },

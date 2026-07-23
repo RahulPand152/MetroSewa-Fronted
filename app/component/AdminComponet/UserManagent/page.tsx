@@ -14,6 +14,7 @@ import {
     Calendar,
     Briefcase,
     AlertTriangle,
+    Download,
 } from "lucide-react";
 import {
     Card,
@@ -323,6 +324,38 @@ export default function UserManagement() {
         setPage(1);
     };
 
+    const handleExport = () => {
+        if (filtered.length === 0) {
+            toast.error("No users to export");
+            return;
+        }
+        
+        const headers = ["S.N", "First Name", "Last Name", "Email", "Phone", "Address", "Total Bookings", "Joined Date"];
+        const csvData = filtered.map((u: User, i: number) => {
+            return [
+                i + 1,
+                `"${u.firstName || ""}"`,
+                `"${u.lastName || ""}"`,
+                `"${u.email || ""}"`,
+                `"${u.phoneNumber || ""}"`,
+                `"${(u.address || "").replace(/"/g, '""')}"`,
+                u._count?.bookings || 0,
+                `"${new Date(u.createdAt).toLocaleDateString("en-NP")}"`
+            ].join(",");
+        });
+        
+        const csvContent = [headers.join(","), ...csvData].join("\n");
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `users_export_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        toast.success("Users exported successfully");
+    };
+
     const handleDelete = () => {
         if (!deleteUser) return;
 
@@ -394,6 +427,10 @@ export default function UserManagement() {
                             </CardDescription>
                         </div>
                         <div className="flex items-center gap-3">
+                            <Button variant="outline" size="sm" onClick={handleExport} className="h-9 gap-2">
+                                <Download className="h-4 w-4" />
+                                <span className="hidden sm:inline">Export</span>
+                            </Button>
                             {/* Search */}
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
